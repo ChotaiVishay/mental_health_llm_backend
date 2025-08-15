@@ -1,2 +1,2 @@
 # COMP30022-Group-30-Mental-Health-Services-with-LLM
-A prototype tool that helps people navigate and discuss mental health service listings.
+A Chat interface which helps users find mental health service providers suited to their needs and within their desired location.
