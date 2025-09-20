@@ -18,6 +18,5 @@ it('shows Start Chat and navigates (when logged in)', () => {
   );
 
   fireEvent.click(screen.getByText('Start Chat'));
-  // Assert something stable on the Chat screen:
   expect(screen.getByRole('textbox', { name: /message/i })).toBeInTheDocument();
 });

@@ -1,4 +1,3 @@
-// web/src/features/chat/sessionStore.ts
 export type Role = 'user' | 'assistant';
 export interface ChatMessage { id: string; role: Role; text: string; at: number }
 export interface ChatSession { messages: ChatMessage[] }
@@ -14,11 +13,21 @@ function read<T>(key: string): T | null {
     return null;
   }
 }
+
 function write<T>(key: string, v: T) {
-  try { localStorage.setItem(key, JSON.stringify(v)); } catch {}
+  try {
+    localStorage.setItem(key, JSON.stringify(v));
+  } catch {
+    // Intentionally ignore quota/private mode errors when persisting chat
+  }
 }
+
 function del(key: string) {
-  try { localStorage.removeItem(key); } catch {}
+  try {
+    localStorage.removeItem(key);
+  } catch {
+    // Intentionally ignore storage removal errors
+  }
 }
 
 export function loadPreloginChat(): ChatSession | null { return read<ChatSession>(PRE_KEY); }

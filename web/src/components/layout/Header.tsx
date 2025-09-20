@@ -19,7 +19,8 @@ export default function Header() {
           <NavLink to="/help" className={({ isActive }) => (isActive ? 'active' : undefined)}>
             Help &amp; Crisis
           </NavLink>
-          <NavLink to="/admin/login" className={({ isActive }) => (isActive ? 'active' : undefined)}>
+          {/* Go to the admin console; RequireAdmin will bounce to /admin/signin if not logged in */}
+          <NavLink to="/admin" className={({ isActive }) => (isActive ? 'active' : undefined)}>
             Admin
           </NavLink>
         </div>

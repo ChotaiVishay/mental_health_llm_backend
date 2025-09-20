@@ -1,20 +1,23 @@
 import { it, expect } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import App from '../../App';
-import { Providers } from '../../test-utils';
+import { MemoryRouter, Routes, Route } from 'react-router-dom';
+import { AuthProvider } from '@/auth/AuthContext';
+import Home from '@/pages/Home';
+import Chat from '@/pages/Chat';
 
-it('redirects to /login when starting chat while logged out', () => {
-  // Ensure logged-out baseline
-  localStorage.removeItem('sa_token');
-  localStorage.removeItem('sa_user');
-
+it('starts chat anonymously when logged out', () => {
   render(
-    <Providers router={{ initialEntries: ['/'] }}>
-      <App />
-    </Providers>
+    <MemoryRouter initialEntries={['/']}>
+      <AuthProvider>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/chat" element={<Chat />} />
+        </Routes>
+      </AuthProvider>
+    </MemoryRouter>
   );
 
   fireEvent.click(screen.getByText('Start Chat'));
-  // We should now be on the login page
-  expect(screen.getByText(/sign in/i)).toBeInTheDocument();
+  // We should be on the Chat page, not /login.
+  expect(screen.getByRole('textbox', { name: /message/i })).toBeInTheDocument();
 });

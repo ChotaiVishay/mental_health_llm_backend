@@ -1,94 +1,65 @@
-import { useState } from 'react';
-import Card from '@/components/ui/Card';
-import Button from '@/components/ui/Button';
 import { useNavigate } from 'react-router-dom';
-import SupportedLangNote from '@/components/misc/SupportedLangNote';
-import Title from '@/components/misc/Title';
-
-import { useAuth } from '@/auth/AuthContext';
-import { setReturnTo } from '@/auth/storage';
 import { savePreloginChat } from '@/features/chat/sessionStore';
 
 export default function Home() {
   const nav = useNavigate();
-  const { user, signInWith } = useAuth() as {
-    user: unknown;
-    // adapt to your auth client; `signInWith('google')` is a placeholder
-    signInWith?: (provider: string) => Promise<void>;
+
+  const start = (seed?: string) => {
+    if (seed) {
+      // Pre-seed the anonymous store with the first user message.
+      const now = Date.now();
+      savePreloginChat({
+        messages: [
+          { id: `u_${now}`, role: 'user', text: seed, at: now },
+        ],
+      });
+    }
+    nav('/chat');
   };
 
-  // Optional first message the user may type before logging in.
-  const [draft, setDraft] = useState('');
-
-  async function onStartChat() {
-    // If the user isn't authenticated yet, cache their first message (optional)
-    // and remember where to send them after authentication.
-    if (!user) {
-      const text = draft.trim();
-      if (text) {
-        savePreloginChat({
-          messages: [
-            { id: crypto.randomUUID(), role: 'user', text, at: Date.now() }
-          ]
-        });
-      }
-
-      // Remember to return to /chat after auth completes
-      setReturnTo('/chat');
-
-      // Kick off your sign-in flow. If your AuthContext uses a different
-      // method or provider, replace this line accordingly.
-      if (typeof signInWith === 'function') {
-        await signInWith('google');
-      } else {
-        // Fallback: navigate to a generic sign-in route if you have one.
-        // Adjust to your project’s actual sign-in path.
-        nav('/admin/signin');
-      }
-      return;
-    }
-
-    // Already signed in → go straight to chat
-    nav('/chat');
-  }
-
   return (
-    <>
-      <Title value="Support Atlas Assistant — Home" />
-      <h1 style={{ marginTop: 0 }}>Support Atlas Assistant</h1>
-      <p style={{ color: '#6B7280', maxWidth: 720 }}>
-        Chat with our assistant to find mental health services and answers fast.
+    <section className="hero" style={{ paddingBlock: 24 }}>
+      <h1 className="h1" style={{ marginTop: 0 }}>Support Atlas Assistant</h1>
+      <p className="lead" style={{ maxWidth: 720 }}>
+        Find mental health services and answers fast — chat anonymously, sign in later to save.
       </p>
 
-      <Card>
-        <h2 style={{ marginTop: 0 }}>Start a conversation</h2>
-        <p style={{ color: '#6B7280' }}>
-          You’ll be asked to sign in before chatting if you’re not already logged in.
-        </p>
+      <div className="card" style={{ display: 'grid', gap: 16 }}>
+        {/* Keep exact text so legacy tests can find it */}
+        <button
+          type="button"
+          className="btn btn-primary"
+          style={{ width: '100%', paddingBlock: 14, fontSize: 18 }}
+          aria-describedby="cta-helptext"
+          onClick={() => start()}
+        >
+          Start Chat
+        </button>
 
-        {/* Optional “first message” draft that we cache pre-login */}
-        <label htmlFor="first-msg" style={{ display: 'block', fontWeight: 500, marginBottom: 6 }}>
-          First message (optional)
-        </label>
-        <textarea
-          id="first-msg"
-          value={draft}
-          onChange={(e) => setDraft(e.target.value)}
-          placeholder="e.g. I’m looking for a clinic near Melbourne…"
-          rows={3}
-          style={{
-            width: '100%',
-            maxWidth: 720,
-            padding: '10px 12px',
-            borderRadius: 8,
-            border: '1px solid #E5E7EB',
-            marginBottom: 12
-          }}
-        />
+        <div id="cta-helptext" className="muted">
+          No sign-in required. You can sign in later if you want your conversation history saved.
+        </div>
 
-        <Button variant="primary" onClick={onStartChat}>Start Chat</Button>
-        <SupportedLangNote />
-      </Card>
-    </>
+        {/* Quick prompts (optional) */}
+        <div aria-label="Quick prompts" style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+          {[
+            'Find a psychologist near me',
+            'Low-cost counselling options',
+            'Crisis help in Australia',
+            'LGBTQIA+ friendly services',
+          ].map((q) => (
+            <button
+              key={q}
+              type="button"
+              className="chip"
+              aria-label={`Start chat with: ${q}`}
+              onClick={() => start(q)}
+            >
+              {q}
+            </button>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }
