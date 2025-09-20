@@ -3,6 +3,8 @@ import Title from '@/components/misc/Title';
 import MessageList, { Message } from '@/components/chat/MessageList';
 import MessageInput from '@/components/chat/MessageInput';
 import { loadPreloginChat, clearPreloginChat } from '@/features/chat/sessionStore';
+import { useAuth } from '@/auth/AuthContext';
+import { getAndClearReturnTo } from '@/auth/storage';
 
 function mkId() {
   return Math.random().toString(36).slice(2);
@@ -15,12 +17,17 @@ export default function Chat() {
   const [busy, setBusy] = useState(false);
   const scrollerRef = useRef<HTMLDivElement>(null);
 
-  // Merge any pre-login cached messages (saved on Home before auth).
+  const { user } = useAuth();
+  const mergedOnceRef = useRef(false);
+
+  // Merge pre-login cached messages AFTER login completes (once).
   useEffect(() => {
+    if (!user || mergedOnceRef.current) return;
+
     const cached = loadPreloginChat();
     if (cached?.messages?.length) {
       setMessages((prev) => {
-        // Keep the first assistant greeting at the top, then insert cached messages.
+        // Keep the greeting on top, then insert cached user messages.
         if (prev.length > 0) {
           const [first, ...rest] = prev;
           return [first, ...cached.messages, ...rest];
@@ -29,9 +36,11 @@ export default function Chat() {
       });
       clearPreloginChat();
     }
-    // run only once on mount
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+
+    // consume any saved returnTo so it doesn't affect future navigations
+    getAndClearReturnTo();
+    mergedOnceRef.current = true;
+  }, [user]);
 
   const onSend = async (text: string) => {
     const userMsg: Message = { id: mkId(), role: 'user', text };
