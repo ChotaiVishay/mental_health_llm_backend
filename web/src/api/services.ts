@@ -39,12 +39,22 @@ function assertJson(r: Response, bodyPreview: string, url: string) {
   }
 }
 
-/** Keep whatever your existing implementation is */
+// narrow unknown/loose updatedAt values to a timestamp
+function toEpoch(val: unknown): number {
+  if (typeof val === 'string' || typeof val === 'number') {
+    return +new Date(val); // valid overloads after typeof check
+  }
+  if (val instanceof Date) {
+    return +val;
+  }
+  return 0;
+}
+
 export function sortServices(items: Service[], key: SortKey): Service[] {
   if (key === 'recent') {
-    return [...items].sort((a: any, b: any) => {
-      const ta = a?.updatedAt ? +new Date(a.updatedAt) : 0;
-      const tb = b?.updatedAt ? +new Date(b.updatedAt) : 0;
+    return [...items].sort((a, b) => {
+      const ta = toEpoch((a as { updatedAt?: unknown }).updatedAt);
+      const tb = toEpoch((b as { updatedAt?: unknown }).updatedAt);
       return tb - ta;
     });
   }
