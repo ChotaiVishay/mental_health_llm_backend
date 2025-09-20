@@ -1,3 +1,4 @@
+// web/src/api/services.ts
 import type { Service } from '@/types/services';
 import { VITE } from '@/utils/env';
 
@@ -12,9 +13,11 @@ function toEpoch(v: string | number | Date | undefined): number {
 }
 
 const BASE = VITE.VITE_API_BASE_URL?.trim();
+const USE_MOCK = VITE.VITE_SERVICES_MOCK === '1' || !BASE;
 
 export async function fetchServices(): Promise<Service[]> {
-  if (!BASE) {
+  // In tests we stub fetch; this branch also keeps us off the network.
+  if (USE_MOCK) {
     const url = '/mock/services.json';
     const r = await fetch(url, { headers: { Accept: 'application/json' } });
     const t = await r.text();
@@ -23,7 +26,7 @@ export async function fetchServices(): Promise<Service[]> {
     return JSON.parse(t) as Service[];
   }
 
-  const url = `${BASE.replace(/\/$/, '')}/api/services`;
+  const url = `${BASE!.replace(/\/$/, '')}/api/services`;
   const r = await fetch(url, { headers: { Accept: 'application/json' } });
   const t = await r.text();
   if (!r.ok) throw new Error(`HTTP ${r.status} on ${url}: ${t.slice(0, 120)}`);

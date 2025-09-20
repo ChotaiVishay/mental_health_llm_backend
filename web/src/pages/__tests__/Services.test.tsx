@@ -1,3 +1,4 @@
+// web/src/pages/__tests__/Services.test.tsx
 import { beforeAll, afterAll, beforeEach, vi, it, expect } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
@@ -23,7 +24,7 @@ const mockServices = [
 ];
 
 beforeAll(() => {
-  // keep the code path on “mock”
+  // ensure mock code path (even if API base exists)
   vi.stubEnv('VITE_SERVICES_MOCK', '1');
 });
 
@@ -31,7 +32,6 @@ afterAll(() => {
   vi.unstubAllEnvs();
 });
 
-// IMPORTANT: return a real Response so .json() and .text() both work
 beforeEach(() => {
   vi.restoreAllMocks();
   vi.spyOn(global, 'fetch').mockImplementation(async () => {
@@ -57,7 +57,7 @@ it('shows default listing and allows sorting', async () => {
 
   // sort control: switch to name if the option exists; otherwise assert default
   const select = screen.getByLabelText('Sort') as HTMLSelectElement;
-  const hasName = Array.from(select.options).some(o => o.value === 'name');
+  const hasName = Array.from(select.options).some((o) => o.value === 'name');
   if (hasName) {
     fireEvent.change(select, { target: { value: 'name' } });
     expect(select.value).toBe('name');
