@@ -6,8 +6,8 @@ export default function RequireAuth({ children }: { children: JSX.Element }) {
   const location = useLocation();
 
   if (!user) {
-    // send user to /login and remember where they wanted to go
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    // pass a simple string to make Login redirect trivial
+    return <Navigate to="/login" state={{ from: location.pathname }} replace />;
   }
   return children;
 }
