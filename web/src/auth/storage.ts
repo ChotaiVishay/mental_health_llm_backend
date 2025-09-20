@@ -12,14 +12,24 @@ export function clearAuth() {
   localStorage.removeItem(USER_KEY);
 }
 
-export function getAuth() {
+export function getAuth(): { token: string | null; user: unknown | null } {
   const token = localStorage.getItem(TOKEN_KEY);
   const userRaw = localStorage.getItem(USER_KEY);
-  return { token, user: userRaw ? JSON.parse(userRaw) : null };
+  if (!userRaw) return { token, user: null };
+  try {
+    return { token, user: JSON.parse(userRaw) as unknown };
+  } catch {
+    // Corrupt JSON in storage — treat as logged out
+    return { token, user: null };
+  }
 }
 
 export function setReturnTo(path: string) {
-  try { localStorage.setItem(RETURN_TO_KEY, path); } catch {}
+  try {
+    localStorage.setItem(RETURN_TO_KEY, path);
+  } catch {
+    /* noop: storage may be unavailable (private mode, quota, etc.) */
+  }
 }
 
 export function getAndClearReturnTo(): string | null {
@@ -28,6 +38,7 @@ export function getAndClearReturnTo(): string | null {
     localStorage.removeItem(RETURN_TO_KEY);
     return v;
   } catch {
+    /* noop */ 
     return null;
   }
 }

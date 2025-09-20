@@ -1,19 +1,13 @@
 // src/auth/__tests__/handoff.test.tsx
-import React from 'react';
+import * as React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { vi } from 'vitest';
 import Chat from '@/pages/Chat';
 import { savePreloginChat } from '@/features/chat/sessionStore';
 
-// IMPORTANT: use Vitest's mocking API (vi), not Jest.
-// We mock the AuthContext module but keep its public surface
-// compatible with the real one: { AuthProvider, useAuth }.
-import { vi } from 'vitest';
-
+// Mock AuthContext with a typed surface (no `require`, no `any`)
 vi.mock('@/auth/AuthContext', () => {
-  // Make React properly typed, not `any`
-  const React = require('react') as typeof import('react');
-
   type CtxShape = {
     user: unknown;
     setUser: (u: unknown) => void;
@@ -37,11 +31,12 @@ vi.mock('@/auth/AuthContext', () => {
   return { AuthProvider, useAuth };
 });
 
-// Now import from the (mocked) module using the real public names
 import { AuthProvider, useAuth } from '@/auth/AuthContext';
 
+type MockAuth = { setUser: (u: unknown) => void };
+
 function SignInButton() {
-  const { setUser } = useAuth() as any;
+  const { setUser } = useAuth() as unknown as MockAuth; // no `any`
   return <button onClick={() => setUser({ id: 'u1', name: 'Test' })}>signin</button>;
 }
 
@@ -60,13 +55,10 @@ it('merges pre-login chat after sign-in', async () => {
     </AuthProvider>
   );
 
-  // trigger sign-in
   (await screen.findByText('signin')).click();
 
-  // Depending on your Chat UI, assert that the pre-login message appears.
-  // This is left relaxed so the test remains portable across UI tweaks.
   await waitFor(() => {
-    // Example (enable once Chat renders messages as visible text):
+    // enable when your Chat renders that message text
     // expect(screen.getByText(/hello before login/i)).toBeInTheDocument();
   });
 });

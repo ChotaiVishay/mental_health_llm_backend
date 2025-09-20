@@ -1,17 +1,14 @@
 import { it, expect } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from '@/auth/AuthContext';
 import Home from '@/pages/Home';
+import Chat from '@/pages/Chat';
 
-function Chat() {
-  return <div>Chat</div>;
-}
-
-it('shows Start Chat and navigates', () => {
+it('shows Start Chat and navigates (when logged in)', () => {
   render(
     <MemoryRouter initialEntries={['/']}>
-      <AuthProvider>
+      <AuthProvider initialState={{ user: { id: 'u1', name: 'Test User' } }}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/chat" element={<Chat />} />
@@ -21,5 +18,6 @@ it('shows Start Chat and navigates', () => {
   );
 
   fireEvent.click(screen.getByText('Start Chat'));
-  expect(screen.getByText('Chat')).toBeInTheDocument();
+  // Assert something stable on the Chat screen:
+  expect(screen.getByRole('textbox', { name: /message/i })).toBeInTheDocument();
 });

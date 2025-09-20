@@ -1,4 +1,4 @@
-// src/pages/admin/AdminSignIn.tsx
+// web/src/pages/admin/AdminSignIn.tsx
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/auth/AuthContext';
@@ -15,7 +15,7 @@ export default function AdminSignIn() {
     <main>
       <h1>Admin sign-in</h1>
       <p>Sign in to access the admin console.</p>
-      <button onClick={() => signIn('google')}>Continue with Google</button>
+      <button onClick={() => signIn('google', '/admin')}>Continue with Google</button>
     </main>
   );
 }

@@ -1,11 +1,9 @@
-// src/api/services.ts
 import type { Service } from '@/types/services';
+import { VITE } from '@/utils/env';
 
 export type SortKey = 'recent' | 'name';
-
 type MaybeDateLike = { updatedAt?: string | number | Date };
 
-/** Safely convert various date-like values to epoch ms (0 if invalid). */
 function toEpoch(v: string | number | Date | undefined): number {
   if (v == null) return 0;
   const d = v instanceof Date ? v : new Date(v);
@@ -13,17 +11,10 @@ function toEpoch(v: string | number | Date | undefined): number {
   return Number.isFinite(t) ? t : 0;
 }
 
-const BASE = import.meta.env.VITE_API_BASE_URL?.trim();
+const BASE = VITE.VITE_API_BASE_URL?.trim();
 
-/**
- * Smart fetch:
- * - If VITE_API_BASE_URL is defined -> call real API `${BASE}/api/services`
- * - Otherwise -> load local mock JSON from /public/mock/services.json
- * Also: guard against HTML/other content types, and surface helpful errors.
- */
 export async function fetchServices(): Promise<Service[]> {
   if (!BASE) {
-    // Dev fallback — served statically by Vite from /public
     const url = '/mock/services.json';
     const r = await fetch(url, { headers: { Accept: 'application/json' } });
     const t = await r.text();
@@ -43,7 +34,6 @@ export async function fetchServices(): Promise<Service[]> {
 function assertJson(r: Response, bodyPreview: string, url: string) {
   const ct = r.headers.get('content-type') || '';
   if (!ct.toLowerCase().includes('application/json')) {
-    // This is the classic "<!doctype html>" case
     const head = bodyPreview.trim().slice(0, 80);
     throw new Error(`Expected JSON from ${url}, got ${ct || 'unknown'}; first bytes: ${head}`);
   }
@@ -51,8 +41,8 @@ function assertJson(r: Response, bodyPreview: string, url: string) {
 
 export function sortServices(items: Service[], key: SortKey): Service[] {
   if (key === 'recent') {
-    return [...items].sort((a, b) =>
-      toEpoch((b as MaybeDateLike).updatedAt) - toEpoch((a as MaybeDateLike).updatedAt)
+    return [...items].sort(
+      (a, b) => toEpoch((b as MaybeDateLike).updatedAt) - toEpoch((a as MaybeDateLike).updatedAt)
     );
   }
   if (key === 'name') {

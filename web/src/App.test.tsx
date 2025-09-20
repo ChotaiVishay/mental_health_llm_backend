@@ -1,15 +1,16 @@
 import { render, screen } from '@testing-library/react';
-import { BrowserRouter } from 'react-router-dom';
-import App from './App';
 import { it, expect } from 'vitest';
+import App from './App';
+import { Providers } from './test-utils';
 
 it('renders core navigation links', () => {
   render(
-    <BrowserRouter>
+    <Providers router={{ initialEntries: ['/'] }}>
       <App />
-    </BrowserRouter>
+    </Providers>
   );
 
+  // Adjust these labels if your Header text differs
   ['Home', 'Chat', 'Services', 'Help & Crisis', 'Admin'].forEach((t) => {
     expect(screen.getByText(t)).toBeInTheDocument();
   });
