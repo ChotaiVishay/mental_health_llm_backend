@@ -1,7 +1,17 @@
 // src/api/services.ts
 import type { Service } from '@/types/services';
 
-export type SortKey = 'recent'; // extend if you support more
+export type SortKey = 'recent' | 'name';
+
+type MaybeDateLike = { updatedAt?: string | number | Date };
+
+/** Safely convert various date-like values to epoch ms (0 if invalid). */
+function toEpoch(v: string | number | Date | undefined): number {
+  if (v == null) return 0;
+  const d = v instanceof Date ? v : new Date(v);
+  const t = d.getTime();
+  return Number.isFinite(t) ? t : 0;
+}
 
 const BASE = import.meta.env.VITE_API_BASE_URL?.trim();
 
@@ -39,24 +49,16 @@ function assertJson(r: Response, bodyPreview: string, url: string) {
   }
 }
 
-// narrow unknown/loose updatedAt values to a timestamp
-function toEpoch(val: unknown): number {
-  if (typeof val === 'string' || typeof val === 'number') {
-    return +new Date(val); // valid overloads after typeof check
-  }
-  if (val instanceof Date) {
-    return +val;
-  }
-  return 0;
-}
-
 export function sortServices(items: Service[], key: SortKey): Service[] {
   if (key === 'recent') {
-    return [...items].sort((a, b) => {
-      const ta = toEpoch((a as { updatedAt?: unknown }).updatedAt);
-      const tb = toEpoch((b as { updatedAt?: unknown }).updatedAt);
-      return tb - ta;
-    });
+    return [...items].sort((a, b) =>
+      toEpoch((b as MaybeDateLike).updatedAt) - toEpoch((a as MaybeDateLike).updatedAt)
+    );
+  }
+  if (key === 'name') {
+    return [...items].sort((a, b) =>
+      (a.name ?? '').localeCompare(b.name ?? '', undefined, { sensitivity: 'base' })
+    );
   }
   return items;
 }

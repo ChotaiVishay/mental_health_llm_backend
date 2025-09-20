@@ -1,4 +1,3 @@
-// web/src/pages/Services.tsx
 import { useEffect, useMemo, useState } from 'react';
 import { fetchServices, sortServices, SortKey } from '@/api/services';
 import type { Service } from '@/types/services';
@@ -18,8 +17,7 @@ type ServiceExt = Service & {
 
 const SORT_OPTIONS: { key: SortKey; label: string }[] = [
   { key: 'recent', label: 'Recently updated' },
-  // If your sortServices supports more keys, add them here:
-  // { key: 'name', label: 'Name (A–Z)' },
+  { key: 'name', label: 'Name (A–Z)' },
 ];
 
 export default function Services() {
@@ -27,9 +25,9 @@ export default function Services() {
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState<string | null>(null);
 
-  // UI state (search, simple type filter, sorting)
+  // UI state (search, type filter, sorting)
   const [q, setQ] = useState('');
-  const [type, setType] = useState('');
+  const [type, setType] = useState(''); // '', 'clinic', 'hospital'
   const [sortKey, setSortKey] = useState<SortKey>('recent');
 
   useEffect(() => {
@@ -58,13 +56,22 @@ export default function Services() {
 
     const base = all.filter((s) => {
       const sx = s as ServiceExt;
+
+      // Free-text query: name, suburb, specialty
       const matchesQ =
         !nq ||
         norm(sx.name).includes(nq) ||
         norm(sx.suburb).includes(nq) ||
         norm(sx.specialty).includes(nq);
 
-      const matchesType = !nt || norm(sx.orgKind) === nt;
+      // Type filter (MHS-219): only Clinic or Hospital.
+      // We treat “Private Clinic” etc. as “clinic” (substring match).
+      const k = norm(sx.orgKind);
+      const matchesType =
+        !nt ||
+        (nt === 'clinic' && k.includes('clinic')) ||
+        (nt === 'hospital' && k.includes('hospital'));
+
       return matchesQ && matchesType;
     });
 
@@ -72,7 +79,11 @@ export default function Services() {
   }, [all, q, type, sortKey]);
 
   const resultsText =
-    loading ? 'Loading services…' : err ? 'Failed to load services' : `${items.length} result${items.length === 1 ? '' : 's'}`;
+    loading
+      ? 'Loading services…'
+      : err
+      ? 'Failed to load services'
+      : `${items.length} result${items.length === 1 ? '' : 's'}`;
 
   return (
     <>
@@ -101,18 +112,18 @@ export default function Services() {
 
           <div className="field">
             <label htmlFor="f-type">Type</label>
-            <select id="f-type" value={type} onChange={(e) => setType(e.target.value)}>
+            <select
+              id="f-type"
+              value={type}
+              onChange={(e) => setType(e.target.value)}
+            >
               <option value="">Any</option>
-              {/* Match your dataset terms used in OrgBadge/kind */}
-              <option value="psychologist">Psychologist</option>
-              <option value="counsellor">Counsellor</option>
-              <option value="gp">GP</option>
-              <option value="peer support">Peer support</option>
-              <option value="helpline">Helpline</option>
+              <option value="clinic">Clinic</option>
+              <option value="hospital">Hospital</option>
             </select>
           </div>
 
-          {/* Keep other controls visible but disabled for now — matches prototype UI and sets expectation */}
+          {/* Keep visible but disabled to match prototype (fees out of scope in 219) */}
           <div className="field advanced-only">
             <label htmlFor="f-fee">Fees</label>
             <select id="f-fee" disabled>
@@ -189,26 +200,30 @@ export default function Services() {
                 <div className="card-grid">
                   {items.map((s) => {
                     const sx = s as ServiceExt;
-                    const updated =
-                      sx.updatedAt ? new Date(sx.updatedAt).toLocaleDateString() : '—';
-                    const subtitle = [
-                      sx.orgKind || 'Service',
-                      sx.suburb ?? '—',
-                      sx.specialty && sx.specialty,
-                    ]
+                    const updated = sx.updatedAt ? new Date(sx.updatedAt).toLocaleDateString() : '—';
+                    const subtitle = [sx.orgKind || 'Service', sx.suburb ?? '—', sx.specialty && sx.specialty]
                       .filter(Boolean)
                       .join(' • ');
 
                     return (
                       <article className="card" key={s.id}>
-                        <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
+                        <header
+                          style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            gap: 8,
+                          }}
+                        >
                           <h3 className="h3" style={{ margin: 0 }}>
                             {s.name}
                           </h3>
                           <OrgBadge kind={sx.orgKind} />
                         </header>
 
-                        <p className="muted" style={{ marginTop: 6 }}>{subtitle}</p>
+                        <p className="muted" style={{ marginTop: 6 }}>
+                          {subtitle}
+                        </p>
                         <p style={{ marginTop: 8 }}>
                           <small className="muted">Last updated: {updated}</small>
                         </p>
