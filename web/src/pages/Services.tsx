@@ -4,6 +4,8 @@ import { fetchServices, sortServices, SortKey } from '@/api/services';
 import type { Service } from '@/types/services';
 import OrgBadge from '@/components/services/OrgBadge';
 import Title from '@/components/misc/Title';
+import useMediaQuery from '@/hooks/useMediaQuery';
+import '@/assets/services.css';
 
 function norm(s?: string) {
   return (s ?? '').toLowerCase();
@@ -30,6 +32,10 @@ export default function Services() {
   const [q, setQ] = useState('');
   const [type, setType] = useState(''); // '', 'clinic', 'hospital'
   const [sortKey, setSortKey] = useState<SortKey>('recent');
+
+  // Mobile-only: show/hide filters panel
+  const [showFilters, setShowFilters] = useState(false);
+  const isMobile = useMediaQuery('(max-width: 900px)');
 
   useEffect(() => {
     let alive = true;
@@ -58,14 +64,12 @@ export default function Services() {
     const base = all.filter((s) => {
       const sx = s as ServiceExt;
 
-      // Free-text query: name, suburb, specialty
       const matchesQ =
         !nq ||
         norm(sx.name).includes(nq) ||
         norm(sx.suburb).includes(nq) ||
         norm(sx.specialty).includes(nq);
 
-      // Type filter (keep simple for MVP—clinic/hospital only).
       const k = norm(sx.orgKind);
       const matchesType =
         !nt ||
@@ -96,9 +100,33 @@ export default function Services() {
         Browse the directory. Use filters to refine. Information only — contact providers directly.
       </p>
 
+      {/* Only show toggle on mobile */}
+      {isMobile && (
+        <button
+          type="button"
+          className="btn filters-toggle"
+          aria-controls="filters-panel"
+          aria-expanded={showFilters}
+          aria-label="Filters"
+          title="Filters"
+          data-testid="filters-toggle"
+          onClick={() => setShowFilters((v) => !v)}
+        >
+          <span aria-hidden="true">
+            {showFilters ? 'Hide filters' : 'Show filters'}
+          </span>
+        </button>
+      )}
+
       <div className="split" style={{ marginTop: 20 }}>
-        {/* Left: Filters (sticky card) */}
-        <aside className="filters" aria-label="Filters">
+        {/* Left: Filters (collapsible on mobile with native `hidden`) */}
+        <aside
+          id="filters-panel"
+          className="filters card"
+          aria-label="Filters"
+          aria-hidden={isMobile ? (!showFilters ? true : undefined) : undefined}
+          hidden={isMobile && !showFilters}
+        >
           <div className="field">
             <label htmlFor="f-q">Search</label>
             <input
@@ -112,18 +140,13 @@ export default function Services() {
 
           <div className="field">
             <label htmlFor="f-type">Type</label>
-            <select
-              id="f-type"
-              value={type}
-              onChange={(e) => setType(e.target.value)}
-            >
+            <select id="f-type" value={type} onChange={(e) => setType(e.target.value)}>
               <option value="">Any</option>
               <option value="clinic">Clinic</option>
               <option value="hospital">Hospital</option>
             </select>
           </div>
 
-          {/* Visible but disabled to mirror prototype; out of scope for MVP */}
           <div className="field advanced-only">
             <label htmlFor="f-fee">Fees</label>
             <select id="f-fee" disabled>
@@ -148,7 +171,6 @@ export default function Services() {
 
         {/* Right: Results area */}
         <section aria-live="polite" aria-busy={loading}>
-          {/* Top toolbar: results count + sort */}
           <div
             className="card"
             style={{
