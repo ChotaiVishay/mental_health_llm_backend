@@ -1,12 +1,22 @@
-# Vite/Node
+# Dependencies
+node_modules/
 web/node_modules/
+
+# Build outputs
+dist/
 web/dist/
+.vite/
 web/.vite/
+coverage/
 web/coverage/
 
-# TS build info
+# TypeScript build info
 web/tsconfig.*.tsbuildinfo
 
 # Generated from tsc on config
 web/vite.config.d.ts
 web/vite.config.js
+
+# Misc
+.DS_Store
+.env*
