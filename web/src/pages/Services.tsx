@@ -4,7 +4,8 @@ import { fetchServices, sortServices, SortKey } from '@/api/services';
 import type { Service } from '@/types/services';
 import OrgBadge from '@/components/services/OrgBadge';
 import Title from '@/components/misc/Title';
-import '@/assets/services.css'; // <-- NEW
+import useMediaQuery from '@/hooks/useMediaQuery';
+import '@/assets/services.css';
 
 function norm(s?: string) {
   return (s ?? '').toLowerCase();
@@ -34,6 +35,7 @@ export default function Services() {
 
   // Mobile-only: show/hide filters panel
   const [showFilters, setShowFilters] = useState(false);
+  const isMobile = useMediaQuery('(max-width: 900px)');
 
   useEffect(() => {
     let alive = true;
@@ -62,14 +64,12 @@ export default function Services() {
     const base = all.filter((s) => {
       const sx = s as ServiceExt;
 
-      // Free-text query: name, suburb, specialty
       const matchesQ =
         !nq ||
         norm(sx.name).includes(nq) ||
         norm(sx.suburb).includes(nq) ||
         norm(sx.specialty).includes(nq);
 
-      // Type filter (MHS-219): only Clinic or Hospital (substring match)
       const k = norm(sx.orgKind);
       const matchesType =
         !nt ||
@@ -100,29 +100,32 @@ export default function Services() {
         Browse the directory. Use filters to refine. Information only — contact providers directly.
       </p>
 
-      {/* Mobile filters toggle (hidden by CSS on desktop) */}
-      <button
-        type="button"
-        className="btn filters-toggle"
-        aria-controls="filters-panel"
-        aria-expanded={showFilters}
-        aria-label="Filters"
-        title="Filters"
-        data-testid="filters-toggle"
-        onClick={() => setShowFilters((v) => !v)}
-      >
-        <span aria-hidden="true">
-          {showFilters ? 'Hide filters' : 'Show filters'}
-        </span>
-      </button>
+      {/* Only show toggle on mobile */}
+      {isMobile && (
+        <button
+          type="button"
+          className="btn filters-toggle"
+          aria-controls="filters-panel"
+          aria-expanded={showFilters}
+          aria-label="Filters"
+          title="Filters"
+          data-testid="filters-toggle"
+          onClick={() => setShowFilters((v) => !v)}
+        >
+          <span aria-hidden="true">
+            {showFilters ? 'Hide filters' : 'Show filters'}
+          </span>
+        </button>
+      )}
 
       <div className="split" style={{ marginTop: 20 }}>
-        {/* Left: Filters (collapsible on mobile) */}
+        {/* Left: Filters (collapsible on mobile with native `hidden`) */}
         <aside
           id="filters-panel"
           className="filters card"
           aria-label="Filters"
-          aria-hidden={showFilters ? undefined : true}
+          aria-hidden={isMobile ? (!showFilters ? true : undefined) : undefined}
+          hidden={isMobile && !showFilters}
         >
           <div className="field">
             <label htmlFor="f-q">Search</label>
@@ -144,7 +147,6 @@ export default function Services() {
             </select>
           </div>
 
-          {/* Keep visible but disabled to match prototype (fees out of scope in 219/221) */}
           <div className="field advanced-only">
             <label htmlFor="f-fee">Fees</label>
             <select id="f-fee" disabled>
@@ -169,7 +171,6 @@ export default function Services() {
 
         {/* Right: Results area */}
         <section aria-live="polite" aria-busy={loading}>
-          {/* Top toolbar: results count + sort */}
           <div
             className="card"
             style={{
