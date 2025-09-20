@@ -1,16 +1,11 @@
 import { render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
-import App from './App';
+import Header from '@/components/layout/Header';
 import { it, expect, describe, vi } from 'vitest';
 
-it('renders core navigation links', () => {
-  render(
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
-  );
-
-  ['Home', 'Chat', 'Services', 'Help & Crisis', 'Admin'].forEach((t) => {
+it('renders nav links', () => {
+  render(<BrowserRouter><Header /></BrowserRouter>);
+  ['Home', 'Chat', 'Services', 'Help & Crisis', 'Admin'].forEach(t => {
     expect(screen.getByText(t)).toBeInTheDocument();
   });
 });
