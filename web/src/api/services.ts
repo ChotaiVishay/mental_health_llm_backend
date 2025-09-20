@@ -1,32 +1,52 @@
+// src/api/services.ts
 import type { Service } from '@/types/services';
 
-// helper: stable compare
-const by = <T>(sel: (x: T) => string | number, dir: 'asc' | 'desc' = 'asc') =>
-  (a: T, b: T) => {
-    const av = sel(a); const bv = sel(b);
-    if (av < bv) return dir === 'asc' ? -1 : 1;
-    if (av > bv) return dir === 'asc' ? 1 : -1;
-    return 0;
-  };
+export type SortKey = 'recent'; // extend if you support more
 
-export type SortKey = 'recent' | 'name';
+const BASE = import.meta.env.VITE_API_BASE_URL?.trim();
 
-export function sortServices(items: Service[], key: SortKey): Service[] {
-  const copy = [...items];
-  if (key === 'name') return copy.sort(by<Service>(s => s.name.toLowerCase(), 'asc'));
-  // default: recent first
-  return copy.sort(by<Service>(s => new Date(s.createdAt).getTime(), 'desc'));
+/**
+ * Smart fetch:
+ * - If VITE_API_BASE_URL is defined -> call real API `${BASE}/api/services`
+ * - Otherwise -> load local mock JSON from /public/mock/services.json
+ * Also: guard against HTML/other content types, and surface helpful errors.
+ */
+export async function fetchServices(): Promise<Service[]> {
+  if (!BASE) {
+    // Dev fallback — served statically by Vite from /public
+    const url = '/mock/services.json';
+    const r = await fetch(url, { headers: { Accept: 'application/json' } });
+    const t = await r.text();
+    if (!r.ok) throw new Error(`HTTP ${r.status} on ${url}: ${t.slice(0, 120)}`);
+    assertJson(r, t, url);
+    return JSON.parse(t) as Service[];
+  }
+
+  const url = `${BASE.replace(/\/$/, '')}/api/services`;
+  const r = await fetch(url, { headers: { Accept: 'application/json' } });
+  const t = await r.text();
+  if (!r.ok) throw new Error(`HTTP ${r.status} on ${url}: ${t.slice(0, 120)}`);
+  assertJson(r, t, url);
+  return JSON.parse(t) as Service[];
 }
 
-export async function fetchServices(): Promise<Service[]> {
-  const useMock = import.meta.env.VITE_SERVICES_MOCK === '1';
-  if (useMock) {
-    const data = (await import('@/mocks/services.json')).default as Service[];
-    return data;
+function assertJson(r: Response, bodyPreview: string, url: string) {
+  const ct = r.headers.get('content-type') || '';
+  if (!ct.toLowerCase().includes('application/json')) {
+    // This is the classic "<!doctype html>" case
+    const head = bodyPreview.trim().slice(0, 80);
+    throw new Error(`Expected JSON from ${url}, got ${ct || 'unknown'}; first bytes: ${head}`);
   }
-  const base = import.meta.env.VITE_API_BASE_URL ?? '';
-  const res = await fetch(`${base}/v1/services`, { credentials: 'include' });
-  if (!res.ok) throw new Error(`Failed to load services (${res.status})`);
-  const json = await res.json();
-  return json as Service[];
+}
+
+/** Keep whatever your existing implementation is */
+export function sortServices(items: Service[], key: SortKey): Service[] {
+  if (key === 'recent') {
+    return [...items].sort((a: any, b: any) => {
+      const ta = a?.updatedAt ? +new Date(a.updatedAt) : 0;
+      const tb = b?.updatedAt ? +new Date(b.updatedAt) : 0;
+      return tb - ta;
+    });
+  }
+  return items;
 }
