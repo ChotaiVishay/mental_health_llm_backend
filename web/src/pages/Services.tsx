@@ -1,3 +1,4 @@
+// web/src/pages/Services.tsx
 import { useEffect, useMemo, useState } from 'react';
 import { fetchServices, sortServices, SortKey } from '@/api/services';
 import type { Service } from '@/types/services';
@@ -64,8 +65,7 @@ export default function Services() {
         norm(sx.suburb).includes(nq) ||
         norm(sx.specialty).includes(nq);
 
-      // Type filter (MHS-219): only Clinic or Hospital.
-      // We treat “Private Clinic” etc. as “clinic” (substring match).
+      // Type filter (keep simple for MVP—clinic/hospital only).
       const k = norm(sx.orgKind);
       const matchesType =
         !nt ||
@@ -123,7 +123,7 @@ export default function Services() {
             </select>
           </div>
 
-          {/* Keep visible but disabled to match prototype (fees out of scope in 219) */}
+          {/* Visible but disabled to mirror prototype; out of scope for MVP */}
           <div className="field advanced-only">
             <label htmlFor="f-fee">Fees</label>
             <select id="f-fee" disabled>
