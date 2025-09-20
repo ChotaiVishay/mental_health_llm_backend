@@ -1,11 +1,13 @@
 // src/components/layout/Container.tsx
-import { ReactNode } from 'react';
+import { ReactNode, ElementType } from 'react';
 
-export default function Container({ children, as: Tag = 'div', className = '' }: {
+type Props = {
   children: ReactNode;
-  as?: keyof JSX.IntrinsicElements;
+  as?: ElementType;
   className?: string;
-}) {
-  const Cmp = Tag as any;
+};
+
+export default function Container({ children, as: Tag = 'div', className = '' }: Props) {
+  const Cmp = Tag as ElementType; // typed, not any
   return <Cmp className={`container ${className}`}>{children}</Cmp>;
 }

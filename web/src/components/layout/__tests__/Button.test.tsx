@@ -1,5 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import Button from '@/components/ui/Button';
+import { it, expect, describe, vi } from 'vitest';
 
 it('renders and handles click', () => {
   const onClick = vi.fn();
