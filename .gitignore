@@ -1,1 +1,12 @@
-.env
+# Vite/Node
+web/node_modules/
+web/dist/
+web/.vite/
+web/coverage/
+
+# TS build info
+web/tsconfig.*.tsbuildinfo
+
+# Generated from tsc on config
+web/vite.config.d.ts
+web/vite.config.js
