@@ -1,26 +1,18 @@
-// src/pages/Login.tsx
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/auth/AuthContext';
 
 type FromState = { from?: string };
-
-function isFromState(state: unknown): state is FromState {
-  return (
-    typeof state === 'object' &&
-    state !== null &&
-    ('from' in state ? typeof (state as Record<string, unknown>).from === 'string' : true)
-  );
-}
 
 export default function Login() {
   const { signIn } = useAuth();
   const nav = useNavigate();
   const loc = useLocation();
 
-  const from = isFromState(loc.state) && loc.state.from ? loc.state.from : '/';
+  // Will be something like "/chat" if redirected by RequireAuth, else "/"
+  const from = (loc.state as FromState)?.from ?? '/';
 
   const start = async (provider: 'google' | 'apple' | 'github') => {
-    await signIn(provider, from);
+    await signIn(provider, from);   // optional: if your signIn cares about returnTo
     nav(from, { replace: true });
   };
 

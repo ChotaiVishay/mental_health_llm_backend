@@ -1,4 +1,5 @@
 import { Route, Routes } from 'react-router-dom';
+import RequireAuth from '@/auth/RequireAuth';
 import Home from '@/pages/Home';
 import Chat from '@/pages/Chat';
 import Services from '@/pages/Services';
@@ -10,7 +11,7 @@ import AuthCallback from '@/pages/AuthCallback';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import Container from '@/components/layout/Container';
-import RequireAuth from '@/auth/RequireAuth';
+
 
 export default function App() {
   return (
