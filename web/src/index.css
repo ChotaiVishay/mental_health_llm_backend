@@ -644,3 +644,81 @@ html[data-theme="dark"] .card--alert {
   .muted { color: color-mix(in srgb, var(--muted), black 25%); }
   .btn-primary { box-shadow: 0 0 0 2px color-mix(in srgb, var(--brand), black 25%) inset; }
 }
+
+.chip {
+  border: 1px solid var(--gray-300);
+  background: var(--surface);
+  padding: 6px 10px;
+  border-radius: 999px;
+  font: inherit;
+  cursor: pointer;
+}
+.chip:hover { background: var(--gray-50); }
+
+/* =========================================
+   CHAT PAGE (new)
+   ========================================= */
+
+/* The chat page fills the "main" row with its own two-row grid:
+   [scrollable history] + [fixed composer] */
+.chat-wrapper{
+  display:grid;
+  grid-template-rows: 1fr auto;
+  gap: 12px;
+  min-height: 0;    /* critical so the top row can shrink and scroll */
+  height: 100%;
+}
+
+/* Scrollable history pane */
+.chat-scroller{
+  min-height:0;
+  overflow:auto;
+  padding:12px;
+  border:1px solid var(--gray-200);
+  border-radius:var(--radius);
+  background:var(--surface);
+  position:relative;
+}
+
+/* Fixed composer box */
+.chat-composer{
+  background:var(--surface);
+  border:1px solid var(--gray-200);
+  border-radius:var(--radius);
+  padding:12px;
+}
+.composer-meta{display:flex; justify-content:flex-end; margin-bottom:6px}
+
+/* Typing indicator (animated dots) */
+.typing-row{margin-top:10px; display:flex}
+.typing-bubble{
+  display:inline-flex; align-items:center; gap:6px;
+  padding:.45rem .65rem; border-radius:999px;
+  background:var(--gray-100); border:1px solid var(--gray-200);
+  animation: fadeIn .2s ease-out both;
+}
+@keyframes bounceDot{
+  0%, 60%, 100%{transform:translateY(0); opacity:.6}
+  30%{transform:translateY(-3px); opacity:1}
+}
+.typing-dot{
+  width:6px; height:6px; border-radius:50%;
+  background:var(--brand);
+  animation: bounceDot 1.2s infinite;
+}
+.typing-dot:nth-child(2){animation-delay:.15s}
+.typing-dot:nth-child(3){animation-delay:.3s}
+
+/* Jump-to-latest button (only visible when not at bottom) */
+.jump-latest{
+  position: sticky;
+  bottom: 8px;
+  margin-left: auto;
+  display:inline-flex; align-items:center; gap:.4rem;
+  padding:.45rem .7rem;
+  border-radius:999px;
+  border:1px solid var(--brand);
+  color:#fff; background:var(--brand);
+  box-shadow:0 8px 16px rgba(15,118,110,.15);
+}
+.jump-latest:hover{background:var(--brand-600)}

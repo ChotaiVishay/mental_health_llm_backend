@@ -1,28 +1,65 @@
-import Card from '@/components/ui/Card';
-import Button from '@/components/ui/Button';
 import { useNavigate } from 'react-router-dom';
-import SupportedLangNote from '@/components/misc/SupportedLangNote';
-import Title from '@/components/misc/Title';
+import { savePreloginChat } from '@/features/chat/sessionStore';
 
 export default function Home() {
   const nav = useNavigate();
 
+  const start = (seed?: string) => {
+    if (seed) {
+      // Pre-seed the anonymous store with the first user message.
+      const now = Date.now();
+      savePreloginChat({
+        messages: [
+          { id: `u_${now}`, role: 'user', text: seed, at: now },
+        ],
+      });
+    }
+    nav('/chat');
+  };
+
   return (
-    <>
-      <Title value="Support Atlas Assistant — Home" />
-      <h1 style={{ marginTop: 0 }}>Support Atlas Assistant</h1>
-      <p style={{ color: '#6B7280', maxWidth: 720 }}>
-        Chat with our assistant to find mental health services and answers fast.
+    <section className="hero" style={{ paddingBlock: 24 }}>
+      <h1 className="h1" style={{ marginTop: 0 }}>Support Atlas Assistant</h1>
+      <p className="lead" style={{ maxWidth: 720 }}>
+        Find mental health services and answers fast — chat anonymously, sign in later to save.
       </p>
 
-      <Card>
-        <h2 style={{ marginTop: 0 }}>Start a conversation</h2>
-        <p style={{ color: '#6B7280' }}>
-          You’ll be asked to sign in before chatting if you’re not already logged in.
-        </p>
-        <Button variant="primary" onClick={() => nav('/chat')}>Start Chat</Button>
-        <SupportedLangNote />
-      </Card>
-    </>
+      <div className="card" style={{ display: 'grid', gap: 16 }}>
+        {/* Keep exact text so legacy tests can find it */}
+        <button
+          type="button"
+          className="btn btn-primary"
+          style={{ width: '100%', paddingBlock: 14, fontSize: 18 }}
+          aria-describedby="cta-helptext"
+          onClick={() => start()}
+        >
+          Start Chat
+        </button>
+
+        <div id="cta-helptext" className="muted">
+          No sign-in required. You can sign in later if you want your conversation history saved.
+        </div>
+
+        {/* Quick prompts (optional) */}
+        <div aria-label="Quick prompts" style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+          {[
+            'Find a psychologist near me',
+            'Low-cost counselling options',
+            'Crisis help in Australia',
+            'LGBTQIA+ friendly services',
+          ].map((q) => (
+            <button
+              key={q}
+              type="button"
+              className="chip"
+              aria-label={`Start chat with: ${q}`}
+              onClick={() => start(q)}
+            >
+              {q}
+            </button>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }

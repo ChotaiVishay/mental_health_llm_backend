@@ -1,31 +1,32 @@
-import { it, expect } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { it, expect, vi } from 'vitest';
+import { render, screen } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from '@/auth/AuthContext';
-import Home from '@/pages/Home';
+import AuthCallback from '@/pages/AuthCallback';
 import Chat from '@/pages/Chat';
-import Login from '@/pages/Login';
-import RequireAuth from '@/auth/RequireAuth';
 
-it('goes to /login then back to /chat after sign-in', async () => {
-  localStorage.removeItem('sa_token');
-  localStorage.removeItem('sa_user');
+// Mock the OAuth client so we don't depend on import.meta.env in tests
+vi.mock('@/auth/client', () => {
+  return {
+    // Pretend the callback parsing succeeded and asked us to go to /chat
+    parseCallbackAndStore: vi.fn(() => '/chat'),
+  };
+});
 
+it('goes to /chat after OAuth callback with state=/chat (smoke)', async () => {
   render(
-    <MemoryRouter initialEntries={['/']}>
+    <MemoryRouter initialEntries={['/auth/callback?token=dev&name=Tester&state=/chat']}>
       <AuthProvider>
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/chat" element={<RequireAuth><Chat /></RequireAuth>} />
+          <Route path="/auth/callback" element={<AuthCallback />} />
+          <Route path="/chat" element={<Chat />} />
+          {/* Optional: define "/" so a stray nav("/") won't crash */}
+          <Route path="/" element={<div />} />
         </Routes>
       </AuthProvider>
     </MemoryRouter>
   );
 
-  fireEvent.click(screen.getByText('Start Chat'));           // → /login
-  expect(screen.getByText(/Sign in/i)).toBeInTheDocument();
-
-  // Fake your signIn inside AuthContext during test or mock it; for now assert login shows.
-  // (Your context's signIn should set a token and user and navigate back to /chat.)
+  // After the callback effect runs, we should land on Chat
+  expect(await screen.findByRole('textbox', { name: /message/i })).toBeInTheDocument();
 });
