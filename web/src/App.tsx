@@ -5,9 +5,12 @@ import Services from '@/pages/Services';
 import HelpCrisis from '@/pages/HelpCrisis';
 import AdminLogin from '@/pages/AdminLogin';
 import NotFound from '@/pages/NotFound';
+import Login from '@/pages/Login';
+import AuthCallback from '@/pages/AuthCallback';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import Container from '@/components/layout/Container';
+import RequireAuth from '@/auth/RequireAuth';
 
 export default function App() {
   return (
@@ -16,9 +19,18 @@ export default function App() {
       <Container as="main">
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/chat" element={<Chat />} />
+          <Route
+            path="/chat"
+            element={
+              <RequireAuth>
+                <Chat />
+              </RequireAuth>
+            }
+          />
           <Route path="/services" element={<Services />} />
           <Route path="/help" element={<HelpCrisis />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

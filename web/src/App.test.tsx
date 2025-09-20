@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import App from './App';
-import { it, expect, describe, vi } from 'vitest';
+import { it, expect } from 'vitest';
 
 it('renders core navigation links', () => {
   render(

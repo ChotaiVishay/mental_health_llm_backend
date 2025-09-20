@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import Header from '@/components/layout/Header';
-import { it, expect, describe, vi } from 'vitest';
+import { it, expect } from 'vitest';
 
 it('renders nav links', () => {
   render(<BrowserRouter><Header /></BrowserRouter>);
