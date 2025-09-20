@@ -103,12 +103,18 @@ export default function Services() {
       {/* Mobile filters toggle (hidden by CSS on desktop) */}
       <button
         type="button"
+        role="button"                  // explicit for test engines
         className="btn filters-toggle"
-        aria-expanded={showFilters}
         aria-controls="filters-panel"
+        aria-expanded={showFilters}
+        aria-label="Filters"           // stable accessible name
+        title="Filters"                // extra hint for some environments
+        data-testid="filters-toggle"   // test hook
         onClick={() => setShowFilters((v) => !v)}
       >
-        {showFilters ? 'Hide filters' : 'Show filters'}
+        <span aria-hidden="true">
+          {showFilters ? 'Hide filters' : 'Show filters'}
+        </span>
       </button>
 
       <div className="split" style={{ marginTop: 20 }}>
