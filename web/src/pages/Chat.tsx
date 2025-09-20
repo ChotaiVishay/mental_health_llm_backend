@@ -12,9 +12,8 @@ import {
 } from '@/features/chat/sessionStore';
 
 /**
- * The storage layer (sessionStore) keeps a timestamp on each message.
- * Our UI component types do not. Add small adapters so we can persist
- * without changing the UI types.
+ * sessionStore messages include a timestamp `at`; the UI type does not.
+ * These adapters let us persist without changing the UI types.
  */
 type ChatMessageStore = {
   id: string;
@@ -50,24 +49,24 @@ export default function Chat() {
   const scrollerRef = useRef<HTMLDivElement>(null);
 
   // Load current session (depends on auth state)
-useEffect(() => {
-  const session = user?.id
-    ? loadUserChat(String(user.id)) ?? loadPreloginChat()
-    : loadPreloginChat();
+  useEffect(() => {
+    const session = user?.id
+      ? loadUserChat(String(user.id)) ?? loadPreloginChat()
+      : loadPreloginChat();
 
-  const initial: Message[] =
-    session?.messages?.length
-      ? toUI(session.messages as unknown as ChatMessageStore[])
-      : [
-          {
-            id: mkId(),
-            role: 'assistant', // stays as the literal type
-            text: 'Hi! How can I help you today?',
-          } as Message,        // 👈 make this object a Message
-        ];
+    const initial: Message[] =
+      session?.messages?.length
+        ? toUI(session.messages as unknown as ChatMessageStore[])
+        : [
+            {
+              id: mkId(),
+              role: 'assistant',
+              text: 'Hi! How can I help you today?',
+            } satisfies Message,
+          ];
 
-  setMessages(initial);
-}, [user?.id]);
+    setMessages(initial);
+  }, [user?.id]);
 
   // Persist on every change (convert UI -> storage shape that includes `at`)
   useEffect(() => {
@@ -75,15 +74,18 @@ useEffect(() => {
       ? loadUserChat(String(user.id)) ?? undefined
       : loadPreloginChat() ?? undefined;
 
-    const payload = { messages: toStore(messages, prev?.messages as unknown as ChatMessageStore[] | undefined) };
+    const payload = {
+      messages: toStore(messages, prev?.messages as unknown as ChatMessageStore[] | undefined),
+    };
 
     if (user?.id) {
-      saveUserChat(String(user.id), payload as any);
+      saveUserChat(String(user.id), payload as unknown as { messages: ChatMessageStore[] });
     } else {
-      savePreloginChat(payload as any);
+      savePreloginChat(payload as unknown as { messages: ChatMessageStore[] });
     }
   }, [messages, user?.id]);
 
+  // Auto-scroll on new messages
   useEffect(() => {
     scrollerRef.current?.scrollTo({
       top: scrollerRef.current.scrollHeight,
@@ -109,6 +111,30 @@ useEffect(() => {
   return (
     <>
       <Title value="Support Atlas Assistant — Chat" />
+
+      {/* Anonymous banner (only when not signed in) */}
+      {!user && (
+        <div
+          className="card"
+          role="note"
+          aria-live="polite"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 12,
+            marginBottom: 12,
+          }}
+        >
+          <span className="muted">
+            You’re chatting anonymously. <strong>Sign in</strong> to save your conversation for later.
+          </span>
+          <a className="btn btn-secondary" href="/login">
+            Sign in
+          </a>
+        </div>
+      )}
+
       <section
         style={{
           display: 'grid',
