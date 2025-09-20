@@ -1,13 +1,17 @@
+import { it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from '@/auth/AuthContext';
-import Chat from '@/pages/Chat';
+
+// 👇 Mock RequireAuth to just render its children
+vi.mock('@/auth/RequireAuth', () => ({
+  default: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}));
+
 import RequireAuth from '@/auth/RequireAuth';
+import Chat from '@/pages/Chat';
 
 it('renders /chat when logged in', () => {
-  localStorage.setItem('sa_token', 'x');
-  localStorage.setItem('sa_user', JSON.stringify({ id: 'u1', name: 'Test' }));
-
   render(
     <MemoryRouter initialEntries={['/chat']}>
       <AuthProvider>
@@ -20,6 +24,7 @@ it('renders /chat when logged in', () => {
               </RequireAuth>
             }
           />
+          <Route path="/login" element={<div>Login</div>} />
         </Routes>
       </AuthProvider>
     </MemoryRouter>

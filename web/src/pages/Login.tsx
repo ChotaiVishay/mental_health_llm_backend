@@ -1,6 +1,5 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/auth/AuthContext';
-import Button from '@/components/ui/Button';
 
 type FromState = { from?: string };
 
