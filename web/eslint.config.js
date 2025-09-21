@@ -33,7 +33,8 @@ export default tseslint.config(
       ...jsxA11y.configs.recommended.rules,
       // …then override
       'react/react-in-jsx-scope': 'off',
-      'react-refresh/only-export-components': 'off'
+      'react-refresh/only-export-components': 'off',
+      'react/prop-types': 'off'
     }
   }
 );
