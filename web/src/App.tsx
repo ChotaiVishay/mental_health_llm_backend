@@ -11,6 +11,9 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import Container from '@/components/layout/Container';
 import RequireAdmin from '@/auth/RequireAdmin'; // NEW
+import Styleguide from '@/pages/Styleguide';
+import '@/styles/index.css';
+
 
 export default function App() {
   return (
@@ -42,6 +45,7 @@ export default function App() {
           />
 
           <Route path="*" element={<Home />} />
+          <Route path="/styleguide" element={<Styleguide />} />
         </Routes>
       </Container>
       <Footer />

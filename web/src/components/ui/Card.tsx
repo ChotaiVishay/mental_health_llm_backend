@@ -1,6 +1,10 @@
-// src/components/ui/Card.tsx
-import { ReactNode } from 'react';
+import React from 'react';
 
-export default function Card({ children, className = '' }: { children: ReactNode; className?: string }) {
-  return <div className={`card ${className}`}>{children}</div>;
+type CardProps = React.ComponentProps<'div'> & {
+  className?: string;
+};
+
+export default function Card({ className = '', ...rest }: CardProps) {
+  // Accepts all regular <div> props (style, id, onClick, etc.)
+  return <div className={`card ${className}`.trim()} {...rest} />;
 }

@@ -5,7 +5,7 @@ import type { Service } from '@/types/services';
 import OrgBadge from '@/components/services/OrgBadge';
 import Title from '@/components/misc/Title';
 import useMediaQuery from '@/hooks/useMediaQuery';
-import '@/assets/services.css';
+
 
 function norm(s?: string) {
   return (s ?? '').toLowerCase();
