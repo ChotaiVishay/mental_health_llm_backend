@@ -1,91 +1,72 @@
-"""
-Configuration management for the Mental Health LLM Backend.
-"""
+# app/config.py
+from __future__ import annotations
 
-import os
-from typing import List
-from pydantic_settings import BaseSettings
+from functools import lru_cache
+from typing import List, Optional
+
 from pydantic import Field
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    """Application settings loaded from environment variables."""
-    
-    # Database Configuration
-    supabase_url: str = Field(..., env="SUPABASE_URL")
-    supabase_key: str = Field(..., env="SUPABASE_KEY")
-    supabase_service_key: str = Field(None, env="SUPABASE_SERVICE_KEY")
-    
-    # OpenAI Configuration
-    openai_api_key: str = Field(..., env="OPENAI_API_KEY")
-    openai_model: str = Field("gpt-4-turbo-preview", env="OPENAI_MODEL")
-    openai_temperature: float = Field(0.1, env="OPENAI_TEMPERATURE")
-    
-    # Application Configuration
-    environment: str = Field("development", env="ENVIRONMENT")
-    log_level: str = Field("INFO", env="LOG_LEVEL")
-    api_version: str = Field("v1", env="API_VERSION")
-    host: str = Field("0.0.0.0", env="HOST")
-    port: int = Field(8000, env="PORT")
-    
-    # Security Configuration
-    secret_key: str = Field(..., env="SECRET_KEY")
-    algorithm: str = Field("HS256", env="ALGORITHM")
-    access_token_expire_minutes: int = Field(30, env="ACCESS_TOKEN_EXPIRE_MINUTES")
-    
-    # Query Limits
-    max_query_complexity: int = Field(100, env="MAX_QUERY_COMPLEXITY")
-    rate_limit_requests: int = Field(60, env="RATE_LIMIT_REQUESTS")
-    rate_limit_window: int = Field(60, env="RATE_LIMIT_WINDOW")
-    max_response_tokens: int = Field(1000, env="MAX_RESPONSE_TOKENS")
-    
-    # CORS Settings
-    allowed_origins: str = Field(
-        "http://localhost:3000,http://localhost:8080", 
-        env="ALLOWED_ORIGINS"
+    # ========= Supabase =========
+    supabase_url: Optional[str] = Field(default=None, alias="SUPABASE_URL")
+    supabase_key: Optional[str] = Field(default=None, alias="SUPABASE_KEY")  # anon key
+    supabase_service_key: Optional[str] = Field(default=None, alias="SUPABASE_SERVICE_KEY")  # service_role
+
+    # ========= OpenAI =========
+    openai_api_key: Optional[str] = Field(default=None, alias="OPENAI_API_KEY")
+    openai_model: str = Field(default="gpt-4.1-nano", alias="OPENAI_MODEL")
+    embed_model: str = Field(default="text-embedding-3-large", alias="EMBED_MODEL")
+
+    # ========= App / Env =========
+    environment: str = Field(default="development", alias="ENVIRONMENT")
+    api_version: str = Field(default="v1", alias="API_VERSION")
+    host: str = Field(default="127.0.0.1", alias="HOST")
+    port: int = Field(default=8000, alias="PORT")
+    log_level: str = Field(default="INFO", alias="LOG_LEVEL")
+
+    # ========= Security / Auth =========
+    secret_key: Optional[str] = Field(default=None, alias="SECRET_KEY")
+    algorithm: str = Field(default="HS256", alias="ALGORITHM")
+    access_token_expire_minutes: int = Field(default=30, alias="ACCESS_TOKEN_EXPIRE_MINUTES")
+
+    # ========= Limits =========
+    max_query_complexity: int = Field(default=100, alias="MAX_QUERY_COMPLEXITY")
+    rate_limit_requests: int = Field(default=60, alias="RATE_LIMIT_REQUESTS")
+    rate_limit_window: int = Field(default=60, alias="RATE_LIMIT_WINDOW")
+    max_response_tokens: int = Field(default=1000, alias="MAX_RESPONSE_TOKENS")
+
+    # ========= CORS (comma-separated) =========
+    allowed_origins: str = Field(default="http://localhost:3000,http://127.0.0.1:3000", alias="ALLOWED_ORIGINS")
+    allowed_methods: str = Field(default="GET,POST,PUT,DELETE", alias="ALLOWED_METHODS")
+    allowed_headers: str = Field(default="*", alias="ALLOWED_HEADERS")
+
+    # ========= Monitoring =========
+    sentry_dsn: Optional[str] = Field(default=None, alias="SENTRY_DSN")
+
+    # Pydantic Settings config
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        case_sensitive=False,
+        extra="ignore",   # don't crash if an extra env var is present
     )
-    allowed_methods: str = Field("GET,POST,PUT,DELETE", env="ALLOWED_METHODS")
-    allowed_headers: str = Field("*", env="ALLOWED_HEADERS")
-    
-    # Monitoring
-    sentry_dsn: str = Field(None, env="SENTRY_DSN")
-    
+
+    # Convenience properties for CORS
     @property
     def allowed_origins_list(self) -> List[str]:
-        """Convert comma-separated origins to list."""
-        return [origin.strip() for origin in self.allowed_origins.split(",")]
-    
+        return [o.strip() for o in self.allowed_origins.split(",") if o.strip()]
+
     @property
     def allowed_methods_list(self) -> List[str]:
-        """Convert comma-separated methods to list."""
-        return [method.strip() for method in self.allowed_methods.split(",")]
-    
+        return [m.strip() for m in self.allowed_methods.split(",") if m.strip()]
+
     @property
     def allowed_headers_list(self) -> List[str]:
-        """Convert comma-separated headers to list."""
-        if self.allowed_headers == "*":
-            return ["*"]
-        return [header.strip() for header in self.allowed_headers.split(",")]
-    
-    @property
-    def is_development(self) -> bool:
-        """Check if running in development environment."""
-        return self.environment.lower() == "development"
-    
-    @property
-    def is_production(self) -> bool:
-        """Check if running in production environment."""
-        return self.environment.lower() == "production"
-    
-    class Config:
-        env_file = ".env"
-        case_sensitive = False
+        return [h.strip() for h in self.allowed_headers.split(",") if h.strip()]
 
 
-# Global settings instance
-settings = Settings()
-
-
+@lru_cache(maxsize=1)
 def get_settings() -> Settings:
-    """Dependency to get settings instance."""
-    return settings
+    """Singleton-ish accessor so we don't parse .env repeatedly."""
+    return Settings()
