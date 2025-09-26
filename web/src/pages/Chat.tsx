@@ -13,6 +13,9 @@ import {
   type ChatMessage as ChatMsgStore, // <- use the typed message from sessionStore
 } from '@/features/chat/sessionStore';
 
+import ChatList from '@/components/chat/ChatList';
+import { sendMessageToAPI } from '@/api/chat';
+
 /** Storage shape (has timestamp) vs UI shape (no timestamp) */
 type ChatMessageStore = {
   id: string;
@@ -149,8 +152,22 @@ export default function Chat() {
     setMessages((prev) => [...prev, userMsg]);
     setBusy(true);
 
+    // Real assistant (API)
+    try {
+      const reply = await sendMessageToAPI(text, user?.id ?? null);
+      setMessages((prev) => [...prev, { id: mkId(), role: 'assistant', text: reply.response }]);
+    } catch (err) {
+      console.error('Error sending message:', err);
+      setMessages((prev) => [
+        ...prev,
+        { id: mkId(), role: 'assistant', text: 'Sorry, something went wrong.' },
+      ]);
+    } finally {
+      setBusy(false);
+    }
+
     // Simulated assistant
-    await new Promise((r) => setTimeout(r, 350)); // tiny delay so the typing indicator is visible
+    /*await new Promise((r) => setTimeout(r, 350)); // tiny delay so the typing indicator is visible
 
     const reply: Message = {
       id: mkId(),
@@ -158,7 +175,7 @@ export default function Chat() {
       text: `You said: "${text}". I’ll look that up.`,
     };
     setMessages((prev) => [...prev, reply]);
-    setBusy(false);
+    setBusy(false);*/
   };
 
   const lastActivityLabel = useMemo(() => relative(lastActivity), [lastActivity]);
@@ -167,47 +184,57 @@ export default function Chat() {
     <>
       <Title value="Support Atlas Assistant — Chat" />
 
-      <section className="chat-wrapper">
-        <div ref={scrollerRef} className="chat-scroller">
-          {/* Anonymous banner (scrolls with history so composer stays fixed) */}
-          {!user && (
-            <div className="card fade-in" role="note" aria-live="polite">
-              <span className="muted">
-                You’re chatting <strong>anonymously</strong>. <strong>Sign in</strong> to
-                save your conversation for later.
-              </span>
-              <a className="btn btn-secondary" href="/login">
-                Sign in
-              </a>
-            </div>
-          )}
-
-          <MessageList items={messages} />
-
-          {/* Typing indicator (assistant) */}
-          {busy && (
-            <div className="typing-row" aria-live="polite" aria-label="Assistant is typing">
-              <div className="typing-bubble">
-                <span className="typing-dot" />
-                <span className="typing-dot" />
-                <span className="typing-dot" />
+      <section className="chat-wrapper" style={{ display: 'flex', gap: 24 }}>
+        {/* ✅ ADDED: Chat sessions list on the left */}
+        <aside style={{ width: 300 }}>
+          <h2>All Chat Sessions</h2>
+          <ChatList />
+        </aside>
+        
+        {/* Main chat area */}
+        <div style={{ flex: 1 }}>
+          <div ref={scrollerRef} className="chat-scroller">
+            {/* Anonymous banner (scrolls with history so composer stays fixed) */}
+            {!user && (
+              <div className="card fade-in" role="note" aria-live="polite">
+                <span className="muted">
+                  You’re chatting <strong>anonymously</strong>. <strong>Sign in</strong> to
+                  save your conversation for later.
+                </span>
+                <a className="btn btn-secondary" href="/login">
+                  Sign in
+                </a>
               </div>
-            </div>
-          )}
 
-          {/* Jump-to-latest appears when you scroll up */}
-          {!atBottom && (
-            <button className="jump-latest" onClick={scrollToBottom}>
-              Jump to latest
-            </button>
-          )}
-        </div>
+            )}
 
-        <div className="chat-composer">
-          <div className="composer-meta">
-            <span className="muted small">Last activity {lastActivityLabel}</span>
+            <MessageList items={messages} />
+
+            {/* Typing indicator (assistant) */}
+            {busy && (
+              <div className="typing-row" aria-live="polite" aria-label="Assistant is typing">
+                <div className="typing-bubble">
+                  <span className="typing-dot" />
+                  <span className="typing-dot" />
+                  <span className="typing-dot" />
+                </div>
+              </div>
+            )}
+
+            {/* Jump-to-latest appears when you scroll up */}
+            {!atBottom && (
+              <button className="jump-latest" onClick={scrollToBottom}>
+                Jump to latest
+              </button>
+            )}
           </div>
-          <MessageInput onSend={onSend} disabled={busy} />
+
+          <div className="chat-composer">
+            <div className="composer-meta">
+              <span className="muted small">Last activity {lastActivityLabel}</span>
+            </div>
+            <MessageInput onSend={onSend} disabled={busy} />
+          </div>
         </div>
       </section>
     </>

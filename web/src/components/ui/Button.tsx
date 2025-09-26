@@ -1,11 +1,28 @@
-// src/components/ui/Button.tsx
-import { ButtonHTMLAttributes } from 'react';
+import React from 'react';
 
-type Props = ButtonHTMLAttributes<HTMLButtonElement> & {
-  variant?: 'default' | 'primary';
+export type Variant = 'default' | 'primary' | 'secondary' | 'link' | 'crisis';
+
+type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
+  variant?: Variant;
 };
 
-export default function Button({ variant = 'default', className = '', ...rest }: Props) {
-  const v = variant === 'primary' ? 'primary' : '';
-  return <button className={`btn ${v} ${className}`.trim()} {...rest} />;
+export default function Button({
+  variant = 'default',
+  className = '',
+  type = 'button', // safer default to avoid accidental form submits
+  ...rest
+}: ButtonProps) {
+  const cls =
+    'btn ' +
+    (variant === 'primary'
+      ? 'btn-primary'
+      : variant === 'secondary'
+      ? 'btn-secondary'
+      : variant === 'link'
+      ? 'btn-link'
+      : variant === 'crisis'
+      ? 'btn-crisis'
+      : '');
+
+  return <button type={type} className={`${cls} ${className}`.trim()} {...rest} />;
 }
