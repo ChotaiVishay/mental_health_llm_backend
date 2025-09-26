@@ -12,11 +12,11 @@ import {
   type ChatSession,
   type ChatMessage as ChatMsgStore,
 } from '@/features/chat/sessionStore';
-
 import ChatList from '@/components/chat/ChatList';
 import { sendMessageToAPI } from '@/api/chat';
 
-import '@/styles/pages/chat.css'; // ✅ styles wired in Step 1
+// ⬇️ ensure chat styles are loaded
+import '@/styles/pages/chat.css';
 
 /** Storage shape (has timestamp) vs UI shape (no timestamp) */
 type ChatMessageStore = {
@@ -29,12 +29,10 @@ type ChatMessageStore = {
 function mkId() {
   return Math.random().toString(36).slice(2);
 }
-
 function toUI(items?: ChatMessageStore[]): Message[] {
   if (!items?.length) return [];
   return items.map(({ id, role, text }) => ({ id, role, text }));
 }
-
 function toStore(items: Message[], prev?: ChatMessageStore[]): ChatMessageStore[] {
   const now = Date.now();
   const prevMap = new Map(prev?.map((m) => [m.id, m.at]));
@@ -45,8 +43,6 @@ function toStore(items: Message[], prev?: ChatMessageStore[]): ChatMessageStore[
     at: prevMap.get(m.id) ?? now,
   }));
 }
-
-/** Relative time like "just now", "2m ago", "1h ago" */
 function relative(ms: number) {
   const s = Math.max(0, Math.floor((Date.now() - ms) / 1000));
   if (s < 10) return 'just now';
@@ -58,15 +54,11 @@ function relative(ms: number) {
   const d = Math.floor(h / 24);
   return `${d}d ago`;
 }
-
-/** Track “am I near the bottom?” and provide a smooth scroller */
 function useAtBottom(ref: React.RefObject<HTMLElement>, threshold = 64) {
   const [atBottom, setAtBottom] = useState(true);
-
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-
     const onScroll = () => {
       const dist = el.scrollHeight - el.scrollTop - el.clientHeight;
       setAtBottom(dist <= threshold);
@@ -75,13 +67,11 @@ function useAtBottom(ref: React.RefObject<HTMLElement>, threshold = 64) {
     onScroll();
     return () => el.removeEventListener('scroll', onScroll);
   }, [ref, threshold]);
-
   const scrollToBottom = () => {
     const el = ref.current;
     if (!el) return;
     el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
   };
-
   return { atBottom, scrollToBottom };
 }
 
@@ -92,6 +82,7 @@ export default function Chat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [busy, setBusy] = useState(false);
   const [lastActivity, setLastActivity] = useState<number>(Date.now());
+  const [error, setError] = useState<string | null>(null); // ⬅️ NEW
 
   // Initial load (depends on auth state)
   useEffect(() => {
@@ -101,9 +92,7 @@ export default function Chat() {
 
     if (session?.messages?.length) {
       setMessages(toUI(session.messages as unknown as ChatMessageStore[]));
-      const maxAt = Math.max(
-        ...session.messages.map((m: ChatMsgStore) => Number(m.at) || 0)
-      );
+      const maxAt = Math.max(...session.messages.map((m: ChatMsgStore) => Number(m.at) || 0));
       setLastActivity(Number.isFinite(maxAt) ? maxAt : Date.now());
     } else {
       const seed: Message = {
@@ -129,10 +118,9 @@ export default function Chat() {
       ),
     };
 
-    const maxAt =
-      payload.messages.length > 0
-        ? Math.max(...payload.messages.map((m) => m.at))
-        : Date.now();
+    const maxAt = payload.messages.length > 0
+      ? Math.max(...payload.messages.map((m) => m.at))
+      : Date.now();
     setLastActivity(maxAt);
 
     if (user?.id) {
@@ -148,6 +136,7 @@ export default function Chat() {
   }, [messages.length, atBottom, scrollToBottom]);
 
   const onSend = async (text: string) => {
+    setError(null); // ⬅️ clear previous error
     const userMsg: Message = { id: mkId(), role: 'user', text };
     setMessages((prev) => [...prev, userMsg]);
     setBusy(true);
@@ -158,8 +147,17 @@ export default function Chat() {
         ...prev,
         { id: mkId(), role: 'assistant', text: reply.response },
       ]);
-    } catch (err) {
-      console.error('Error sending message:', err);
+    } catch (err: unknown) {
+      let msg = "We couldn’t reach the assistant. Please try again.";
+      if (err instanceof Error) {
+        if (/429/.test(err.message)) {
+          msg = "You’re sending messages too quickly. Please wait a moment.";
+        } else if (/Failed to fetch|Network/i.test(err.message)) {
+          msg = "Network error. Check your connection and try again.";
+        }
+      }
+      setError(msg); // ⬅️ show friendly banner
+      // keep a soft apology in the thread so UX feels responsive
       setMessages((prev) => [
         ...prev,
         { id: mkId(), role: 'assistant', text: 'Sorry, something went wrong.' },
@@ -174,53 +172,42 @@ export default function Chat() {
   return (
     <>
       <Title value="Support Atlas Assistant — Chat" />
-      {/* Visible H1 helps navigation/a11y + satisfies tests that query for /chat/i heading */}
-      <h1 className="h1" style={{ marginTop: 0 }}>Chat</h1>
 
       <section className="chat-wrapper" style={{ display: 'flex', gap: 24 }}>
-        {/* Side list of sessions */}
-        <aside style={{ width: 300 }} aria-label="All chat sessions">
+        <aside style={{ width: 300 }}>
           <h2>All Chat Sessions</h2>
           <ChatList />
         </aside>
 
-        {/* Main chat area */}
         <div style={{ flex: 1 }}>
-          <div
-            ref={scrollerRef}
-            className="chat-scroller"
-            role="log"
-            aria-live="polite"
-            aria-relevant="additions text"
-            aria-label="Messages"
-          >
-            {/* Anonymous banner (scrolls with history so composer stays fixed) */}
+          {/* ⬇️ Friendly error banner; input stays usable */}
+          {error && (
+            <div className="alert error" role="alert">
+              {error}
+            </div>
+          )}
+
+          <div ref={scrollerRef} className="chat-scroller">
             {!user && (
               <div className="card fade-in" role="note" aria-live="polite">
                 <span className="muted">
                   You’re chatting <strong>anonymously</strong>. <strong>Sign in</strong> to
                   save your conversation for later.
                 </span>
-                <a className="btn btn-secondary" href="/login">
-                  Sign in
-                </a>
+                <a className="btn btn-secondary" href="/login">Sign in</a>
               </div>
             )}
 
             <MessageList items={messages} />
 
-            {/* Typing indicator (assistant) */}
             {busy && (
               <div className="typing-row" aria-live="polite" aria-label="Assistant is typing">
                 <div className="typing-bubble">
-                  <span className="typing-dot" />
-                  <span className="typing-dot" />
-                  <span className="typing-dot" />
+                  <span className="typing-dot" /><span className="typing-dot" /><span className="typing-dot" />
                 </div>
               </div>
             )}
 
-            {/* Jump-to-latest appears when you scroll up */}
             {!atBottom && (
               <button className="jump-latest" onClick={scrollToBottom}>
                 Jump to latest
