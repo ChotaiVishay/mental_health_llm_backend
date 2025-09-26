@@ -4,18 +4,19 @@ import Title from '@/components/misc/Title';
 import MessageList, { Message } from '@/components/chat/MessageList';
 import MessageInput from '@/components/chat/MessageInput';
 import { useAuth } from '@/auth/AuthContext';
-import '@/styles/pages/chat.css';
 import {
   loadPreloginChat,
   savePreloginChat,
   loadUserChat,
   saveUserChat,
   type ChatSession,
-  type ChatMessage as ChatMsgStore, // <- use the typed message from sessionStore
+  type ChatMessage as ChatMsgStore,
 } from '@/features/chat/sessionStore';
 
 import ChatList from '@/components/chat/ChatList';
 import { sendMessageToAPI } from '@/api/chat';
+
+import '@/styles/pages/chat.css'; // ✅ styles wired in Step 1
 
 /** Storage shape (has timestamp) vs UI shape (no timestamp) */
 type ChatMessageStore = {
@@ -100,7 +101,6 @@ export default function Chat() {
 
     if (session?.messages?.length) {
       setMessages(toUI(session.messages as unknown as ChatMessageStore[]));
-      // remove `any` by using the exported ChatMessage type
       const maxAt = Math.max(
         ...session.messages.map((m: ChatMsgStore) => Number(m.at) || 0)
       );
@@ -129,7 +129,6 @@ export default function Chat() {
       ),
     };
 
-    // update “last activity”
     const maxAt =
       payload.messages.length > 0
         ? Math.max(...payload.messages.map((m) => m.at))
@@ -153,10 +152,12 @@ export default function Chat() {
     setMessages((prev) => [...prev, userMsg]);
     setBusy(true);
 
-    // Real assistant (API)
     try {
       const reply = await sendMessageToAPI(text, user?.id ?? null);
-      setMessages((prev) => [...prev, { id: mkId(), role: 'assistant', text: reply.response }]);
+      setMessages((prev) => [
+        ...prev,
+        { id: mkId(), role: 'assistant', text: reply.response },
+      ]);
     } catch (err) {
       console.error('Error sending message:', err);
       setMessages((prev) => [
@@ -166,17 +167,6 @@ export default function Chat() {
     } finally {
       setBusy(false);
     }
-
-    // Simulated assistant
-    /*await new Promise((r) => setTimeout(r, 350)); // tiny delay so the typing indicator is visible
-
-    const reply: Message = {
-      id: mkId(),
-      role: 'assistant',
-      text: `You said: "${text}". I’ll look that up.`,
-    };
-    setMessages((prev) => [...prev, reply]);
-    setBusy(false);*/
   };
 
   const lastActivityLabel = useMemo(() => relative(lastActivity), [lastActivity]);
@@ -184,17 +174,26 @@ export default function Chat() {
   return (
     <>
       <Title value="Support Atlas Assistant — Chat" />
+      {/* Visible H1 helps navigation/a11y + satisfies tests that query for /chat/i heading */}
+      <h1 className="h1" style={{ marginTop: 0 }}>Chat</h1>
 
       <section className="chat-wrapper" style={{ display: 'flex', gap: 24 }}>
-        {/* ✅ ADDED: Chat sessions list on the left */}
-        <aside style={{ width: 300 }}>
+        {/* Side list of sessions */}
+        <aside style={{ width: 300 }} aria-label="All chat sessions">
           <h2>All Chat Sessions</h2>
           <ChatList />
         </aside>
-        
+
         {/* Main chat area */}
         <div style={{ flex: 1 }}>
-          <div ref={scrollerRef} className="chat-scroller">
+          <div
+            ref={scrollerRef}
+            className="chat-scroller"
+            role="log"
+            aria-live="polite"
+            aria-relevant="additions text"
+            aria-label="Messages"
+          >
             {/* Anonymous banner (scrolls with history so composer stays fixed) */}
             {!user && (
               <div className="card fade-in" role="note" aria-live="polite">
@@ -206,7 +205,6 @@ export default function Chat() {
                   Sign in
                 </a>
               </div>
-
             )}
 
             <MessageList items={messages} />
