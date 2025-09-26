@@ -4,6 +4,7 @@ import Title from '@/components/misc/Title';
 import MessageList, { Message } from '@/components/chat/MessageList';
 import MessageInput from '@/components/chat/MessageInput';
 import { useAuth } from '@/auth/AuthContext';
+import '@/styles/pages/chat.css';
 import {
   loadPreloginChat,
   savePreloginChat,

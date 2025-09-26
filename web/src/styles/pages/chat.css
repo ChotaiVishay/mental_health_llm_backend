@@ -1,14 +1,59 @@
-.chat { background: var(--surface); border:1px solid var(--grey-300); border-radius: var(--radius-lg); display:flex; flex-direction:column; max-height: 560px; }
-.chat-header { padding: var(--space-4) var(--space-5); border-bottom:1px solid var(--grey-300); display:flex; align-items:center; gap:12px; font-weight:600; }
-.chat-body { padding: var(--space-5); display:flex; flex-direction:column; gap:12px; overflow:auto; }
-.msg { max-width: 80%; padding:12px 14px; border-radius:14px; }
-.msg.bot { background: var(--surface-alt); }
-.msg.user { background: var(--green-100); margin-left:auto; }
-.chat-input { display:flex; gap:8px; padding: var(--space-4) var(--space-5); border-top:1px solid var(--grey-300); }
-.chat-input input { flex:1; padding: 12px 14px; border-radius: var(--radius-md); border:1px solid var(--grey-300); background:#fff; color: var(--text); }
+/* web/src/styles/pages/chat.css */
 
-/* Typing indicator */
-.typing-row{margin-top:10px; display:flex}
-.typing-bubble{ display:inline-flex; align-items:center; gap:6px; padding:.45rem .65rem; border-radius:999px; background:var(--offwhite-3); border:1px solid var(--grey-300); }
-.typing-dot{ width:6px; height:6px; border-radius:50%; background:var(--brand); animation: typingDot 1.2s infinite; }
-@keyframes typingDot{ 0%, 60%, 100%{transform:translateY(0); opacity:.6} 30%{transform:translateY(-3px); opacity:1} }
+/* Outer layout wrappers used by Chat.tsx */
+.chat-wrapper { align-items: flex-start; }
+
+/* Scroll area that contains messages, banner, typing indicator */
+.chat-scroller{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  padding:var(--space-5);
+  background:var(--surface);
+  border:1px solid var(--grey-300);
+  border-radius:var(--radius-lg);
+  height:calc(100vh - 260px);   /* leaves space for header/footer; tweak as needed */
+  overflow:auto;
+}
+
+/* Composer block under the scroller */
+.chat-composer{
+  margin-top:12px;
+  display:grid;
+  gap:8px;
+}
+
+/* “Jump to latest” helper that sticks near bottom when you scroll up */
+.jump-latest{
+  position:sticky;
+  bottom:8px;
+  align-self:center;
+  padding:6px 10px;
+  border-radius:999px;
+  border:1px solid var(--grey-300);
+  background:var(--surface-alt);
+  box-shadow:var(--shadow-1);
+}
+
+/* Message bubbles (MessageList uses .msg.bot / .msg.user) */
+.msg{ max-width:80%; padding:12px 14px; border-radius:14px; }
+.msg.bot{  background:var(--surface-alt); }
+.msg.user{ background:var(--green-100); margin-left:auto; }
+
+/* Typing indicator from your spec */
+.typing-row{ margin-top:10px; display:flex; }
+.typing-bubble{
+  display:inline-flex; align-items:center; gap:6px;
+  padding:.45rem .65rem; border-radius:999px;
+  background:var(--offwhite-3); border:1px solid var(--grey-300);
+}
+.typing-dot{
+  width:6px; height:6px; border-radius:50%;
+  background:var(--brand); animation:typingDot 1.2s infinite;
+}
+@keyframes typingDot{ 0%,60%,100%{transform:translateY(0);opacity:.6} 30%{transform:translateY(-3px);opacity:1} }
+
+/* Simple responsive tweak: collapse side panel under 960px (used later) */
+@media (max-width: 960px){
+  .chat-wrapper{ flex-direction:column; }
+}
