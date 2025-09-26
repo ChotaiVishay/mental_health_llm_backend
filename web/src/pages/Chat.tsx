@@ -14,21 +14,11 @@ import {
 } from '@/features/chat/sessionStore';
 import ChatList from '@/components/chat/ChatList';
 import { sendMessageToAPI } from '@/api/chat';
-
-// ⬇️ ensure chat styles are loaded
 import '@/styles/pages/chat.css';
 
-/** Storage shape (has timestamp) vs UI shape (no timestamp) */
-type ChatMessageStore = {
-  id: string;
-  role: 'user' | 'assistant';
-  text: string;
-  at: number;
-};
+type ChatMessageStore = { id: string; role: 'user' | 'assistant'; text: string; at: number };
 
-function mkId() {
-  return Math.random().toString(36).slice(2);
-}
+function mkId() { return Math.random().toString(36).slice(2); }
 function toUI(items?: ChatMessageStore[]): Message[] {
   if (!items?.length) return [];
   return items.map(({ id, role, text }) => ({ id, role, text }));
@@ -36,12 +26,7 @@ function toUI(items?: ChatMessageStore[]): Message[] {
 function toStore(items: Message[], prev?: ChatMessageStore[]): ChatMessageStore[] {
   const now = Date.now();
   const prevMap = new Map(prev?.map((m) => [m.id, m.at]));
-  return items.map((m) => ({
-    id: m.id,
-    role: m.role,
-    text: m.text,
-    at: prevMap.get(m.id) ?? now,
-  }));
+  return items.map((m) => ({ id: m.id, role: m.role, text: m.text, at: prevMap.get(m.id) ?? now }));
 }
 function relative(ms: number) {
   const s = Math.max(0, Math.floor((Date.now() - ms) / 1000));
@@ -67,24 +52,22 @@ function useAtBottom(ref: React.RefObject<HTMLElement>, threshold = 64) {
     onScroll();
     return () => el.removeEventListener('scroll', onScroll);
   }, [ref, threshold]);
-  const scrollToBottom = () => {
-    const el = ref.current;
-    if (!el) return;
-    el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
-  };
+  const scrollToBottom = () => ref.current?.scrollTo({ top: ref.current.scrollHeight, behavior: 'smooth' });
   return { atBottom, scrollToBottom };
 }
 
 export default function Chat() {
   const { user } = useAuth();
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+
   const scrollerRef = useRef<HTMLDivElement>(null);
   const { atBottom, scrollToBottom } = useAtBottom(scrollerRef);
+
   const [messages, setMessages] = useState<Message[]>([]);
   const [busy, setBusy] = useState(false);
   const [lastActivity, setLastActivity] = useState<number>(Date.now());
-  const [error, setError] = useState<string | null>(null); // ⬅️ NEW
 
-  // Initial load (depends on auth state)
+  // initial load
   useEffect(() => {
     const session: ChatSession | null = user?.id
       ? loadUserChat(String(user.id)) ?? loadPreloginChat()
@@ -95,73 +78,32 @@ export default function Chat() {
       const maxAt = Math.max(...session.messages.map((m: ChatMsgStore) => Number(m.at) || 0));
       setLastActivity(Number.isFinite(maxAt) ? maxAt : Date.now());
     } else {
-      const seed: Message = {
-        id: mkId(),
-        role: 'assistant',
-        text: 'Hi! How can I help you today?',
-      };
-      setMessages([seed]);
+      setMessages([{ id: mkId(), role: 'assistant', text: 'Hi! How can I help you today?' }]);
       setLastActivity(Date.now());
     }
   }, [user?.id]);
 
-  // Persist whenever UI messages change
+  // persist
   useEffect(() => {
-    const prev = user?.id
-      ? loadUserChat(String(user.id)) ?? undefined
-      : loadPreloginChat() ?? undefined;
-
-    const payload = {
-      messages: toStore(
-        messages,
-        (prev?.messages as unknown as ChatMessageStore[] | undefined)
-      ),
-    };
-
-    const maxAt = payload.messages.length > 0
-      ? Math.max(...payload.messages.map((m) => m.at))
-      : Date.now();
+    const prev = user?.id ? loadUserChat(String(user.id)) ?? undefined : loadPreloginChat() ?? undefined;
+    const payload = { messages: toStore(messages, (prev?.messages as unknown as ChatMessageStore[] | undefined)) };
+    const maxAt = payload.messages.length ? Math.max(...payload.messages.map((m) => m.at)) : Date.now();
     setLastActivity(maxAt);
-
-    if (user?.id) {
-      saveUserChat(String(user.id), payload as { messages: ChatMessageStore[] });
-    } else {
-      savePreloginChat(payload as { messages: ChatMessageStore[] });
-    }
+    if (user?.id) saveUserChat(String(user.id), payload as { messages: ChatMessageStore[] });
+    else savePreloginChat(payload as { messages: ChatMessageStore[] });
   }, [messages, user?.id]);
 
-  // Auto-scroll only if you were already at the bottom
-  useEffect(() => {
-    if (atBottom) scrollToBottom();
-  }, [messages.length, atBottom, scrollToBottom]);
+  useEffect(() => { if (atBottom) scrollToBottom(); }, [messages.length, atBottom, scrollToBottom]);
 
   const onSend = async (text: string) => {
-    setError(null); // ⬅️ clear previous error
     const userMsg: Message = { id: mkId(), role: 'user', text };
     setMessages((prev) => [...prev, userMsg]);
     setBusy(true);
-
     try {
       const reply = await sendMessageToAPI(text, user?.id ?? null);
-      setMessages((prev) => [
-        ...prev,
-        { id: mkId(), role: 'assistant', text: reply.response },
-      ]);
-    } catch (err: unknown) {
-      let msg = "We couldn’t reach the assistant. Please try again.";
-      if (err instanceof Error) {
-        if (/429/.test(err.message)) {
-          msg = "You’re sending messages too quickly. Please wait a moment.";
-        } else if (/Failed to fetch|Network/i.test(err.message)) {
-          msg = "Network error. Check your connection and try again.";
-        }
-      }
-      setError(msg); // ⬅️ show friendly banner
-      // keep a soft apology in the thread so UX feels responsive
-      setMessages((prev) => [
-        ...prev,
-        { id: mkId(), role: 'assistant', text: 'Sorry, something went wrong.' },
-      ]);
+      setMessages((prev) => [...prev, { id: mkId(), role: 'assistant', text: reply.response }]);
+    } catch {
+      setMessages((prev) => [...prev, { id: mkId(), role: 'assistant', text: 'Sorry, something went wrong.' }]);
     } finally {
       setBusy(false);
     }
@@ -171,43 +113,59 @@ export default function Chat() {
 
   return (
     <>
-      <Title value="Support Atlas Assistant — Chat" />
+      <Title value="Support Atlas — Chat" />
 
-      <section className="chat-wrapper" style={{ display: 'flex', gap: 24 }}>
-        <aside style={{ width: 300 }}>
-          <h2>All Chat Sessions</h2>
-          <ChatList />
-        </aside>
+      {/* Sticky top banner; always visible until signed in */}
+      {!user && (
+        <div className="anon-banner" role="note" aria-live="polite">
+          <span>You’re chatting <strong>anonymously</strong>. Sign in to save your conversation for later.</span>
+          <a className="btn btn-secondary" href="/login">Sign in</a>
+        </div>
+      )}
 
-        <div style={{ flex: 1 }}>
-          {/* ⬇️ Friendly error banner; input stays usable */}
-          {error && (
-            <div className="alert error" role="alert">
-              {error}
+      {/* Collapsible layout */}
+      <div className={`chat-page ${sidebarOpen ? '' : '-collapsed'}`}>
+        {/* Sidebar */}
+        {sidebarOpen ? (
+          <aside className="chat-sidebar">
+            <header className="sidebar-head">
+              <h2 className="h3" style={{ margin: 0 }}>Conversations</h2>
+              <button className="icon-btn" aria-label="Hide conversations" onClick={() => setSidebarOpen(false)}>
+                ×
+              </button>
+            </header>
+            <div className="sidebar-body">
+              <ChatList />
             </div>
-          )}
+          </aside>
+        ) : (
+          <button
+            className="hambtn"
+            aria-label="Show conversations"
+            onClick={() => setSidebarOpen(true)}
+          >
+            ☰
+          </button>
+        )}
+
+        {/* Main chat panel */}
+        <section className="chat-main">
+          <header className="chat-head">
+            <h2 className="h2" style={{ margin: 0 }}>Chat</h2>
+            <span className="muted small">Last activity {lastActivityLabel}</span>
+          </header>
 
           <div ref={scrollerRef} className="chat-scroller">
-            {!user && (
-              <div className="card fade-in" role="note" aria-live="polite">
-                <span className="muted">
-                  You’re chatting <strong>anonymously</strong>. <strong>Sign in</strong> to
-                  save your conversation for later.
-                </span>
-                <a className="btn btn-secondary" href="/login">Sign in</a>
-              </div>
-            )}
-
             <MessageList items={messages} />
-
             {busy && (
               <div className="typing-row" aria-live="polite" aria-label="Assistant is typing">
                 <div className="typing-bubble">
-                  <span className="typing-dot" /><span className="typing-dot" /><span className="typing-dot" />
+                  <span className="typing-dot" />
+                  <span className="typing-dot" />
+                  <span className="typing-dot" />
                 </div>
               </div>
             )}
-
             {!atBottom && (
               <button className="jump-latest" onClick={scrollToBottom}>
                 Jump to latest
@@ -215,14 +173,11 @@ export default function Chat() {
             )}
           </div>
 
-          <div className="chat-composer">
-            <div className="composer-meta">
-              <span className="muted small">Last activity {lastActivityLabel}</span>
-            </div>
+          <div className="composer-bar">
             <MessageInput onSend={onSend} disabled={busy} />
           </div>
-        </div>
-      </section>
+        </section>
+      </div>
     </>
   );
 }

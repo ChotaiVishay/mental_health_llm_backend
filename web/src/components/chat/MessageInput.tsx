@@ -1,4 +1,3 @@
-// web/src/components/chat/MessageInput.tsx
 import { useState, FormEvent } from 'react';
 
 type Props = {
@@ -19,12 +18,10 @@ export default function MessageInput({ onSend, disabled }: Props) {
 
   return (
     <form className="chat-input" onSubmit={submit} aria-label="Send a message">
-      <label htmlFor="chat-input" className="sr-only">
-        Message
-      </label>
+      <label htmlFor="chat-input" className="sr-only">Message</label>
       <textarea
         id="chat-input"
-        placeholder="Type your message…"
+        placeholder="Ask anything—services, support, next steps…"
         rows={3}
         value={value}
         onChange={(e) => setValue(e.target.value)}
