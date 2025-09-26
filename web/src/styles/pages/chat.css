@@ -1,59 +1,111 @@
 /* web/src/styles/pages/chat.css */
+.chat-wrapper { display: flex; gap: 24px; }
 
-/* Outer layout wrappers used by Chat.tsx */
-.chat-wrapper { align-items: flex-start; }
-
-/* Scroll area that contains messages, banner, typing indicator */
-.chat-scroller{
-  display:flex;
-  flex-direction:column;
-  gap:12px;
-  padding:var(--space-5);
-  background:var(--surface);
-  border:1px solid var(--grey-300);
-  border-radius:var(--radius-lg);
-  height:calc(100vh - 260px);   /* leaves space for header/footer; tweak as needed */
-  overflow:auto;
+/* Scrollable transcript panel */
+.chat-scroller {
+  background: #fff;
+  border: 1px solid var(--grey-300);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  min-height: 360px;
+  max-height: 56vh;
+  overflow: auto;
+  display: grid;
+  align-content: start;
+  gap: 12px;
 }
 
-/* Composer block under the scroller */
-.chat-composer{
-  margin-top:12px;
-  display:grid;
-  gap:8px;
+/* Ordered transcript for SRs and selection */
+.transcript {
+  display: grid;
+  gap: 12px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
-/* “Jump to latest” helper that sticks near bottom when you scroll up */
-.jump-latest{
-  position:sticky;
-  bottom:8px;
-  align-self:center;
-  padding:6px 10px;
-  border-radius:999px;
-  border:1px solid var(--grey-300);
-  background:var(--surface-alt);
-  box-shadow:var(--shadow-1);
+/* Message alignment */
+.msg { display: flex; }
+.msg.assistant { justify-content: flex-start; }
+.msg.user { justify-content: flex-end; }
+
+/* Bubble */
+.bubble {
+  max-width: min(680px, 86%);
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid var(--grey-300);
+  background: var(--surface-alt);
+  color: var(--text);
+}
+.msg.user .bubble {
+  background: var(--green-100);
+  border-color: var(--green-200);
+}
+.msg-meta {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 4px;
 }
 
-/* Message bubbles (MessageList uses .msg.bot / .msg.user) */
-.msg{ max-width:80%; padding:12px 14px; border-radius:14px; }
-.msg.bot{  background:var(--surface-alt); }
-.msg.user{ background:var(--green-100); margin-left:auto; }
-
-/* Typing indicator from your spec */
-.typing-row{ margin-top:10px; display:flex; }
-.typing-bubble{
-  display:inline-flex; align-items:center; gap:6px;
-  padding:.45rem .65rem; border-radius:999px;
-  background:var(--offwhite-3); border:1px solid var(--grey-300);
+/* Typing indicator */
+.typing-row { display: flex; }
+.typing-bubble {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: .45rem .65rem;
+  border-radius: 999px;
+  background: var(--offwhite-3);
+  border: 1px solid var(--grey-300);
 }
-.typing-dot{
-  width:6px; height:6px; border-radius:50%;
-  background:var(--brand); animation:typingDot 1.2s infinite;
+.typing-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--brand);
+  animation: typingDot 1.2s infinite;
 }
-@keyframes typingDot{ 0%,60%,100%{transform:translateY(0);opacity:.6} 30%{transform:translateY(-3px);opacity:1} }
+@keyframes typingDot {
+  0%, 60%, 100% { transform: translateY(0); opacity: .6; }
+  30% { transform: translateY(-3px); opacity: 1; }
+}
 
-/* Simple responsive tweak: collapse side panel under 960px (used later) */
-@media (max-width: 960px){
-  .chat-wrapper{ flex-direction:column; }
+/* Composer pinned under the scroller */
+.chat-composer {
+  margin-top: 12px;
+  display: grid;
+  gap: 8px;
+}
+.composer-meta { display: flex; justify-content: space-between; }
+
+/* Input row */
+.chat-input {
+  display: flex;
+  gap: 8px;
+  padding: var(--space-4) var(--space-0);
+  border-top: 1px solid var(--grey-200);
+}
+.chat-input textarea {
+  flex: 1;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--grey-300);
+  background: #fff;
+  color: var(--text);
+  resize: vertical;
+}
+
+/* Jump to latest button */
+.jump-latest {
+  align-self: center;
+  justify-self: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--grey-300);
+  background: var(--offwhite-3);
+}
+
+/* Screen-reader only utility */
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
 }

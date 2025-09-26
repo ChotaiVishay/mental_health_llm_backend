@@ -1,44 +1,38 @@
-import { FormEvent, useRef, useState } from 'react';
-import Button from '@/components/ui/Button';
+// web/src/components/chat/MessageInput.tsx
+import { useState, FormEvent } from 'react';
 
-export default function MessageInput({
-  onSend,
-  disabled
-}: {
-  onSend: (text: string) => void;
+type Props = {
+  onSend: (text: string) => void | Promise<void>;
   disabled?: boolean;
-}) {
-  const [val, setVal] = useState('');
-  const ref = useRef<HTMLTextAreaElement>(null);
+};
 
-  const submit = (e: FormEvent) => {
+export default function MessageInput({ onSend, disabled }: Props) {
+  const [value, setValue] = useState('');
+
+  function submit(e: FormEvent) {
     e.preventDefault();
-    const text = val.trim();
-    if (!text) return;
+    const text = value.trim();
+    if (!text || disabled) return;
     onSend(text);
-    setVal('');
-    ref.current?.focus();
-  };
+    setValue('');
+  }
 
   return (
-    <form onSubmit={submit} style={{ display: 'grid', gap: 8 }}>
-      <label htmlFor="chat-input" style={{ position: 'absolute', left: -9999 }}>
+    <form className="chat-input" onSubmit={submit} aria-label="Send a message">
+      <label htmlFor="chat-input" className="sr-only">
         Message
       </label>
       <textarea
         id="chat-input"
-        ref={ref}
-        value={val}
-        onChange={(e) => setVal(e.target.value)}
-        rows={3}
         placeholder="Type your message…"
-        style={{ padding: 12, borderRadius: 10, border: '1px solid #E5E7EB', resize: 'vertical' }}
+        rows={3}
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        disabled={disabled}
       />
-      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-        <Button variant="primary" type="submit" disabled={disabled || !val.trim()}>
-          Send
-        </Button>
-      </div>
+      <button className="btn primary" type="submit" disabled={disabled || !value.trim()}>
+        Send
+      </button>
     </form>
   );
 }
