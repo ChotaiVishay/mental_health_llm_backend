@@ -1,0 +1,18 @@
+[
+  {
+    "id": "svc-1",
+    "name": "Northside Counselling",
+    "orgKind": "Private Clinic",
+    "suburb": "Brunswick",
+    "specialty": "Anxiety",
+    "updatedAt": "2025-06-10T10:00:00Z"
+  },
+  {
+    "id": "svc-2",
+    "name": "City GP Clinic",
+    "orgKind": "Hospital",
+    "suburb": "Melbourne CBD",
+    "specialty": "Mental health care plan",
+    "updatedAt": "2025-05-28T09:00:00Z"
+  }
+]
