@@ -18,12 +18,9 @@ export default function Header() {
             <NavLink to="/chat" className={({ isActive }) => (isActive ? 'active' : undefined)}>
               Chat
             </NavLink>
-            <NavLink to="/services" className={({ isActive }) => (isActive ? 'active' : undefined)}>
-              Services
-            </NavLink>
-            <NavLink to="/help" className={({ isActive }) => (isActive ? 'active' : undefined)}>
-              Help &amp; Crisis
-            </NavLink>
+            {/* Removed Services; add in-page anchors for Help & Crisis and FAQ */}
+            <a href="/#help-crisis">Help &amp; Crisis</a>
+            <a href="/#faq">FAQ</a>
           </nav>
         </div>
       </Container>
