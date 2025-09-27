@@ -1,4 +1,3 @@
-// web/src/pages/Chat.tsx
 import { useEffect, useMemo, useRef, useState } from 'react';
 import Title from '@/components/misc/Title';
 import MessageList, { Message } from '@/components/chat/MessageList';
@@ -10,42 +9,24 @@ import {
   loadUserChat,
   saveUserChat,
   type ChatSession,
-  type ChatMessage as ChatMsgStore, // <- use the typed message from sessionStore
+  type ChatMessage as ChatMsgStore,
 } from '@/features/chat/sessionStore';
-
-// ✅ ADDED: import the ChatList component to show all sessions
 import ChatList from '@/components/chat/ChatList';
 import { sendMessageToAPI } from '@/api/chat';
+import '@/styles/pages/chat.css';
 
-/** Storage shape (has timestamp) vs UI shape (no timestamp) */
-type ChatMessageStore = {
-  id: string;
-  role: 'user' | 'assistant';
-  text: string;
-  at: number;
-};
+type ChatMessageStore = { id: string; role: 'user' | 'assistant'; text: string; at: number };
 
-function mkId() {
-  return Math.random().toString(36).slice(2);
-}
-
+function mkId() { return Math.random().toString(36).slice(2); }
 function toUI(items?: ChatMessageStore[]): Message[] {
   if (!items?.length) return [];
   return items.map(({ id, role, text }) => ({ id, role, text }));
 }
-
 function toStore(items: Message[], prev?: ChatMessageStore[]): ChatMessageStore[] {
   const now = Date.now();
   const prevMap = new Map(prev?.map((m) => [m.id, m.at]));
-  return items.map((m) => ({
-    id: m.id,
-    role: m.role,
-    text: m.text,
-    at: prevMap.get(m.id) ?? now,
-  }));
+  return items.map((m) => ({ id: m.id, role: m.role, text: m.text, at: prevMap.get(m.id) ?? now }));
 }
-
-/** Relative time like "just now", "2m ago", "1h ago" */
 function relative(ms: number) {
   const s = Math.max(0, Math.floor((Date.now() - ms) / 1000));
   if (s < 10) return 'just now';
@@ -58,14 +39,11 @@ function relative(ms: number) {
   return `${d}d ago`;
 }
 
-/** Track “am I near the bottom?” and provide a smooth scroller */
 function useAtBottom(ref: React.RefObject<HTMLElement>, threshold = 64) {
   const [atBottom, setAtBottom] = useState(true);
-
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-
     const onScroll = () => {
       const dist = el.scrollHeight - el.scrollTop - el.clientHeight;
       setAtBottom(dist <= threshold);
@@ -74,25 +52,26 @@ function useAtBottom(ref: React.RefObject<HTMLElement>, threshold = 64) {
     onScroll();
     return () => el.removeEventListener('scroll', onScroll);
   }, [ref, threshold]);
-
-  const scrollToBottom = () => {
-    const el = ref.current;
-    if (!el) return;
-    el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
-  };
-
+  const scrollToBottom = () => ref.current?.scrollTo({ top: ref.current.scrollHeight, behavior: 'smooth' });
   return { atBottom, scrollToBottom };
 }
 
 export default function Chat() {
   const { user } = useAuth();
-  const scrollerRef = useRef<HTMLDivElement>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+
+  // Refs
+  const pageRef = useRef<HTMLDivElement>(null);     // whole [sidebar|main] + composer grid
+  const scrollerRef = useRef<HTMLDivElement>(null); // transcript scroller
+
   const { atBottom, scrollToBottom } = useAtBottom(scrollerRef);
+
   const [messages, setMessages] = useState<Message[]>([]);
   const [busy, setBusy] = useState(false);
   const [lastActivity, setLastActivity] = useState<number>(Date.now());
+  const [netErr, setNetErr] = useState<string | null>(null);
 
-  // Initial load (depends on auth state)
+  // initial load
   useEffect(() => {
     const session: ChatSession | null = user?.id
       ? loadUserChat(String(user.id)) ?? loadPreloginChat()
@@ -100,144 +79,172 @@ export default function Chat() {
 
     if (session?.messages?.length) {
       setMessages(toUI(session.messages as unknown as ChatMessageStore[]));
-      // remove `any` by using the exported ChatMessage type
-      const maxAt = Math.max(
-        ...session.messages.map((m: ChatMsgStore) => Number(m.at) || 0)
-      );
+      const maxAt = Math.max(...session.messages.map((m: ChatMsgStore) => Number(m.at) || 0));
       setLastActivity(Number.isFinite(maxAt) ? maxAt : Date.now());
     } else {
-      const seed: Message = {
-        id: mkId(),
-        role: 'assistant',
-        text: 'Hi! How can I help you today?',
-      };
-      setMessages([seed]);
+      setMessages([{ id: mkId(), role: 'assistant', text: 'Hi! How can I help you today?' }]);
       setLastActivity(Date.now());
     }
   }, [user?.id]);
 
-  // Persist whenever UI messages change
+  // persist
   useEffect(() => {
-    const prev = user?.id
-      ? loadUserChat(String(user.id)) ?? undefined
-      : loadPreloginChat() ?? undefined;
-
-    const payload = {
-      messages: toStore(
-        messages,
-        (prev?.messages as unknown as ChatMessageStore[] | undefined)
-      ),
-    };
-
-    // update “last activity”
-    const maxAt =
-      payload.messages.length > 0
-        ? Math.max(...payload.messages.map((m) => m.at))
-        : Date.now();
+    const prev = user?.id ? loadUserChat(String(user.id)) ?? undefined : loadPreloginChat() ?? undefined;
+    const payload = { messages: toStore(messages, (prev?.messages as unknown as ChatMessageStore[] | undefined)) };
+    const maxAt = payload.messages.length ? Math.max(...payload.messages.map((m) => m.at)) : Date.now();
     setLastActivity(maxAt);
-
-    if (user?.id) {
-      saveUserChat(String(user.id), payload as { messages: ChatMessageStore[] });
-    } else {
-      savePreloginChat(payload as { messages: ChatMessageStore[] });
-    }
+    if (user?.id) saveUserChat(String(user.id), payload as { messages: ChatMessageStore[] });
+    else savePreloginChat(payload as { messages: ChatMessageStore[] });
   }, [messages, user?.id]);
 
-  // Auto-scroll only if you were already at the bottom
-  useEffect(() => {
-    if (atBottom) scrollToBottom();
-  }, [messages.length, atBottom, scrollToBottom]);
+  // auto-scroll only when already near the bottom
+  useEffect(() => { if (atBottom) scrollToBottom(); }, [messages.length, atBottom, scrollToBottom]);
 
   const onSend = async (text: string) => {
+    setNetErr(null);
     const userMsg: Message = { id: mkId(), role: 'user', text };
     setMessages((prev) => [...prev, userMsg]);
     setBusy(true);
-
-    // Real assistant (API)
     try {
       const reply = await sendMessageToAPI(text, user?.id ?? null);
       setMessages((prev) => [...prev, { id: mkId(), role: 'assistant', text: reply.response }]);
-    } catch (err) {
-      console.error('Error sending message:', err);
-      setMessages((prev) => [
-        ...prev,
-        { id: mkId(), role: 'assistant', text: 'Sorry, something went wrong.' },
-      ]);
+    } catch {
+      setNetErr('Network error — please try again.');
+      setMessages((prev) => [...prev, { id: mkId(), role: 'assistant', text: 'Sorry, something went wrong.' }]);
     } finally {
       setBusy(false);
     }
-
-    // Simulated assistant
-    /*await new Promise((r) => setTimeout(r, 350)); // tiny delay so the typing indicator is visible
-
-    const reply: Message = {
-      id: mkId(),
-      role: 'assistant',
-      text: `You said: "${text}". I’ll look that up.`,
-    };
-    setMessages((prev) => [...prev, reply]);
-    setBusy(false);*/
   };
 
   const lastActivityLabel = useMemo(() => relative(lastActivity), [lastActivity]);
 
+  // === Fit the page grid to the viewport from its actual top (so composer is visible at 100% zoom)
+  useEffect(() => {
+    let raf = 0;
+    const el = pageRef.current;
+    if (!el) return;
+
+    const recalc = () => {
+      const top = el.getBoundingClientRect().top;
+      const h = Math.max(520, Math.round(window.innerHeight - top)); // never collapse
+      el.style.height = `${h}px`;
+    };
+
+    const schedule = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(recalc);
+    };
+
+    schedule();
+
+    // fonts.ready isn't in JSDOM — guard it without using `any`
+    type DocWithFonts = Document & { fonts?: { ready?: Promise<unknown> } };
+    const fontsReady = (document as DocWithFonts).fonts?.ready;
+    fontsReady?.then(() => schedule());
+
+    // Viewport changes
+    window.addEventListener('resize', schedule);
+    window.addEventListener('orientationchange', schedule);
+
+    // Guard ResizeObserver (missing in JSDOM)
+    let ro: ResizeObserver | null = null;
+    if (typeof window !== 'undefined' && 'ResizeObserver' in window) {
+      ro = new ResizeObserver(schedule);
+      ro.observe(document.body);
+    }
+
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener('resize', schedule);
+      window.removeEventListener('orientationchange', schedule);
+      ro?.disconnect();
+    };
+  }, []);
+
+  // Recalculate when these toggle height above the grid
+  useEffect(() => {
+    const el = pageRef.current;
+    if (!el) return;
+    const top = el.getBoundingClientRect().top;
+    el.style.height = `${Math.max(520, Math.round(window.innerHeight - top))}px`;
+  }, [netErr, sidebarOpen, user]);
+
   return (
     <>
-      <Title value="Support Atlas Assistant — Chat" />
+      <Title value="Support Atlas — Chat" />
 
-      <section className="chat-wrapper" style={{ display: 'flex', gap: 24 }}>
-        {/* ✅ ADDED: Chat sessions list on the left */}
-        <aside style={{ width: 300 }}>
-          <h2>All Chat Sessions</h2>
-          <ChatList />
-        </aside>
-        
-        {/* Main chat area */}
-        <div style={{ flex: 1 }}>
-          <div ref={scrollerRef} className="chat-scroller">
-            {/* Anonymous banner (scrolls with history so composer stays fixed) */}
-            {!user && (
-              <div className="card fade-in" role="note" aria-live="polite">
-                <span className="muted">
-                  You’re chatting <strong>anonymously</strong>. <strong>Sign in</strong> to
-                  save your conversation for later.
-                </span>
-                <a className="btn btn-secondary" href="/login">
-                  Sign in
-                </a>
-              </div>
-
-            )}
-
-            <MessageList items={messages} />
-
-            {/* Typing indicator (assistant) */}
-            {busy && (
-              <div className="typing-row" aria-live="polite" aria-label="Assistant is typing">
-                <div className="typing-bubble">
-                  <span className="typing-dot" />
-                  <span className="typing-dot" />
-                  <span className="typing-dot" />
-                </div>
-              </div>
-            )}
-
-            {/* Jump-to-latest appears when you scroll up */}
-            {!atBottom && (
-              <button className="jump-latest" onClick={scrollToBottom}>
-                Jump to latest
-              </button>
-            )}
-          </div>
-
-          <div className="chat-composer">
-            <div className="composer-meta">
-              <span className="muted small">Last activity {lastActivityLabel}</span>
-            </div>
-            <MessageInput onSend={onSend} disabled={busy} />
-          </div>
+      {/* Signed-out banner */}
+      {!user && (
+        <div className="anon-banner" role="note" aria-live="polite">
+          <span>You’re chatting <strong>anonymously</strong>. Sign in to save your conversation for later.</span>
+          <a className="btn btn-secondary" href="/login">Sign in</a>
         </div>
-      </section>
+      )}
+
+      {/* Page grid: [sidebar | main] above, [sidebar | composer] below */}
+      <div ref={pageRef} className={`chat-page ${sidebarOpen ? '' : '-collapsed'}`}>
+        {/* Sidebar */}
+        {sidebarOpen ? (
+          <aside className="chat-sidebar">
+            <header className="sidebar-head">
+              <h2 className="h3" style={{ margin: 0 }}>Conversations</h2>
+              <button className="icon-btn" aria-label="Hide conversations" onClick={() => setSidebarOpen(false)}>×</button>
+            </header>
+            <div className="sidebar-body">
+              <ChatList />
+            </div>
+          </aside>
+        ) : (
+          <button className="hambtn" aria-label="Open chat history" onClick={() => setSidebarOpen(true)}>☰</button>
+        )}
+
+        {/* Main chat panel (no composer here) */}
+        <section className="chat-main">
+          <header className="chat-head">
+            <h2 className="h2" style={{ margin: 0 }}>Chat</h2>
+            <span className="muted small">Last activity {lastActivityLabel}</span>
+          </header>
+
+          {netErr && (
+            <div role="alert" className="chat-alert" aria-live="polite">
+              <span>{netErr}</span>
+              <button
+                type="button"
+                className="alert-dismiss"
+                aria-label="Dismiss alert"
+                onClick={() => setNetErr(null)}
+              >
+                ×
+              </button>
+            </div>
+          )}
+
+          {/* Only this div scrolls */}
+          <div ref={scrollerRef} className="chat-scroller">
+            <div className="chat-body">
+              <MessageList items={messages} />
+              {busy && (
+                <div className="typing-row" aria-live="polite" aria-label="Assistant is typing">
+                  <div className="typing-bubble">
+                    <span className="typing-dot" />
+                    <span className="typing-dot" />
+                    <span className="typing-dot" />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {!atBottom && (
+              <button className="jump-latest" onClick={scrollToBottom}>Jump to latest</button>
+            )}
+          </div>
+        </section>
+
+        {/* Composer dock — separate row pinned at grid bottom */}
+        <div className="composer-dock">
+          <MessageInput onSend={onSend} disabled={busy} />
+        </div>
+      </div>
     </>
   );
 }
