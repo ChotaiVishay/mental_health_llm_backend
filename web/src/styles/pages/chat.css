@@ -71,3 +71,18 @@
 .typing-dot{ width:6px; height:6px; border-radius:50%; background:var(--brand); animation: typingDot 1.2s infinite; }
 @keyframes typingDot{ 0%,60%,100%{transform:translateY(0); opacity:.6} 30%{transform:translateY(-3px); opacity:1} }
 .jump-latest{ margin:0 auto; padding:6px 10px; border:1px solid var(--grey-300); border-radius:999px; background:var(--surface); }
+
+/* Composer actions & mic state */
+.composer-actions { display:flex; gap:8px; align-items:center; }
+.btn.listening { position: relative; }
+.btn.listening::after{
+  content:''; position:absolute; inset:-4px; border-radius:12px;
+  border:2px solid var(--brand); opacity:.6; animation:pulse 1s infinite;
+}
+@keyframes pulse{ 0%{transform:scale(.95)} 70%{transform:scale(1.05); opacity:.2} 100%{transform:scale(.95); opacity:.6} }
+
+/* Inline icon in bubble meta */
+.icon-inline{
+  margin-left:8px; padding:2px 6px; border:1px solid var(--grey-300);
+  border-radius:10px; background:var(--surface); cursor:pointer; font-size:12px;
+}
