@@ -1,4 +1,3 @@
-// web/src/pages/Chat.tsx
 import { useEffect, useMemo, useRef, useState } from 'react';
 import Title from '@/components/misc/Title';
 import MessageList, { Message } from '@/components/chat/MessageList';
@@ -62,7 +61,7 @@ export default function Chat() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   // Refs
-  const pageRef = useRef<HTMLDivElement>(null);   // whole [sidebar|main] + composer grid
+  const pageRef = useRef<HTMLDivElement>(null);     // whole [sidebar|main] + composer grid
   const scrollerRef = useRef<HTMLDivElement>(null); // transcript scroller
 
   const { atBottom, scrollToBottom } = useAtBottom(scrollerRef);
@@ -137,19 +136,28 @@ export default function Chat() {
     };
 
     schedule();
-    (document as any).fonts?.ready?.then?.(schedule);
 
-    // React on viewport or layout changes (banner/nav/sidebar/alert)
+    // fonts.ready isn't in JSDOM — guard it without using `any`
+    type DocWithFonts = Document & { fonts?: { ready?: Promise<unknown> } };
+    const fontsReady = (document as DocWithFonts).fonts?.ready;
+    fontsReady?.then(() => schedule());
+
+    // Viewport changes
     window.addEventListener('resize', schedule);
     window.addEventListener('orientationchange', schedule);
-    const ro = new ResizeObserver(schedule);
-    ro.observe(document.body);
+
+    // Guard ResizeObserver (missing in JSDOM)
+    let ro: ResizeObserver | null = null;
+    if (typeof window !== 'undefined' && 'ResizeObserver' in window) {
+      ro = new ResizeObserver(schedule);
+      ro.observe(document.body);
+    }
 
     return () => {
       cancelAnimationFrame(raf);
       window.removeEventListener('resize', schedule);
       window.removeEventListener('orientationchange', schedule);
-      ro.disconnect();
+      ro?.disconnect();
     };
   }, []);
 
