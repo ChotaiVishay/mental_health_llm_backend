@@ -39,6 +39,7 @@ function relative(ms: number) {
   const d = Math.floor(h / 24);
   return `${d}d ago`;
 }
+
 function useAtBottom(ref: React.RefObject<HTMLElement>, threshold = 64) {
   const [atBottom, setAtBottom] = useState(true);
   useEffect(() => {
@@ -60,13 +61,16 @@ export default function Chat() {
   const { user } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
-  const scrollerRef = useRef<HTMLDivElement>(null);
+  // Refs
+  const pageRef = useRef<HTMLDivElement>(null);   // whole [sidebar|main] + composer grid
+  const scrollerRef = useRef<HTMLDivElement>(null); // transcript scroller
+
   const { atBottom, scrollToBottom } = useAtBottom(scrollerRef);
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [busy, setBusy] = useState(false);
   const [lastActivity, setLastActivity] = useState<number>(Date.now());
-  const [netErr, setNetErr] = useState<string | null>(null); // NEW: surface network errors
+  const [netErr, setNetErr] = useState<string | null>(null);
 
   // initial load
   useEffect(() => {
@@ -94,10 +98,11 @@ export default function Chat() {
     else savePreloginChat(payload as { messages: ChatMessageStore[] });
   }, [messages, user?.id]);
 
+  // auto-scroll only when already near the bottom
   useEffect(() => { if (atBottom) scrollToBottom(); }, [messages.length, atBottom, scrollToBottom]);
 
   const onSend = async (text: string) => {
-    setNetErr(null); // clear any previous network error
+    setNetErr(null);
     const userMsg: Message = { id: mkId(), role: 'user', text };
     setMessages((prev) => [...prev, userMsg]);
     setBusy(true);
@@ -105,7 +110,6 @@ export default function Chat() {
       const reply = await sendMessageToAPI(text, user?.id ?? null);
       setMessages((prev) => [...prev, { id: mkId(), role: 'assistant', text: reply.response }]);
     } catch {
-      // Friendly error + keep composer usable
       setNetErr('Network error — please try again.');
       setMessages((prev) => [...prev, { id: mkId(), role: 'assistant', text: 'Sorry, something went wrong.' }]);
     } finally {
@@ -114,6 +118,48 @@ export default function Chat() {
   };
 
   const lastActivityLabel = useMemo(() => relative(lastActivity), [lastActivity]);
+
+  // === Fit the page grid to the viewport from its actual top (so composer is visible at 100% zoom)
+  useEffect(() => {
+    let raf = 0;
+    const el = pageRef.current;
+    if (!el) return;
+
+    const recalc = () => {
+      const top = el.getBoundingClientRect().top;
+      const h = Math.max(520, Math.round(window.innerHeight - top)); // never collapse
+      el.style.height = `${h}px`;
+    };
+
+    const schedule = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(recalc);
+    };
+
+    schedule();
+    (document as any).fonts?.ready?.then?.(schedule);
+
+    // React on viewport or layout changes (banner/nav/sidebar/alert)
+    window.addEventListener('resize', schedule);
+    window.addEventListener('orientationchange', schedule);
+    const ro = new ResizeObserver(schedule);
+    ro.observe(document.body);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener('resize', schedule);
+      window.removeEventListener('orientationchange', schedule);
+      ro.disconnect();
+    };
+  }, []);
+
+  // Recalculate when these toggle height above the grid
+  useEffect(() => {
+    const el = pageRef.current;
+    if (!el) return;
+    const top = el.getBoundingClientRect().top;
+    el.style.height = `${Math.max(520, Math.round(window.innerHeight - top))}px`;
+  }, [netErr, sidebarOpen, user]);
 
   return (
     <>
@@ -127,71 +173,69 @@ export default function Chat() {
         </div>
       )}
 
-      {/* Collapsible layout */}
-      <div className={`chat-page ${sidebarOpen ? '' : '-collapsed'}`}>
+      {/* Page grid: [sidebar | main] above, [sidebar | composer] below */}
+      <div ref={pageRef} className={`chat-page ${sidebarOpen ? '' : '-collapsed'}`}>
         {/* Sidebar */}
         {sidebarOpen ? (
           <aside className="chat-sidebar">
             <header className="sidebar-head">
               <h2 className="h3" style={{ margin: 0 }}>Conversations</h2>
-              <button className="icon-btn" aria-label="Hide conversations" onClick={() => setSidebarOpen(false)}>
-                ×
-              </button>
+              <button className="icon-btn" aria-label="Hide conversations" onClick={() => setSidebarOpen(false)}>×</button>
             </header>
             <div className="sidebar-body">
               <ChatList />
             </div>
           </aside>
         ) : (
-          <button
-            className="hambtn"
-            aria-label="Open chat history"
-            onClick={() => setSidebarOpen(true)}
-          >
-            ☰
-          </button>
+          <button className="hambtn" aria-label="Open chat history" onClick={() => setSidebarOpen(true)}>☰</button>
         )}
 
-        {/* Main chat panel */}
+        {/* Main chat panel (no composer here) */}
         <section className="chat-main">
           <header className="chat-head">
             <h2 className="h2" style={{ margin: 0 }}>Chat</h2>
             <span className="muted small">Last activity {lastActivityLabel}</span>
           </header>
 
-          {/* NEW: network error banner */}
           {netErr && (
-            <div
-              role="alert"
-              className="card"
-              style={{ margin: '12px 16px 0', borderColor: '#f59e0b', background: '#fff7ed' }}
-            >
-              {netErr}
+            <div role="alert" className="chat-alert" aria-live="polite">
+              <span>{netErr}</span>
+              <button
+                type="button"
+                className="alert-dismiss"
+                aria-label="Dismiss alert"
+                onClick={() => setNetErr(null)}
+              >
+                ×
+              </button>
             </div>
           )}
 
+          {/* Only this div scrolls */}
           <div ref={scrollerRef} className="chat-scroller">
-            <MessageList items={messages} />
-            {busy && (
-              <div className="typing-row" aria-live="polite" aria-label="Assistant is typing">
-                <div className="typing-bubble">
-                  <span className="typing-dot" />
-                  <span className="typing-dot" />
-                  <span className="typing-dot" />
+            <div className="chat-body">
+              <MessageList items={messages} />
+              {busy && (
+                <div className="typing-row" aria-live="polite" aria-label="Assistant is typing">
+                  <div className="typing-bubble">
+                    <span className="typing-dot" />
+                    <span className="typing-dot" />
+                    <span className="typing-dot" />
+                  </div>
                 </div>
-              </div>
-            )}
-            {!atBottom && (
-              <button className="jump-latest" onClick={scrollToBottom}>
-                Jump to latest
-              </button>
-            )}
-          </div>
+              )}
+            </div>
 
-          <div className="composer-bar">
-            <MessageInput onSend={onSend} disabled={busy} />
+            {!atBottom && (
+              <button className="jump-latest" onClick={scrollToBottom}>Jump to latest</button>
+            )}
           </div>
         </section>
+
+        {/* Composer dock — separate row pinned at grid bottom */}
+        <div className="composer-dock">
+          <MessageInput onSend={onSend} disabled={busy} />
+        </div>
       </div>
     </>
   );

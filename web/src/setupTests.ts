@@ -1,16 +1,11 @@
 import '@testing-library/jest-dom/vitest';
 
-// ---------------------------------------------------------------------
-// Keep your existing scrollTo polyfill
-// ---------------------------------------------------------------------
+// scrollTo (used by Services.tsx for "back to top" button)
 if (!('scrollTo' in window.HTMLElement.prototype)) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (window.HTMLElement.prototype as any).scrollTo = () => {};
 }
-
-// ---------------------------------------------------------------------
 // matchMedia (used by Home.tsx)
-// ---------------------------------------------------------------------
 if (!window.matchMedia) {
   Object.defineProperty(window, 'matchMedia', {
     writable: true,

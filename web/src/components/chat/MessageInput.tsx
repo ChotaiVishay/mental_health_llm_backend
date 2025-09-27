@@ -1,4 +1,4 @@
-import { useState, FormEvent } from 'react';
+import { useState, FormEvent, useEffect } from 'react';
 import { useSpeechToText } from '@/hooks/useSpeechToText';
 import { useMicRecorder } from '@/hooks/useMicRecorder';
 
@@ -11,6 +11,20 @@ export default function MessageInput({ onSend, disabled }: Props) {
   const [value, setValue] = useState('');
   const stt = useSpeechToText();           // Chrome path
   const rec = useMicRecorder();            // Fallback path
+
+  // Keep dictated text after the mic stops: append final transcript, or last interim if no final arrives.
+  useEffect(() => {
+    const t = stt.finalText;
+    if (!t) return;
+    setValue((prev) => (prev ? `${prev} ${t}`.trim() : t));
+  }, [stt.finalText]);
+
+  useEffect(() => {
+    // If the user stops speaking and we only had interim text, keep that in the box.
+    if (!stt.isListening && !stt.error && stt.interim && !stt.finalText) {
+      setValue((prev) => (prev ? `${prev} ${stt.interim}`.trim() : stt.interim));
+    }
+  }, [stt.isListening, stt.error, stt.interim, stt.finalText]);
 
   async function uploadAndInsert(blob: Blob) {
     const fd = new FormData();
