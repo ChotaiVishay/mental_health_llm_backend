@@ -17,7 +17,10 @@ it('starts chat anonymously when logged out', () => {
     </MemoryRouter>
   );
 
-  fireEvent.click(screen.getByText('Start Chat'));
+  // Click the main CTA (unique accessible name)
+  const cta = screen.getByRole('button', { name: /no sign-in required/i });
+  fireEvent.click(cta);
+
   // We should be on the Chat page, not /login.
   expect(screen.getByRole('textbox', { name: /message/i })).toBeInTheDocument();
 });

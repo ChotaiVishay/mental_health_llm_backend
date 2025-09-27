@@ -1,28 +1,43 @@
 import { vi } from 'vitest';
 import '@testing-library/jest-dom/vitest';
 
-// Mock styles that jsdom/cssstyle can't parse (e.g., border: 1px solid var(...)).
-// We don't need CSS in behavior tests, so stub the module to an empty object.
+/**
+ * CSS stubs — jsdom can't parse our CSS vars/border shorthands. We don't assert styles in unit tests,
+ * so return empty modules for CSS imports.
+ */
 vi.mock('@/styles/pages/login.css', () => ({}));
+vi.mock('@/styles/pages/home.css', () => ({}));
 
-// scrollTo (used by Services.tsx for "back to top" button)
+/**
+ * Smooth scroll helpers used by various components
+ */
+if (!('scrollTo' in window)) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (window as any).scrollTo = () => {};
+}
 if (!('scrollTo' in window.HTMLElement.prototype)) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (window.HTMLElement.prototype as any).scrollTo = () => {};
 }
+if (!('scrollIntoView' in window.HTMLElement.prototype)) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (window.HTMLElement.prototype as any).scrollIntoView = () => {};
+}
 
-// matchMedia (used by Home.tsx)
+/**
+ * matchMedia — Home.tsx checks prefers-reduced-motion
+ */
 if (!window.matchMedia) {
   Object.defineProperty(window, 'matchMedia', {
     writable: true,
     value: (query: string) => ({
-      matches: false,
+      matches: false, // simulate "no reduced motion" by default
       media: query,
       onchange: null as ((this: MediaQueryList, ev: MediaQueryListEvent) => unknown) | null,
-      // Legacy listeners some libs still call:
+      // Legacy API
       addListener: () => {},
       removeListener: () => {},
-      // Modern API:
+      // Modern API
       addEventListener: () => {},
       removeEventListener: () => {},
       dispatchEvent: () => false,
@@ -30,8 +45,10 @@ if (!window.matchMedia) {
   });
 }
 
-// IntersectionObserver (used by Home.tsx for reveals/parallax)
-// Minimal, no-op implementation sufficient for tests
+/**
+ * IntersectionObserver — reveal-on-view, etc.
+ * Minimal no-op that satisfies the type/usage.
+ */
 if (typeof (globalThis as unknown as { IntersectionObserver?: unknown }).IntersectionObserver === 'undefined') {
   class MockIntersectionObserver implements IntersectionObserver {
     readonly root: Element | Document | null;
@@ -59,8 +76,9 @@ if (typeof (globalThis as unknown as { IntersectionObserver?: unknown }).Interse
     MockIntersectionObserver;
 }
 
-
-// ResizeObserver — some components guard for it, but add a tiny mock for tests
+/**
+ * ResizeObserver — occasionally referenced; provide a tiny stub.
+ */
 if (typeof (globalThis as unknown as { ResizeObserver?: unknown }).ResizeObserver === 'undefined') {
   class MockResizeObserver implements ResizeObserver {
     constructor(_cb: ResizeObserverCallback) { void _cb; }
@@ -71,7 +89,9 @@ if (typeof (globalThis as unknown as { ResizeObserver?: unknown }).ResizeObserve
   (globalThis as unknown as { ResizeObserver: typeof MockResizeObserver }).ResizeObserver = MockResizeObserver;
 }
 
-// requestAnimationFrame fallback (used by smooth animations in Home.tsx)
+/**
+ * rAF — gentle animations fallback used by Home.tsx
+ */
 if (!(globalThis as unknown as { requestAnimationFrame?: unknown }).requestAnimationFrame) {
   (globalThis as unknown as {
     requestAnimationFrame: (cb: FrameRequestCallback) => number;
@@ -83,7 +103,9 @@ if (!(globalThis as unknown as { requestAnimationFrame?: unknown }).requestAnima
     clearTimeout(id);
 }
 
-// Very small speechSynthesis shim so playing TTS in tests is a no-op
+/**
+ * speechSynthesis — noop shim for any TTS calls in tests.
+ */
 if (!(window as unknown as { speechSynthesis?: unknown }).speechSynthesis) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (window as any).speechSynthesis = {
@@ -99,7 +121,6 @@ if (!(window as unknown as { speechSynthesis?: unknown }).speechSynthesis) {
     onvoiceschanged: null,
   };
 
-  // Minimal constructor
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (globalThis as any).SpeechSynthesisUtterance = function (this: unknown, text?: string) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
