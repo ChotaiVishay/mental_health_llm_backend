@@ -13,6 +13,7 @@ import Container from '@/components/layout/Container';
 import RequireAdmin from '@/auth/RequireAdmin'; // NEW
 import Styleguide from '@/pages/Styleguide';
 import '@/styles/index.css';
+import NotFound from '@/pages/NotFound';
 
 
 export default function App() {
@@ -44,8 +45,10 @@ export default function App() {
             }
           />
 
-          <Route path="*" element={<Home />} />
+          
+
           <Route path="/styleguide" element={<Styleguide />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </Container>
       <Footer />
