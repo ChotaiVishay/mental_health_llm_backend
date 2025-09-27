@@ -5,6 +5,7 @@ if (!('scrollTo' in window.HTMLElement.prototype)) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (window.HTMLElement.prototype as any).scrollTo = () => {};
 }
+
 // matchMedia (used by Home.tsx)
 if (!window.matchMedia) {
   Object.defineProperty(window, 'matchMedia', {
@@ -38,20 +39,34 @@ if (typeof (globalThis as unknown as { IntersectionObserver?: unknown }).Interse
       _callback: IntersectionObserverCallback,
       options?: IntersectionObserverInit
     ) {
+      void _callback;
       this.root = options?.root ?? null;
       this.rootMargin = options?.rootMargin ?? '';
       const t = options?.threshold ?? 0;
       this.thresholds = Array.isArray(t) ? t : [t];
     }
 
-    observe(_target: Element): void {}
-    unobserve(_target: Element): void {}
+    observe(_target: Element): void { void _target; }
+    unobserve(_target: Element): void { void _target; }
     disconnect(): void {}
     takeRecords(): IntersectionObserverEntry[] { return []; }
   }
 
   (globalThis as unknown as { IntersectionObserver: typeof MockIntersectionObserver }).IntersectionObserver =
     MockIntersectionObserver;
+}
+
+// ---------------------------------------------------------------------
+// ResizeObserver — some components guard for it, but add a tiny mock for tests
+// ---------------------------------------------------------------------
+if (typeof (globalThis as unknown as { ResizeObserver?: unknown }).ResizeObserver === 'undefined') {
+  class MockResizeObserver implements ResizeObserver {
+    constructor(_cb: ResizeObserverCallback) { void _cb; }
+    observe(target: Element): void { void target; }
+    unobserve(target: Element): void { void target; }
+    disconnect(): void {}
+  }
+  (globalThis as unknown as { ResizeObserver: typeof MockResizeObserver }).ResizeObserver = MockResizeObserver;
 }
 
 // ---------------------------------------------------------------------
