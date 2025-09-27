@@ -5,12 +5,19 @@ import { Providers } from '@/test-utils';
 
 // mock the API to fail once
 vi.mock('@/api/chat', () => ({
-  sendMessageToAPI: vi.fn(async () => { throw new Error('Failed to fetch'); }),
+  sendMessageToAPI: vi.fn(async () => {
+    throw new Error('Failed to fetch');
+  }),
 }));
 
+type MiniUser = { id: string; name: string };
+type MiniAuth = { user: MiniUser | null };
+
 it('shows a friendly banner when API fails and keeps composer enabled', async () => {
+  const auth: MiniAuth = { user: { id: 'u1', name: 'Test' } };
+
   render(
-    <Providers router={{ initialEntries: ['/chat'] }} auth={{ user: { id: 'u1', name: 'Test' } as any }}>
+    <Providers router={{ initialEntries: ['/chat'] }} auth={auth as unknown as Record<string, unknown>}>
       <Chat />
     </Providers>
   );

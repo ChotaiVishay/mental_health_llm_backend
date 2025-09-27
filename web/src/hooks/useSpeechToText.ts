@@ -8,8 +8,8 @@ interface SpeechRecognition extends EventTarget {
   start(): void;
   stop(): void;
   abort(): void;
-  onresult: (event: any) => void;
-  onerror: (event: any) => void;
+  onresult: (event: unknown) => void;
+  onerror: (event: unknown) => void;
   onend: () => void;
   onstart: () => void;
 }
@@ -45,17 +45,12 @@ function friendly(code: ErrCode, raw?: string) {
 function buildLangCandidates(requested?: string): string[] {
   const out: string[] = [];
   const tag = (requested || '').trim();
-
-  // If a specific tag was requested (e.g. en-AU), try it first.
   if (tag) out.push(tag);
 
-  // Prefer concrete English locales (Chrome often rejects bare "en").
   const EN_PREFS = ['en-AU', 'en-GB', 'en-US', 'en-CA', 'en-IN'];
   for (const t of EN_PREFS) if (!out.includes(t)) out.push(t);
 
-  // Always include a final US fallback.
   if (!out.includes('en-US')) out.push('en-US');
-
   return out;
 }
 
@@ -64,11 +59,17 @@ export function useSpeechToText(opts?: { lang?: string; interim?: boolean }) {
     typeof window !== 'undefined' &&
     (window.isSecureContext || window.location.hostname === 'localhost');
 
-  const SR: SRClass | undefined =
-    (typeof window !== 'undefined' &&
-      (((window as any).SpeechRecognition as SRClass) ||
-       ((window as any).webkitSpeechRecognition as SRClass))) ||
-    undefined;
+  // Typed globals lookup (no `any` casts)
+  type SRGlobals = typeof globalThis & {
+    SpeechRecognition?: SRClass;
+    webkitSpeechRecognition?: SRClass;
+  };
+
+  const SR: SRClass | undefined = (() => {
+    if (typeof globalThis === 'undefined') return undefined;
+    const g = globalThis as SRGlobals;
+    return g.SpeechRecognition ?? g.webkitSpeechRecognition ?? undefined;
+  })();
 
   const recRef       = useRef<SpeechRecognition | null>(null);
   const startedRef   = useRef(false);
@@ -85,50 +86,58 @@ export function useSpeechToText(opts?: { lang?: string; interim?: boolean }) {
     if (!navigator.mediaDevices?.getUserMedia) return true;
     try {
       const s = await navigator.mediaDevices.getUserMedia({ audio: true });
-      s.getTracks().forEach(t => t.stop());
+      s.getTracks().forEach((t) => t.stop());
       return true;
-    } catch (e: any) {
-      const name = e?.name || '';
+    } catch (e: unknown) {
+      const name = (e as { name?: string })?.name || '';
       if (name === 'NotAllowedError' || name === 'SecurityError') setErrorText(friendly('blocked'));
       else if (name === 'NotFoundError' || name === 'OverconstrainedError') setErrorText(friendly('no-mic'));
-      else setErrorText(friendly('other', e?.message));
+      else setErrorText(friendly('other', (e as Error)?.message));
       return false;
     }
   }, []);
 
-  const newRecognizer = useCallback((): SpeechRecognition => {
-    const rec = new (SR as SRClass)();
-    rec.interimResults = opts?.interim ?? true;
-    rec.continuous = false;
+  type SRLikeEvent = {
+    resultIndex: number;
+    results: ArrayLike<{ isFinal: boolean; 0: { transcript: string } }>;
+  };
 
-    rec.onstart = () => { setListening(true); setErrorText(null); setInterim(''); };
-    rec.onresult = (e: any) => {
-      let interimChunk = '';
-      let finalChunk = '';
-      for (let i = e.resultIndex; i < e.results.length; i++) {
-        const res = e.results[i];
-        if (res.isFinal) finalChunk += res[0].transcript;
-        else interimChunk += res[0].transcript;
-      }
-      if (interimChunk) setInterim(interimChunk);
-      if (finalChunk) setFinal(prev => (prev ? prev + finalChunk : finalChunk));
-    };
-    rec.onerror = (e: any) => {
-      const err = String(e?.error || '');
-      if (err === 'language-not-supported') { tryNextCandidate(); return; }
-      if (err === 'not-allowed' || err === 'service-not-allowed') setErrorText(friendly('blocked'));
-      else if (err === 'audio-capture') setErrorText(friendly('no-mic'));
-      else if (err === 'no-speech') setErrorText(friendly('no-speech'));
-      else if (err === 'network') setErrorText(friendly('network'));
-      else if (err === 'aborted') setErrorText(friendly('aborted'));
-      else if (err === 'busy') setErrorText(friendly('busy'));
-      else setErrorText(friendly('other', err));
-    };
-    rec.onend = () => { setListening(false); startedRef.current = false; };
-    return rec;
-  }, [SR, opts?.interim]);
+  const newRecognizer = useCallback(
+    (onLangUnsupported: () => void): SpeechRecognition => {
+      const rec = new (SR as SRClass)();
+      rec.interimResults = opts?.interim ?? true;
+      rec.continuous = false;
 
-  // Try to start, advancing candidates if the failure looks like a language reject.
+      rec.onstart = () => { setListening(true); setErrorText(null); setInterim(''); };
+      rec.onresult = (e: unknown) => {
+        const ev = e as SRLikeEvent;
+        let interimChunk = '';
+        let finalChunk = '';
+        for (let i = ev.resultIndex; i < ev.results.length; i++) {
+          const res = ev.results[i];
+          if (res.isFinal) finalChunk += res[0].transcript;
+          else interimChunk += res[0].transcript;
+        }
+        if (interimChunk) setInterim(interimChunk);
+        if (finalChunk) setFinal((prev) => (prev ? prev + finalChunk : finalChunk));
+      };
+      rec.onerror = (e: unknown) => {
+        const err = String((e as { error?: string })?.error || '');
+        if (err === 'language-not-supported') { onLangUnsupported(); return; }
+        if (err === 'not-allowed' || err === 'service-not-allowed') setErrorText(friendly('blocked'));
+        else if (err === 'audio-capture') setErrorText(friendly('no-mic'));
+        else if (err === 'no-speech') setErrorText(friendly('no-speech'));
+        else if (err === 'network') setErrorText(friendly('network'));
+        else if (err === 'aborted') setErrorText(friendly('aborted'));
+        else if (err === 'busy') setErrorText(friendly('busy'));
+        else setErrorText(friendly('other', err));
+      };
+      rec.onend = () => { setListening(false); startedRef.current = false; };
+      return rec;
+    },
+    [SR, opts?.interim]
+  );
+
   const tryStartChain = useCallback((rec: SpeechRecognition) => {
     const cands = candsRef.current;
     while (candIdxRef.current < cands.length) {
@@ -138,17 +147,13 @@ export function useSpeechToText(opts?: { lang?: string; interim?: boolean }) {
         rec.start();
         startedRef.current = true;
         return true;
-      } catch (e: any) {
-        const msg = (e?.message || e?.name || '').toString();
-
-        // Hard failures that shouldn't rotate languages:
+      } catch (e: unknown) {
+        const msg = String((e as { message?: string; name?: string })?.message || (e as { name?: string })?.name || '');
         if (/not-allowed|service-not-allowed/i.test(msg)) { setErrorText(friendly('blocked')); return false; }
         if (/audio-capture/i.test(msg))                 { setErrorText(friendly('no-mic'));   return false; }
         if (/network/i.test(msg))                       { setErrorText(friendly('network'));  return false; }
         if (/already started|busy/i.test(msg))          { setErrorText(friendly('busy'));     return false; }
-
-        // Anything else (incl. language issues) → try the next candidate.
-        candIdxRef.current += 1;
+        candIdxRef.current += 1; // language issue → next candidate
         continue;
       }
     }
@@ -156,15 +161,18 @@ export function useSpeechToText(opts?: { lang?: string; interim?: boolean }) {
     return false;
   }, []);
 
-  // Called when onerror('language-not-supported') fires.
   const tryNextCandidate = useCallback(() => {
     candIdxRef.current += 1;
     if (candIdxRef.current >= candsRef.current.length) {
       setErrorText(friendly('lang-unsupported'));
       return;
     }
-    try { recRef.current?.abort(); } catch {}
-    const rec = newRecognizer();
+    try {
+      recRef.current?.abort();
+    } catch (err) {
+      void err; // ignore abort race
+    }
+    const rec = newRecognizer(tryNextCandidate);
     recRef.current = rec;
     tryStartChain(rec);
   }, [newRecognizer, tryStartChain]);
@@ -183,7 +191,7 @@ export function useSpeechToText(opts?: { lang?: string; interim?: boolean }) {
     candIdxRef.current = 0;
 
     // Immediate attempt to preserve the user gesture.
-    let rec = newRecognizer();
+    let rec = newRecognizer(tryNextCandidate);
     recRef.current = rec;
     if (tryStartChain(rec)) return;
 
@@ -191,14 +199,18 @@ export function useSpeechToText(opts?: { lang?: string; interim?: boolean }) {
     const ok = await preflight();
     if (!ok) return;
 
-    rec = newRecognizer();
+    rec = newRecognizer(tryNextCandidate);
     recRef.current = rec;
     tryStartChain(rec);
-  }, [isSupported, isSecure, isListening, opts?.lang, preflight, newRecognizer, tryStartChain]);
+  }, [isSupported, isSecure, isListening, opts?.lang, preflight, newRecognizer, tryStartChain, tryNextCandidate]);
 
   const stop = useCallback(() => {
     const r = recRef.current;
-    if (r) { try { r.stop(); } catch {} try { r.abort(); } catch {} recRef.current = null; }
+    if (r) {
+      try { r.stop(); } catch (err) { void err; }
+      try { r.abort(); } catch (err) { void err; }
+      recRef.current = null;
+    }
     startedRef.current = false;
   }, []);
 
