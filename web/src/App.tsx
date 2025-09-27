@@ -1,8 +1,6 @@
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes, Navigate } from 'react-router-dom';
 import Home from '@/pages/Home';
 import Chat from '@/pages/Chat';
-import Services from '@/pages/Services';
-import HelpCrisis from '@/pages/HelpCrisis';
 import AdminSignIn from '@/pages/admin/AdminSignIn';
 import AdminIndex from '@/pages/admin/AdminIndex';
 import Login from '@/pages/Login';
@@ -10,11 +8,10 @@ import AuthCallback from '@/pages/AuthCallback';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import Container from '@/components/layout/Container';
-import RequireAdmin from '@/auth/RequireAdmin'; // NEW
+import RequireAdmin from '@/auth/RequireAdmin';
 import Styleguide from '@/pages/Styleguide';
 import '@/styles/index.css';
 import NotFound from '@/pages/NotFound';
-
 
 export default function App() {
   return (
@@ -27,8 +24,8 @@ export default function App() {
           {/* Chat is anonymous by default; saving happens when the user signs in later */}
           <Route path="/chat" element={<Chat />} />
 
-          <Route path="/services" element={<Services />} />
-          <Route path="/help" element={<HelpCrisis />} />
+          {/* Link old /help route to the Help & Crisis section on the one-pager */}
+          <Route path="/help" element={<Navigate to="/#help-crisis" replace />} />
 
           {/* Regular user auth */}
           <Route path="/login" element={<Login />} />
@@ -44,8 +41,6 @@ export default function App() {
               </RequireAdmin>
             }
           />
-
-          
 
           <Route path="/styleguide" element={<Styleguide />} />
           <Route path="*" element={<NotFound />} />
