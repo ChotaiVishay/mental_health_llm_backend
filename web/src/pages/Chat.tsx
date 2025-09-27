@@ -66,6 +66,7 @@ export default function Chat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [busy, setBusy] = useState(false);
   const [lastActivity, setLastActivity] = useState<number>(Date.now());
+  const [netErr, setNetErr] = useState<string | null>(null); // NEW: surface network errors
 
   // initial load
   useEffect(() => {
@@ -96,6 +97,7 @@ export default function Chat() {
   useEffect(() => { if (atBottom) scrollToBottom(); }, [messages.length, atBottom, scrollToBottom]);
 
   const onSend = async (text: string) => {
+    setNetErr(null); // clear any previous network error
     const userMsg: Message = { id: mkId(), role: 'user', text };
     setMessages((prev) => [...prev, userMsg]);
     setBusy(true);
@@ -103,6 +105,8 @@ export default function Chat() {
       const reply = await sendMessageToAPI(text, user?.id ?? null);
       setMessages((prev) => [...prev, { id: mkId(), role: 'assistant', text: reply.response }]);
     } catch {
+      // Friendly error + keep composer usable
+      setNetErr('Network error — please try again.');
       setMessages((prev) => [...prev, { id: mkId(), role: 'assistant', text: 'Sorry, something went wrong.' }]);
     } finally {
       setBusy(false);
@@ -115,7 +119,7 @@ export default function Chat() {
     <>
       <Title value="Support Atlas — Chat" />
 
-      {/* Sticky top banner; always visible until signed in */}
+      {/* Signed-out banner */}
       {!user && (
         <div className="anon-banner" role="note" aria-live="polite">
           <span>You’re chatting <strong>anonymously</strong>. Sign in to save your conversation for later.</span>
@@ -141,7 +145,7 @@ export default function Chat() {
         ) : (
           <button
             className="hambtn"
-            aria-label="Show conversations"
+            aria-label="Open chat history"
             onClick={() => setSidebarOpen(true)}
           >
             ☰
@@ -154,6 +158,17 @@ export default function Chat() {
             <h2 className="h2" style={{ margin: 0 }}>Chat</h2>
             <span className="muted small">Last activity {lastActivityLabel}</span>
           </header>
+
+          {/* NEW: network error banner */}
+          {netErr && (
+            <div
+              role="alert"
+              className="card"
+              style={{ margin: '12px 16px 0', borderColor: '#f59e0b', background: '#fff7ed' }}
+            >
+              {netErr}
+            </div>
+          )}
 
           <div ref={scrollerRef} className="chat-scroller">
             <MessageList items={messages} />
