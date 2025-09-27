@@ -49,4 +49,3 @@ export async function sendMessageToAPI(message: string, sessionId: string | null
 
   return response.json() as Promise<ChatReply>;
 }
-

@@ -1,0 +1,16 @@
+.field { display:flex; flex-direction:column; gap:8px; margin-bottom: 16px; }
+label { font-weight: 600; }
+
+input[type="text"], input[type="email"], input[type="password"], select, textarea {
+  padding:12px 14px; border:1px solid var(--grey-300); border-radius: var(--radius-md);
+  background: #fff; color: var(--text);
+}
+textarea { min-height: 120px; resize: vertical; }
+
+html[data-theme="dark"] input[type="text"],
+html[data-theme="dark"] input[type="email"],
+html[data-theme="dark"] input[type="password"],
+html[data-theme="dark"] select,
+html[data-theme="dark"] textarea {
+  background:#1d2925; color: var(--text);
+}

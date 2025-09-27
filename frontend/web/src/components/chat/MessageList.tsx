@@ -1,29 +1,36 @@
-import { memo } from 'react';
+// web/src/components/chat/MessageList.tsx
+import { speak } from '@/hooks/useTextToSpeech';
 
-export type Message = { id: string; role: 'user' | 'assistant'; text: string };
+export type Message = {
+  id: string;
+  role: 'user' | 'assistant';
+  text: string;
+};
 
-export default memo(function MessageList({ items }: { items: Message[] }) {
+type Props = { items: Message[] };
+
+export default function MessageList({ items }: Props) {
   return (
-    <div aria-live="polite" aria-label="Messages" style={{ display: 'grid', gap: 12 }}>
+    <ul className="transcript" aria-label="Conversation">
       {items.map((m) => (
-        <div
-          key={m.id}
-          style={{
-            alignSelf: m.role === 'user' ? 'end' : 'start',
-            justifySelf: m.role === 'user' ? 'end' : 'start',
-            maxWidth: 640,
-            border: '1px solid #E5E7EB',
-            background: m.role === 'user' ? '#EFF6FF' : '#FFFFFF',
-            borderRadius: 10,
-            padding: 12
-          }}
-        >
-          <div style={{ fontSize: 12, color: '#6B7280', marginBottom: 4 }}>
-            {m.role === 'user' ? 'You' : 'Support Atlas Assistant'}
-          </div>
-          <div>{m.text}</div>
-        </div>
+        <li key={m.id} className={`msg ${m.role}`}>
+          {m.role === 'assistant' && (
+            <div className="msg-meta">
+              Support Atlas Assistant
+              <button
+                type="button"
+                className="icon-inline"
+                aria-label="Play this reply"
+                onClick={() => speak(m.text)}
+                title="Play reply"
+              >
+                🔊
+              </button>
+            </div>
+          )}
+          <div className="msg-text">{m.text}</div>
+        </li>
       ))}
-    </div>
+    </ul>
   );
-});
+}

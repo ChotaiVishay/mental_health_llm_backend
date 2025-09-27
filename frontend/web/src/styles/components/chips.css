@@ -1,0 +1,6 @@
+.chips { display:flex; gap:8px; flex-wrap:wrap; }
+.chip {
+  padding:6px 10px; border-radius:999px; font: inherit; cursor:pointer;
+  border: 1px solid var(--grey-300); background: var(--surface);
+}
+.chip:hover { background: var(--surface-alt); }
