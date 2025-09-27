@@ -1,4 +1,9 @@
+import { vi } from 'vitest';
 import '@testing-library/jest-dom/vitest';
+
+// Mock styles that jsdom/cssstyle can't parse (e.g., border: 1px solid var(...)).
+// We don't need CSS in behavior tests, so stub the module to an empty object.
+vi.mock('@/styles/pages/login.css', () => ({}));
 
 // scrollTo (used by Services.tsx for "back to top" button)
 if (!('scrollTo' in window.HTMLElement.prototype)) {
@@ -25,10 +30,8 @@ if (!window.matchMedia) {
   });
 }
 
-// ---------------------------------------------------------------------
 // IntersectionObserver (used by Home.tsx for reveals/parallax)
 // Minimal, no-op implementation sufficient for tests
-// ---------------------------------------------------------------------
 if (typeof (globalThis as unknown as { IntersectionObserver?: unknown }).IntersectionObserver === 'undefined') {
   class MockIntersectionObserver implements IntersectionObserver {
     readonly root: Element | Document | null;
@@ -56,9 +59,8 @@ if (typeof (globalThis as unknown as { IntersectionObserver?: unknown }).Interse
     MockIntersectionObserver;
 }
 
-// ---------------------------------------------------------------------
+
 // ResizeObserver — some components guard for it, but add a tiny mock for tests
-// ---------------------------------------------------------------------
 if (typeof (globalThis as unknown as { ResizeObserver?: unknown }).ResizeObserver === 'undefined') {
   class MockResizeObserver implements ResizeObserver {
     constructor(_cb: ResizeObserverCallback) { void _cb; }
@@ -69,9 +71,7 @@ if (typeof (globalThis as unknown as { ResizeObserver?: unknown }).ResizeObserve
   (globalThis as unknown as { ResizeObserver: typeof MockResizeObserver }).ResizeObserver = MockResizeObserver;
 }
 
-// ---------------------------------------------------------------------
 // requestAnimationFrame fallback (used by smooth animations in Home.tsx)
-// ---------------------------------------------------------------------
 if (!(globalThis as unknown as { requestAnimationFrame?: unknown }).requestAnimationFrame) {
   (globalThis as unknown as {
     requestAnimationFrame: (cb: FrameRequestCallback) => number;
@@ -83,9 +83,7 @@ if (!(globalThis as unknown as { requestAnimationFrame?: unknown }).requestAnima
     clearTimeout(id);
 }
 
-// ---------------------------------------------------------------------
 // Very small speechSynthesis shim so playing TTS in tests is a no-op
-// ---------------------------------------------------------------------
 if (!(window as unknown as { speechSynthesis?: unknown }).speechSynthesis) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (window as any).speechSynthesis = {
