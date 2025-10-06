@@ -1,5 +1,0 @@
-[
-  { "id": "svc-001", "name": "Northside Mental Health Clinic", "suburb": "Carlton", "specialty": "Psychology", "orgKind": "private_clinic", "createdAt": "2025-09-05T10:00:00Z" },
-  { "id": "svc-002", "name": "Royal Melbourne Hospital – MH", "suburb": "Parkville", "specialty": "Psychiatry", "orgKind": "hospital", "createdAt": "2025-09-12T09:30:00Z" },
-  { "id": "svc-003", "name": "Eastside Wellness Centre", "suburb": "Richmond", "specialty": "Counselling", "orgKind": "private_clinic", "createdAt": "2025-08-29T12:00:00Z" }
-]

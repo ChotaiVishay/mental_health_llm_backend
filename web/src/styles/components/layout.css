@@ -1,8 +1,0 @@
-/* Generic shells */
-main { display:block; }
-.section { padding: var(--space-9) 0; }
-.section.alt { background: var(--surface); }
-
-/* Grids */
-.grid { display: grid; gap: 16px; }
-.container { width: min(100% - 32px, var(--container)); margin-inline: auto; }

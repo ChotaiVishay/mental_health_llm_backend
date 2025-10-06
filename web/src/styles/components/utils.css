@@ -1,3 +1,0 @@
-/* Image placeholder utility (optional) */
-.img-ph { display:grid; place-items:center; border-radius:var(--radius-lg); }
-.img-ph--outline { border:1px solid var(--grey-300); box-shadow: var(--shadow-sm); }

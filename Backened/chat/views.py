@@ -42,8 +42,6 @@ class ChatMessageAPIView(APIView):
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
-        # llm_response = "This is a placeholder response from the LLM."
-
         # 4. (Optional) Save the LLM response to the database
         # Message.objects.create(session_id=session_id, content=llm_response, sender='bot')
 
