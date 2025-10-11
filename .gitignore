@@ -20,3 +20,8 @@ web/vite.config.js
 # Misc
 .DS_Store
 .env*
+
+venv
+
+*.pyc
+__pycache__/
