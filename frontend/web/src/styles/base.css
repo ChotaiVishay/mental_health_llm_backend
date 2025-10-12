@@ -1,0 +1,42 @@
+* { box-sizing: border-box; }
+html, body, #root { height: 100%; }
+body {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: var(--fs-base);
+  line-height: var(--lh-base);
+  color: var(--text);
+  background: var(--bg);
+}
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; text-underline-offset: 2px; }
+a:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+img { max-width: 100%; display: block; }
+
+/* Type helpers used everywhere */
+.h1, h1 { font-family: var(--font-display); font-size: clamp(32px, 3vw + 1rem, 44px); line-height: 1.2; margin: 0 0 var(--space-4); }
+.h2, h2 { font-family: var(--font-display); font-size: clamp(24px, 2vw + 1rem, 32px); line-height: 1.3; margin: 0 0 var(--space-4); }
+.h3, h3 { font-family: var(--font-display); font-size: 22px; line-height: 1.3; margin: 0 0 var(--space-3); }
+.lead { font-size: 1.125rem; color: var(--muted); }
+
+/* a11y media queries */
+@media (prefers-reduced-motion: reduce) {
+  * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+}
+@media (forced-colors: active) {
+  :root {
+    --bg: Canvas; --surface: Canvas; --surface-alt: Canvas;
+    --text: CanvasText; --muted: GrayText; --brand: Highlight;
+    --brand-contrast: Canvas; --link: LinkText; --focus: Highlight; --danger: Highlight;
+  }
+  a { text-decoration: underline; }
+  .btn, .chip, .tool, .switch, input, select, textarea, .card, .table, .filters {
+    forced-color-adjust: none;
+    border-color: CanvasText !important; color: CanvasText !important; background: Canvas !important;
+  }
+  .btn-primary { background: Highlight !important; color: Canvas !important; }
+}
+@media (prefers-contrast: more) {
+  .muted { color: color-mix(in srgb, var(--muted), black 25%); }
+  .btn-primary { box-shadow: 0 0 0 2px color-mix(in srgb, var(--brand), black 25%) inset; }
+}
