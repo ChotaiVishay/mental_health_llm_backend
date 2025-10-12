@@ -66,3 +66,122 @@ async def chat(request: ChatRequest):
         session_id=request.session_id
     )
     return result
+
+@app.get("/debug/versions")
+async def get_versions():
+    import supabase
+    import openai
+    import fastapi
+    try:
+        import httpx
+        httpx_version = httpx.__version__
+    except:
+        httpx_version = "not installed"
+    
+    return {
+        "supabase": supabase.__version__ if hasattr(supabase, '__version__') else "unknown",
+        "openai": openai.__version__ if hasattr(openai, '__version__') else "unknown", 
+        "fastapi": fastapi.__version__ if hasattr(fastapi, '__version__') else "unknown",
+        "httpx": httpx_version,
+    }
+
+@app.get("/debug/code-version")
+async def code_version():
+    """Check which version of the code is running"""
+    return {
+        "timestamp": "2025-10-13-v6",
+        "chat_service_file": "updated_with_logging_v2",
+        "test": "New code is deployed with chat-debug endpoint"
+    }
+
+@app.get("/debug/supabase-test")
+async def test_supabase_connection():
+    """Test different ways to connect to Supabase"""
+    results = {}
+    
+    # Test 1: Check environment variables
+    results["env_vars"] = {
+        "SUPABASE_URL": bool(settings.supabase_url),
+        "SUPABASE_KEY": bool(settings.supabase_key),
+        "url_value": settings.supabase_url[:30] + "..." if settings.supabase_url else None
+    }
+    
+    # Test 2: Try creating client with minimal parameters
+    try:
+        from supabase import create_client
+        test_client = create_client(
+            supabase_url=settings.supabase_url,
+            supabase_key=settings.supabase_key
+        )
+        results["client_creation"] = "success"
+        
+        # Test 3: Try a simple query
+        try:
+            query_result = test_client.table("staging_services").select("id").limit(1).execute()
+            results["query_test"] = {
+                "status": "success",
+                "has_data": bool(query_result.data)
+            }
+        except Exception as e:
+            results["query_test"] = {
+                "status": "error",
+                "error": str(e)
+            }
+            
+    except Exception as e:
+        results["client_creation"] = {
+            "status": "error",
+            "error": str(e),
+            "error_type": type(e).__name__
+        }
+    
+    return results
+
+@app.get("/debug/test-search")
+async def test_search(query: str = "Melbourne"):
+    """Test search functionality directly"""
+    try:
+        from core.database.supabase_only import get_supabase_db
+        db = await get_supabase_db()
+        
+        # Test the search
+        results = db.search_services_by_text(query, limit=5)
+        
+        return {
+            "query": query,
+            "results_count": len(results),
+            "results": results[:2] if results else [],
+            "search_worked": len(results) > 0
+        }
+    except Exception as e:
+        return {
+            "error": str(e),
+            "error_type": type(e).__name__
+        }
+
+@app.post("/api/v1/chat/chat-debug")
+async def chat_debug(request: ChatRequest):
+    """Debug version of chat endpoint - shows what chat service sees"""
+    from services.chat_service import get_chat_service
+    from core.database.supabase_only import get_supabase_db
+    
+    # Test 1: Direct database call in this endpoint
+    db = await get_supabase_db()
+    direct_results = db.search_services_by_text(request.message, limit=5)
+    
+    # Test 2: Call through chat service
+    chat_service = await get_chat_service()
+    result = await chat_service.process_message(
+        message=request.message,
+        session_id=request.session_id
+    )
+    
+    # Return comparison
+    return {
+        "direct_search_in_endpoint": {
+            "count": len(direct_results),
+            "sample": direct_results[0] if direct_results else None
+        },
+        "chat_service_result": result,
+        "mismatch": len(direct_results) > 0 and result.get("services_found", 0) == 0
+    }

@@ -3,4 +3,12 @@ uvicorn==0.24.0
 pydantic==2.5.0
 pydantic-settings==2.1.0
 python-dotenv==1.0.0
-httpx==0.24.1
+
+# Only httpx - NO supabase library
+httpx==0.25.2
+
+# LLM
+openai==1.12.0
+
+# Utilities
+structlog==24.1.0

@@ -17,8 +17,8 @@ class Settings(BaseSettings):
     # ========= OpenAI =========
     openai_api_key: Optional[str] = Field(default=None, alias="OPENAI_API_KEY")
     openai_model: str = Field(default="gpt-4.1-nano", alias="OPENAI_MODEL")
-    embed_model: str = Field(default="text-embedding-3-large", alias="EMBED_MODEL")
-    openai_temperature: float = Field(default=0.7, alias="OPENAI_TEMPERATURE")  # ⚡ ADD THIS
+    embed_model: str = Field(default="text-embedding-3-small", alias="EMBED_MODEL")
+    openai_temperature: float = Field(default=0.7, alias="OPENAI_TEMPERATURE")  # ADD THIS
 
 
     # ========= App / Env =========
@@ -34,9 +34,9 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = Field(default=30, alias="ACCESS_TOKEN_EXPIRE_MINUTES")
 
     # ========= Limits =========
-    max_query_complexity: int = Field(default=100, alias="MAX_QUERY_COMPLEXITY")
-    rate_limit_requests: int = Field(default=60, alias="RATE_LIMIT_REQUESTS")
-    rate_limit_window: int = Field(default=60, alias="RATE_LIMIT_WINDOW")
+    max_query_complexity: int = Field(default=500, alias="MAX_QUERY_COMPLEXITY")
+    rate_limit_requests: int = Field(default=100, alias="RATE_LIMIT_REQUESTS")
+    rate_limit_window: int = Field(default=100, alias="RATE_LIMIT_WINDOW")
     max_response_tokens: int = Field(default=1000, alias="MAX_RESPONSE_TOKENS")
 
     # ========= CORS (comma-separated) =========
