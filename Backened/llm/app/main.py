@@ -30,13 +30,18 @@ app = FastAPI(
     redoc_url=f"/redoc"
 )
 
-# Add CORS middleware
+# Add CORS middleware - updated for production
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.allowed_origins_list,
+    allow_origins=[
+        "https://comp-30022-group-30-mental-health-s.vercel.app",  # Vercel deployment domain
+        "https://*.vercel.app",  # Allow all Vercel preview deployments
+        "http://localhost:5173",  # Keep for local testing
+        "http://localhost:3000",  # Keep for local testing
+    ],
     allow_credentials=True,
-    allow_methods=settings.allowed_methods_list,
-    allow_headers=settings.allowed_headers_list,
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["*"],
 )
 
 # Include chat routes

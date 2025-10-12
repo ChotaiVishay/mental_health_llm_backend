@@ -29,3 +29,8 @@ venv
 *.pyc
 __pycache__/
 >>>>>>> develop
+
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
