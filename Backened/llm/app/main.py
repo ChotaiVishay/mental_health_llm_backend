@@ -24,7 +24,7 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "https://comp-30022-group-30-mental-health-s.vercel.app",
+        "https://support-atlas-68fhuevc5-gurshan-singh-nandas-projects.vercel.app/chat",
         "https://*.vercel.app",
         "http://localhost:5173",
         "http://localhost:3000",
