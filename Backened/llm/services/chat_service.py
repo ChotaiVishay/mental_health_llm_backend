@@ -92,7 +92,7 @@ class MentalHealthChatService:
                             search_term=message,
                             exc_info=True)
                 return {
-                    "message": "I apologize, but I'm having trouble accessing the service database right now. Please try again later or contact support.",
+                    "message": "I apologise, but I'm having trouble accessing the service database right now. Please try again later or contact support.",
                     "session_id": session_id,
                     "services_found": 0,
                     "query_successful": False,
@@ -128,6 +128,7 @@ Please provide a helpful response that:
 3. Is empathetic and supportive
 4. Keeps response under 250 words
 5. Encourages them to contact the services for more information
+6. Reiterates that I am a supportive assistant and not a substitute for professional help
 
 Respond as a helpful mental health services assistant."""
 
@@ -144,10 +145,10 @@ Respond as a helpful mental health services assistant."""
                     
                     return {
                         "message": response_text,
-                        "session_id": session_id,
-                        "services_found": len(search_results),
-                        "raw_data": search_results[:3],
-                        "query_successful": True,
+                        #"session_id": session_id,
+                        #"services_found": len(search_results),
+                        #"raw_data": search_results[:3],
+                        #"query_successful": True,
                     }
                 else:
                     logger.info("No results found, generating fallback response")
@@ -161,7 +162,8 @@ Please provide a supportive response that:
 2. Suggests they try different search terms (be specific about what to try)
 3. Recommends contacting their GP or calling mental health helplines (Lifeline 13 11 14, Beyond Blue 1300 22 4636)
 4. Is empathetic and helpful
-5. Keeps response under 150 words"""
+5. In case of mention of self harm, propmt them to call emergency services (000) immediately
+6. Keeps response under 150 words"""
 
                     response = openai_client.client.chat.completions.create(
                         model=self.settings.openai_model,
@@ -200,7 +202,7 @@ Please provide a supportive response that:
                     }
                 else:
                     return {
-                        "message": "I apologize, but I'm experiencing technical difficulties with the AI service. Please try again later.",
+                        "message": "I apologise, but I'm experiencing technical difficulties with the AI service. Please try again later.",
                         "session_id": session_id,
                         "services_found": 0,
                         "query_successful": False,
@@ -208,12 +210,12 @@ Please provide a supportive response that:
                     }
 
         except Exception as e:
-            logger.error("✗ CHAT PROCESSING COMPLETELY FAILED", 
+            logger.error("CHAT PROCESSING COMPLETELY FAILED", 
                         message=message, 
                         error=str(e), 
                         exc_info=True)
             return {
-                "message": "I apologize, but I'm experiencing technical difficulties. Please try again later or contact support.",
+                "message": "I apologise, but I'm experiencing technical difficulties. Please try again later or contact support.",
                 "session_id": session_id or str(uuid.uuid4()),
                 "services_found": 0,
                 "query_successful": False,

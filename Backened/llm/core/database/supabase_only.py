@@ -251,3 +251,9 @@ supabase_db = SupabaseOnlyConnection()
 
 async def get_supabase_db() -> SupabaseOnlyConnection:
     return supabase_db
+
+
+
+
+
+
