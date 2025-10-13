@@ -1,3 +1,4 @@
+// Chat page
 import { useEffect, useMemo, useRef, useState } from 'react';
 import Title from '@/components/misc/Title';
 import MessageList, { Message } from '@/components/chat/MessageList';
