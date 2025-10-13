@@ -7,7 +7,10 @@ export interface ChatSession {
   // add more fields if your API returns them
 }
 
-const CHAT_API_URL = 'http://localhost:8000/chat/chat-sessions/';
+// const CHAT_API_URL = 'http://localhost:8000/chat/chat-sessions/';
+const API_BASE = (import.meta.env.VITE_API_BASE_URL ?? '').toString().replace(/\/+$/,'');
+const CHAT_API_URL = `${API_BASE}/chat/chat-sessions/`;
+const MESSAGE_API_URL = `${API_BASE}/chat/send-message/`;
 
 export async function fetchChatSessions(): Promise<ChatSession[]> {
   const response = await fetch(CHAT_API_URL, {
