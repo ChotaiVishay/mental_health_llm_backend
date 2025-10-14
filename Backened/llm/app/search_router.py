@@ -129,3 +129,31 @@ def search(in_: SearchIn):
         )
     items.sort(key=lambda x: x.score, reverse=True)
     return SearchOut(results=items[: in_.top_k])
+
+
+@router.get("/services")
+async def get_all_services(
+    limit: int = 100,
+    suburb: Optional[str] = None,
+    state: Optional[str] = None
+):
+    """Get all services or filter by location"""
+    from core.database.supabase_only import get_supabase_db
+    
+    try:
+        db = await get_supabase_db()
+        
+        # If location filters provided, use location search
+        if suburb or state:
+            results = db.search_by_location(suburb=suburb, state=state, limit=limit)
+        else:
+            # Otherwise get all services
+            results = db.query_table("staging_services", limit=limit)
+        
+        return results
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to fetch services: {str(e)}"
+        )

@@ -10,6 +10,7 @@ from typing import Optional
 from app.config import get_settings
 from core.database.supabase_only import get_supabase_db, SupabaseOnlyConnection
 from services.chat_service import get_chat_service
+from search_router import router as search_router # Import the search router
 
 settings = get_settings()
 
@@ -20,6 +21,8 @@ app = FastAPI(
     docs_url=f"/docs",
     redoc_url=f"/redoc"
 )
+
+app.include_router(search_router)
 
 app.add_middleware(
     CORSMiddleware,
