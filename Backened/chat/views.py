@@ -9,6 +9,7 @@ from .serializers import *
 from rest_framework.views import APIView
 import asyncio
 from llm.services.chat_service import chat_service
+import httpx
 
 class ChatSessionViewSet(viewsets.ModelViewSet):
     """
@@ -18,32 +19,30 @@ class ChatSessionViewSet(viewsets.ModelViewSet):
     serializer_class = ChatSessionSerializer
     
 class ChatMessageAPIView(APIView):
-    """
-    Receives a user message, sends it to the LLM, and returns the response.
-    """
     def post(self, request, *args, **kwargs):
-        # 1. Extract user message and session info from request
         user_message = request.data.get('message')
-        session_id = request.data.get('session_id', None) # Optional: session_id to associate with a chat session
+        session_id = request.data.get('session_id', None)
         
         if not user_message:
-            return Response({'error': 'Missing message or session_id'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'Missing message'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # 2. (Optional) Save the user message to the database
-        # Message.objects.create(session_id=session_id, content=user_message, sender='user')
-
-        # 3. Send the message to the LLM (to be integrated)
-        # For now, use a placeholder response
         try:
-            llm_response = asyncio.run(chat_service.process_message(user_message, session_id=session_id))
+            # Call your FastAPI service on AWS
+            fastapi_url = "https://your-aws-fastapi-url.com/api/v1/chat/chat"
+            
+            with httpx.Client() as client:
+                response = client.post(
+                    fastapi_url,
+                    json={"message": user_message, "session_id": session_id},
+                    timeout=30.0
+                )
+                response.raise_for_status()
+                llm_response = response.json()
 
-            llm_reply = llm_response.get("message", "No reply from LLM.")
-
+            return Response({
+                'response': llm_response.get('message'),
+                'session_id': llm_response.get('session_id')
+            }, status=status.HTTP_200_OK)
+            
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
-        # 4. (Optional) Save the LLM response to the database
-        # Message.objects.create(session_id=session_id, content=llm_response, sender='bot')
-
-        # 5. Return the LLM response
-        return Response({'response': llm_reply, 'session_id': session_id}, status=status.HTTP_200_OK)

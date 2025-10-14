@@ -23,9 +23,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-%14x-+6xg_0m_8op&-igq%3&4shk2qo9+40@b!3vojv1k3z79&'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    'http://mental-health-prod-v2.eba-cxhtfs2h.us-east-1',  # Your AWS backend URL
+    '.elasticbeanstalk.com',  # If using Elastic Beanstalk
+]
 
 
 # Application definition
@@ -69,6 +74,8 @@ MIDDLEWARE = [
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
+    "https://https://comp-30022-group-30-mental-health-s.vercel.app/",
+    "https://*.vercel.app", 
 ]
 
 ROOT_URLCONF = 'Backened.urls'
