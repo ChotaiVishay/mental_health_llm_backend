@@ -31,7 +31,7 @@ export interface ChatReply {
   session_id: string | null;
 }
 
-const CHAT_MESSAGE_URL = 'http://localhost:8000/chat/chat-message/';
+const CHAT_MESSAGE_URL = `${API_BASE}/chat/send-message/`;
 
 export async function sendMessageToAPI(message: string, sessionId: string | null): Promise<ChatReply> {
   const response = await fetch(CHAT_MESSAGE_URL, {
