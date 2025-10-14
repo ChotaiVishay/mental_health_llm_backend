@@ -74,7 +74,7 @@ MIDDLEWARE = [
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
-    "https://https://comp-30022-group-30-mental-health-s.vercel.app/",
+    "https://comp-30022-group-30-mental-health-s.vercel.app/",
     "https://*.vercel.app", 
 ]
 
