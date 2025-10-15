@@ -12,13 +12,14 @@ export default function Login() {
     emailSignUp,
     verifyEmailSignUp,
     resendEmailSignUp,
+    requestPasswordReset,
     loading,
   } = useAuth();
   const nav = useNavigate();
   const loc = useLocation();
   const from = (loc.state as FromState)?.from ?? '/';
   const [mode, setMode] = useState<'signin' | 'signup'>('signin');
-  const [phase, setPhase] = useState<'form' | 'verify'>('form');
+  const [phase, setPhase] = useState<'form' | 'verify' | 'forgot'>('form');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
@@ -164,6 +165,41 @@ export default function Login() {
     setStatus(null);
   };
 
+  const beginForgot = () => {
+    setPhase('forgot');
+    setError(null);
+    setStatus(null);
+  };
+
+  const cancelForgot = () => {
+    setPhase('form');
+    setStatus(null);
+    setError(null);
+  };
+
+  const onSubmitForgot = async (evt: FormEvent<HTMLFormElement>) => {
+    evt.preventDefault();
+    setError(null);
+    setStatus(null);
+
+    const trimmedEmail = email.trim();
+    if (!trimmedEmail) {
+      setError('Enter the email associated with your account.');
+      return;
+    }
+    if (!requestPasswordReset) {
+      setError('Password reset is unavailable right now.');
+      return;
+    }
+    const result = await requestPasswordReset(trimmedEmail);
+    if (!result.ok) {
+      setError(result.error ?? 'Unable to send password reset email.');
+      return;
+    }
+
+    setStatus('Check your inbox for a password reset link. The link will expire after a short time.');
+  };
+
   return (
     <section className="auth-page" aria-labelledby="auth-title">
       <div className="auth-card" role="dialog" aria-modal="true" aria-labelledby="auth-title">
@@ -215,7 +251,53 @@ export default function Login() {
                 Resend code
               </button>
               <button type="button" className="linklike" onClick={resetToForm}>
-                Use a different email
+                  Use a different email
+              </button>
+            </div>
+          </>
+        ) : phase === 'forgot' ? (
+          <>
+            <h1 id="auth-title" className="h1">Reset your password</h1>
+            <p className="muted">
+              Enter the email you used to sign up. We&apos;ll send a link to reset your password.
+            </p>
+
+            <form className="email-auth" onSubmit={onSubmitForgot} noValidate>
+              <fieldset disabled={loading}>
+                <legend className="sr-only">Request a password reset link</legend>
+
+                <label className="field">
+                  <span>Email</span>
+                  <input
+                    type="email"
+                    name="forgot-email"
+                    autoComplete="email"
+                    required
+                    value={email}
+                    onChange={(evt) => setEmail(evt.target.value)}
+                  />
+                </label>
+
+                {error && (
+                  <p className="error" role="alert">
+                    {error}
+                  </p>
+                )}
+                {status && (
+                  <p className="status" role="status">
+                    {status}
+                  </p>
+                )}
+
+                <button type="submit" className="btn btn-primary">
+                  Email me a reset link
+                </button>
+              </fieldset>
+            </form>
+
+            <div className="auth-foot">
+              <button type="button" className="linklike" onClick={cancelForgot}>
+                Back to sign in
               </button>
             </div>
           </>
@@ -342,6 +424,13 @@ export default function Login() {
                 {isSignup ? 'Sign in with email' : 'Create an email account'}
               </button>
             </div>
+            {!isSignup && (
+              <div className="auth-foot">
+                <button type="button" className="linklike" onClick={beginForgot}>
+                  Forgot password?
+                </button>
+              </div>
+            )}
           </>
         )}
       </div>

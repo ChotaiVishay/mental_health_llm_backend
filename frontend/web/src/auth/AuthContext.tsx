@@ -20,6 +20,8 @@ type EmailVerificationPayload = {
   name?: string;
 };
 type EmailVerificationResult = { ok: boolean; error?: string };
+type PasswordResetRequestResult = { ok: boolean; error?: string };
+type PasswordUpdateResult = { ok: boolean; error?: string };
 
 type SignInResult = { redirected: boolean };
 
@@ -33,6 +35,8 @@ type Ctx = {
   emailSignUp: (payload: EmailSignUpPayload) => Promise<EmailAuthResult>;
   verifyEmailSignUp: (payload: EmailVerificationPayload) => Promise<EmailVerificationResult>;
   resendEmailSignUp: (email: string) => Promise<EmailAuthResult>;
+  requestPasswordReset: (email: string) => Promise<PasswordResetRequestResult>;
+  resetPassword: (password: string) => Promise<PasswordUpdateResult>;
   setUser?: React.Dispatch<React.SetStateAction<User | null>>; // handy for tests
 };
 
@@ -47,6 +51,8 @@ const AuthContext = createContext<Ctx>({
   async emailSignUp() { return { ok: false, error: 'Email sign-up unavailable' }; },
   async verifyEmailSignUp() { return { ok: false, error: 'Email verification unavailable' }; },
   async resendEmailSignUp() { return { ok: false, error: 'Email verification unavailable' }; },
+  async requestPasswordReset() { return { ok: false, error: 'Password reset unavailable' }; },
+  async resetPassword() { return { ok: false, error: 'Password update unavailable' }; },
 });
 
 function commitSession(session: Session | null, setUser: React.Dispatch<React.SetStateAction<User | null>>) {
@@ -344,6 +350,72 @@ export function AuthProvider({ children, initialState }: AuthProviderProps) {
     }
   }, [isMockAuth, supabase]);
 
+  const requestPasswordReset = useCallback(async (email: string): Promise<PasswordResetRequestResult> => {
+    setLoading(true);
+    try {
+      const normalisedEmail = email.trim().toLowerCase();
+      if (!normalisedEmail) {
+        return { ok: false, error: 'Email is required.' };
+      }
+
+      if (isMockAuth || !supabase) {
+        return { ok: true };
+      }
+
+      const redirectTo = typeof window !== 'undefined'
+        ? `${window.location.origin}/reset-password`
+        : undefined;
+
+      const { error } = await supabase.auth.resetPasswordForEmail(normalisedEmail, { redirectTo });
+      if (error) {
+        return { ok: false, error: error.message };
+      }
+
+      return { ok: true };
+    } catch (err) {
+      return {
+        ok: false,
+        error: err instanceof Error ? err.message : 'Unable to send password reset email.',
+      };
+    } finally {
+      setLoading(false);
+    }
+  }, [isMockAuth, supabase]);
+
+  const resetPassword = useCallback(async (password: string): Promise<PasswordUpdateResult> => {
+    setLoading(true);
+    try {
+      const trimmed = password.trim();
+      if (!trimmed) {
+        return { ok: false, error: 'Password is required.' };
+      }
+      if (trimmed.length < 6) {
+        return { ok: false, error: 'Password must be at least 6 characters long.' };
+      }
+
+      if (isMockAuth || !supabase) {
+        return { ok: true };
+      }
+
+      const { error } = await supabase.auth.updateUser({ password: trimmed });
+      if (error) {
+        return { ok: false, error: error.message };
+      }
+
+      const { data } = await supabase.auth.getSession();
+      if (data.session) commitSession(data.session, setUser);
+
+      return { ok: true };
+    } catch (err) {
+      return {
+        ok: false,
+        error: err instanceof Error ? err.message : 'Unable to update password.',
+      };
+    } finally {
+      setLoading(false);
+    }
+  }, [isMockAuth, supabase]);
+
   const value = useMemo<Ctx>(
     () => ({
       user,
@@ -355,9 +427,23 @@ export function AuthProvider({ children, initialState }: AuthProviderProps) {
       emailSignUp,
       verifyEmailSignUp,
       resendEmailSignUp,
+      requestPasswordReset,
+      resetPassword,
       setUser,
     }),
-    [user, loading, signIn, signOut, finishAuth, emailSignIn, emailSignUp, verifyEmailSignUp, resendEmailSignUp]
+    [
+      user,
+      loading,
+      signIn,
+      signOut,
+      finishAuth,
+      emailSignIn,
+      emailSignUp,
+      verifyEmailSignUp,
+      resendEmailSignUp,
+      requestPasswordReset,
+      resetPassword,
+    ]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

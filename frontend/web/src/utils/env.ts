@@ -14,4 +14,8 @@ export type ViteEnv = {
   VITE_SHOW_ADMIN_LINK?: string;
 };
 
-export const VITE: ViteEnv = import.meta.env as ViteEnv;
+const metaEnv = (import.meta as ImportMeta & {
+  env?: Record<string, string | undefined>;
+}).env ?? {};
+
+export const VITE: ViteEnv = metaEnv as ViteEnv;

@@ -6,6 +6,7 @@ import AdminIndex from '@/pages/admin/AdminIndex';
 import Login from '@/pages/Login';
 import Profile from '@/pages/Profile';
 import AuthCallback from '@/pages/AuthCallback';
+import ResetPassword from '@/pages/ResetPassword';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import Container from '@/components/layout/Container';
@@ -31,6 +32,7 @@ export default function App() {
 
           {/* Regular user auth */}
           <Route path="/login" element={<Login />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
           <Route
             path="/profile"
