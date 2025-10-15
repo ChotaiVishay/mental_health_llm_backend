@@ -40,7 +40,7 @@ function relative(ms: number) {
   return `${d}d ago`;
 }
 
-function useAtBottom(ref: React.RefObject<HTMLElement>, threshold = 64) {
+function useAtBottom(ref: React.RefObject<HTMLDivElement>, threshold = 64) {
   const [atBottom, setAtBottom] = useState(true);
   useEffect(() => {
     const el = ref.current;
@@ -63,7 +63,7 @@ export default function Chat() {
 
   // Refs
   const pageRef = useRef<HTMLDivElement>(null);     // whole [sidebar|main] + composer grid
-  const scrollerRef = useRef<HTMLDivElement>(null); // transcript scroller
+  const scrollerRef = useRef<HTMLDivElement>(null!) as React.RefObject<HTMLDivElement>; // transcript scroller
 
   const { atBottom, scrollToBottom } = useAtBottom(scrollerRef);
 

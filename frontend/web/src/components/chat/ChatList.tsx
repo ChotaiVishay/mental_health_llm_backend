@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { fetchChatSessions, ChatSession } from '@/api/chat';
+import { fetchChatSessions, type ChatSession } from '@/api/chat';
 import { useAuth } from '@/auth/AuthContext';
 
 export default function ChatList() {

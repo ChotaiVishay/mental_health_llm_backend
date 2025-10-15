@@ -1,13 +1,12 @@
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { savePreloginChat } from '@/features/chat/sessionStore';
+import Title from '@/components/misc/Title';
 import Container from '@/components/layout/Container';
-
-type ParallaxEl = HTMLElement & { dataset: { speed?: string } };
+import { savePreloginChat } from '@/features/chat/sessionStore';
+import '@/styles/pages/home.css';
 
 export default function Home() {
   const nav = useNavigate();
-  const parallaxRoot = useRef<HTMLDivElement>(null);
 
   const start = (seed?: string) => {
     if (seed) {
@@ -19,247 +18,261 @@ export default function Home() {
     nav('/chat');
   };
 
-  // Reveal + Parallax (respects prefers-reduced-motion)
   useEffect(() => {
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    if (reduce) return;
 
+    // Reveal-on-view only (removed horizontal scrollytelling)
     const io = new IntersectionObserver(
       entries => entries.forEach(e => e.isIntersecting && (e.target as HTMLElement).classList.add('in')),
-      { rootMargin: '0px 0px -10% 0px', threshold: 0.15 }
+      { rootMargin: '0px 0px -15% 0px', threshold: 0.2 }
     );
     document.querySelectorAll<HTMLElement>('.reveal').forEach(el => io.observe(el));
-
-    if (!reduce) {
-      const els = parallaxRoot.current?.querySelectorAll<ParallaxEl>('[data-par]') ?? [];
-      let ticking = false;
-      const onScroll = () => {
-        if (ticking) return;
-        ticking = true;
-        requestAnimationFrame(() => {
-          const y = window.scrollY;
-          els.forEach(el => {
-            const speed = parseFloat(el.dataset.speed || '0.2');
-            el.style.transform = `translate3d(0, ${y * speed * -0.15}px, 0)`;
-          });
-          ticking = false;
-        });
-      };
-      window.addEventListener('scroll', onScroll, { passive: true });
-      onScroll();
-      return () => window.removeEventListener('scroll', onScroll);
-    }
-
     return () => io.disconnect();
   }, []);
 
   return (
-    <div className="home" ref={parallaxRoot}>
-      {/* ===== HERO (floating media + calm gradient) ===== */}
-      <section id="top" className="home-hero">
-        <div className="hero-bg" role="img" aria-label="Calm abstract background" />
+    <div className="home">
+      <Title value="Support Atlas — Find support fast" />
 
-        {/* Replace these with real images later */}
-        <img data-par data-speed="0.25" className="tile tile-a" src="/assets/placeholder-1.jpg" alt="" loading="lazy" />
-        <img data-par data-speed="0.18" className="tile tile-b" src="/assets/placeholder-2.jpg" alt="" loading="lazy" />
-        <img data-par data-speed="0.22" className="tile tile-c" src="/assets/placeholder-3.jpg" alt="" loading="lazy" />
-
+      {/* HERO */}
+      <section id="top" className="edge hero hero-block">
         <Container>
-          <div className="hero-inner">
-            <h1 className="display reveal">Support Atlas Assistant</h1>
-            <p className="lead reveal delay-1">
-              Find mental-health services and answers fast — chat anonymously, sign in later to save.
+          <header className="hero-head">
+            <h1 className="hero-title reveal">Find mental-health support, fast.</h1>
+            <p className="hero-sub reveal delay-1">
+              Browse trusted information about services or ask the assistant. Anonymous by default —
+              sign in later to save your history.
             </p>
+          </header>
 
-            <div className="cta-card reveal delay-2" role="group" aria-labelledby="cta-title">
+          <button
+            type="button"
+            className="cta-banner reveal delay-2"
+            aria-describedby="cta-note"
+            onClick={() => start()}
+          >
+            Start chat — no sign-in required
+          </button>
+
+          <p id="cta-note" className="hero-note reveal delay-3" role="note">
+            We’re an information directory. We don’t provide medical advice, diagnosis, referrals, or
+            endorsements. Verify details directly with providers.
+          </p>
+
+          <div className="chips reveal delay-4" role="group" aria-label="Quick prompts">
+            {[
+              'Low-cost counselling',
+              'Find a psychologist near me',
+              'Crisis help in Australia',
+              'LGBTQIA+ friendly services',
+            ].map(q => (
               <button
-                id="cta-title"
+                key={q}
                 type="button"
-                className="btn btn-primary big"
-                aria-describedby="cta-helptext"
-                onClick={() => start()}
+                className="chip"
+                aria-label={`Start chat with: ${q}`}
+                onClick={() => start(q)}
               >
-                Start Chat
+                {q}
               </button>
+            ))}
+          </div>
 
-              <div id="cta-helptext" className="muted">
-                No sign-in required. You can sign in later if you want your conversation history saved.
-              </div>
+          {/* Updated order to match new section order */}
+          <nav className="hero-links reveal delay-5" aria-label="On this page">
+            <a href="#how">How it works</a>
+            <a href="#help-crisis">Help & Crisis</a>
+            <a href="#principles">Our principles</a>
+            <a href="#faq">FAQ</a>
+          </nav>
+        </Container>
+      </section>
 
-              <div aria-label="Quick prompts" className="chips">
-                {[
-                  'Find a psychologist near me',
-                  'Low-cost counselling options',
-                  'Crisis help in Australia',
-                  'LGBTQIA+ friendly services',
-                ].map(q => (
-                  <button
-                    key={q}
-                    type="button"
-                    className="chip"
-                    aria-label={`Start chat with: ${q}`}
-                    onClick={() => start(q)}
-                  >
-                    {q}
-                  </button>
-                ))}
-              </div>
+      {/* HOW IT WORKS — 2-col + decorative brand SVG */}
+      <section id="how" className="edge section pattern-a hero-block">
+        <Container>
+          <div className="how-grid">
+            <div className="how-copy">
+              <header className="section-head reveal">
+                <h2 className="h1">How it works</h2>
+                <p className="muted">Simple steps. No matching. No endorsements.</p>
+              </header>
+
+              <ol className="steps reveal delay-1">
+                <li>
+                  <div className="step-num">1</div>
+                  <div>
+                    <h3>Search your area</h3>
+                    <p>Enter a suburb or postcode to explore services, including telehealth options.</p>
+                  </div>
+                </li>
+                <li>
+                  <div className="step-num">2</div>
+                  <div>
+                    <h3>Review information</h3>
+                    <p>See specialties, fees, hours, languages and access options at a glance.</p>
+                  </div>
+                </li>
+                <li>
+                  <div className="step-num">3</div>
+                  <div>
+                    <h3>Contact directly</h3>
+                    <p>Reach providers via their website, phone or email. Always verify details.</p>
+                  </div>
+                </li>
+              </ol>
             </div>
 
-            <nav className="hero-links reveal delay-3" aria-label="Sections">
-              <a href="#how">How it works</a>
-              <a href="#principles">Our principles</a>
-              <a href="#safety">Safety & privacy</a>
-              <a href="#providers">For providers</a>
-            </nav>
+            {/* Decorative inline "leaf badges" */}
+            <div className="how-media reveal delay-2" aria-hidden="true">
+              <svg className="how-svg" viewBox="0 0 480 360" role="img" aria-label="">
+                <defs>
+                  <linearGradient id="g1" x1="0" x2="1">
+                    <stop offset="0" stopColor="#276D57" stopOpacity="0.14" />
+                    <stop offset="1" stopColor="#3E9C7C" stopOpacity="0.26" />
+                  </linearGradient>
+                  <linearGradient id="g2" x1="0" x2="1">
+                    <stop offset="0" stopColor="#85C9B0" stopOpacity="0.18" />
+                    <stop offset="1" stopColor="#B0DFCC" stopOpacity="0.28" />
+                  </linearGradient>
+                </defs>
+                <path d="M30,220 C110,140 210,200 280,140 C340,90 420,120 450,90 L450,330 L30,330 Z" fill="url(#g1)" />
+                <path d="M30,250 C120,220 220,290 300,230 C360,185 410,210 450,180 L450,330 L30,330 Z" fill="url(#g2)" />
+                <g transform="translate(120,110)">
+                  <circle r="48" fill="#D6EFE5" />
+                  <circle r="48" fill="none" stroke="#85C9B0" strokeWidth="2" />
+                  <path d="M-10,6 C-6,-8 8,-18 20,-10 C32,-2 10,20 -8,24" fill="none" stroke="#2F8468" strokeWidth="3" strokeLinecap="round"/>
+                  <path d="M-4,10 C2,2 12,-2 16,4" fill="none" stroke="#648046" strokeWidth="3" strokeLinecap="round"/>
+                </g>
+                <g transform="translate(330,80)">
+                  <rect x="-58" y="-38" rx="18" ry="18" width="116" height="76" fill="#E9F8F1" stroke="#B0DFCC" />
+                  <path d="M-28,0 h56" stroke="#2F8468" strokeWidth="3" strokeLinecap="round"/>
+                  <path d="M-18,-10 h36" stroke="#648046" strokeWidth="3" strokeLinecap="round" opacity=".85"/>
+                  <path d="M-20,10 h40" stroke="#3E9C7C" strokeWidth="3" strokeLinecap="round" opacity=".9"/>
+                </g>
+                <g transform="translate(340,190)">
+                  <circle r="38" fill="#E9F8F1" />
+                  <circle r="38" fill="none" stroke="#B0DFCC" strokeWidth="2" />
+                  <path d="M-12,6 q10,-22 30,-12 q-6,18 -24,22" fill="#60B596" opacity=".9"/>
+                </g>
+              </svg>
+            </div>
           </div>
         </Container>
       </section>
 
-      {/* ===== NEW: SCROLLY — text sticks, background moves ===== */}
-      <section id="story" className="scrolly">
-        {/* moving background layers (placeholders) */}
-        <div className="scrolly-bg" aria-hidden="true">
-          <img data-par data-speed="0.06" className="layer l1" src="/assets/placeholder-4.jpg" alt="" />
-          <img data-par data-speed="0.12" className="layer l2" src="/assets/placeholder-5.jpg" alt="" />
-          <img data-par data-speed="0.18" className="layer l3" src="/assets/placeholder-6.jpg" alt="" />
-        </div>
-
+      {/* HELP & CRISIS (moved above principles) */}
+      <section id="help-crisis" className="edge section pattern-crisis hero-block" aria-labelledby="help-title">
         <Container>
-          <div className="scrolly-grid">
-            <div className="stickycopy">
-              <h2 className="display-xl">Take the first step.</h2>
-              <p className="lead">
-                Scroll to explore how Support Atlas works. The message stays with you while the world
-                behind it moves.
-              </p>
-              <p className="muted">
-                Tip: try it on desktop and mobile—animations respect reduced-motion settings.
-              </p>
-              <p className="scrolly-jump">
-                <a href="#how">See how it works ↓</a>
-              </p>
-            </div>
-          </div>
-        </Container>
-      </section>
-
-      {/* ===== STATS ===== */}
-      <section className="stats reveal">
-        <Container>
-          <ul className="stat-list" aria-label="Platform stats">
-            <li><strong>2,500+</strong><span>Services listed</span></li>
-            <li><strong>24/7</strong><span>Crisis numbers</span></li>
-            <li><strong>450+</strong><span>Locations</span></li>
-            <li><strong>Multi-lang</strong><span>Support</span></li>
-          </ul>
-        </Container>
-      </section>
-
-      {/* ===== NEW: BOLD TYPOGRAPHIC STATEMENT ===== */}
-      <section className="display-slab reveal" aria-label="Big statement">
-        <Container>
-          <h2 className="slab">Get support in minutes.</h2>
-          <a className="btn btn-secondary" href="#top">Start now</a>
-        </Container>
-      </section>
-
-      {/* ===== HOW IT WORKS ===== */}
-      <section id="how" className="section reveal">
-        <Container>
-          <header className="section-head">
-            <h2 className="h1">How it works</h2>
-            <p className="muted">Simple, transparent steps — no matching, no endorsements.</p>
+          <header className="section-head reveal">
+            <h2 id="help-title" className="h1">Help & Crisis</h2>
           </header>
 
-          <ol className="steps">
-            <li>
-              <div className="step-num">1</div>
-              <h3>Search your area</h3>
-              <p>Enter a suburb or postcode to browse nearby services, including telehealth options.</p>
-            </li>
-            <li>
-              <div className="step-num">2</div>
-              <h3>Review information</h3>
-              <p>See clear details (specialties, fees, hours, languages). We don’t match or recommend.</p>
-            </li>
-            <li>
-              <div className="step-num">3</div>
-              <h3>Contact directly</h3>
-              <p>Reach providers via their website, phone or email. Verify details with the provider.</p>
-            </li>
-          </ol>
-        </Container>
-      </section>
-
-      {/* ===== PRINCIPLES ===== */}
-      <section id="principles" className="section alt reveal">
-        <Container>
-          <header className="section-head">
-            <h2 className="h1">Our principles</h2>
-          </header>
-
-          <div className="grid-2">
-            <div>
-              <h3>Calm</h3>
-              <p>Lower anxiety with simple choices, gentle colour, and spacious layouts.</p>
-            </div>
-            <div>
-              <h3>Trust</h3>
-              <p>Be consistent, cite sources where available, and protect privacy.</p>
-            </div>
-            <div>
-              <h3>Support</h3>
-              <p>Meet people where they are. Never diagnose. Offer clear next steps.</p>
-            </div>
-            <div>
-              <h3>Inclusive</h3>
-              <p>Accessible by design: keyboard-friendly, screen-reader support, large touch targets.</p>
-            </div>
-          </div>
-        </Container>
-      </section>
-
-      {/* ===== SAFETY ===== */}
-      <section id="safety" className="section reveal">
-        <Container>
-          <header className="section-head">
-            <h2 className="h1">Safety & privacy</h2>
-          </header>
-
-          <div className="grid-3">
-            <div>
-              <h3>Information-only</h3>
-              <p>We do not provide medical advice, diagnosis, referrals, or endorsements.</p>
-            </div>
-            <div>
-              <h3>Privacy protected</h3>
-              <p>Anonymous chat is available. Minimise data; don’t share without consent.</p>
-            </div>
-            <div>
-              <h3>Accessible</h3>
-              <p>Strong contrast, large targets, semantic HTML, and reduced-motion support.</p>
-            </div>
-          </div>
-
-          <aside className="callout">
-            If you’re in immediate danger, call <strong>000</strong>. For 24/7 support: Lifeline <strong>13 11 14</strong>.
+          <aside className="crisis-banner reveal delay-1" role="note" aria-live="polite">
+            <strong>If you’re in immediate danger, call 000.</strong>
           </aside>
+
+          <div className="hotlines reveal delay-2" role="group" aria-label="24/7 support numbers">
+            <a className="hotline" href="tel:131114" aria-label="Call Lifeline on 13 11 14">
+              <h3>Lifeline</h3>
+              <p className="phone">13 11 14</p>
+              <span className="tag">24/7</span>
+            </a>
+            <a className="hotline" href="tel:1800551800" aria-label="Call Kids Helpline on 1800 55 1800">
+              <h3>Kids Helpline</h3>
+              <p className="phone">1800 55 1800</p>
+              <span className="tag">24/7</span>
+            </a>
+            <a className="hotline" href="tel:1300224636" aria-label="Call Beyond Blue on 1300 22 4636">
+              <h3>Beyond Blue</h3>
+              <p className="phone">1300 22 4636</p>
+              <span className="tag">24/7</span>
+            </a>
+          </div>
+
+          <div className="grid grid-3 reveal delay-3">
+            <div className="card">
+              <h3>What is Support Atlas?</h3>
+              <p>We’re an information directory. We don’t diagnose, refer, or endorse providers.</p>
+            </div>
+            <div className="card">
+              <h3>Anonymous chat</h3>
+              <p>Use chat without an account. Messages aren’t stored. Sign in to save history.</p>
+            </div>
+            <div className="card">
+              <h3>List a service</h3>
+              <p>Suggest a new service or update an existing one. Anonymous suggestions are moderated.</p>
+            </div>
+          </div>
+
+          <div className="cta-row reveal delay-4">
+            <button className="btn btn-primary" onClick={() => start()}>Ask in chat</button>
+          </div>
         </Container>
       </section>
 
-      {/* ===== PROVIDERS ===== */}
-      <section id="providers" className="section alt reveal">
+      {/* OUR PRINCIPLES — static large cards */}
+      <section id="principles" className="edge section hero-block" aria-labelledby="principles-title">
         <Container>
-          <header className="section-head">
-            <h2 className="display-sm">For service providers</h2>
-            <p className="muted">
-              Create or update a listing. Suggestions go to moderation; super-users approve changes.
-            </p>
+          <header className="section-head reveal">
+            <h2 id="principles-title" className="h1">Our principles</h2>
           </header>
 
-          <div className="cta-row">
-            <a className="btn btn-primary" href="/admin">List a service</a>
-            <a className="btn btn-secondary" href="/contact">Learn more</a>
+          <div className="p-grid reveal delay-1" role="group" aria-label="Principles">
+            <article className="p-card">
+              <header><span className="p-dot" aria-hidden="true" />Calm</header>
+              <p>Gentle colour, clear hierarchy and generous spacing lower anxiety.</p>
+            </article>
+            <article className="p-card">
+              <header><span className="p-dot" aria-hidden="true" />Trust</header>
+              <p>Consistent design, plain language and privacy by default build confidence.</p>
+            </article>
+            <article className="p-card">
+              <header><span className="p-dot" aria-hidden="true" />Support</header>
+              <p>Meet people where they are. Offer kind, actionable next steps.</p>
+            </article>
+            <article className="p-card">
+              <header><span className="p-dot" aria-hidden="true" />Inclusive</header>
+              <p>Keyboard-friendly, screen-reader-ready, and reduced-motion aware.</p>
+            </article>
+          </div>
+        </Container>
+      </section>
+
+      {/* FAQ — minimal accordion */}
+      <section id="faq" className="edge section pattern-faq hero-block" aria-labelledby="faq-title">
+        <Container>
+          <header className="section-head reveal">
+            <h2 id="faq-title" className="h1">Frequently asked questions</h2>
+            <p className="muted">Tap a question to reveal the answer.</p>
+          </header>
+
+          <div className="faq-list">
+            <details className="faq-min reveal">
+              <summary>Is this medical advice or a referral service?</summary>
+              <div>No — we provide information only. Contact providers directly for care.</div>
+            </details>
+            <details className="faq-min reveal delay-1">
+              <summary>Can I use chat without an account?</summary>
+              <div>Yes. Anonymous chat is available; messages aren’t stored. Sign in to save history.</div>
+            </details>
+            <details className="faq-min reveal delay-2">
+              <summary>How do I find services near me?</summary>
+              <div>Start a chat or search by suburb/postcode to browse nearby and telehealth options.</div>
+            </details>
+            <details className="faq-min reveal delay-3">
+              <summary>What about privacy?</summary>
+              <div>We minimise data collection and don’t share without consent.</div>
+            </details>
+            <details className="faq-min reveal delay-4">
+              <summary>Do you endorse or rate providers?</summary>
+              <div>No. We list information only, so you can reach out and decide what’s right for you.</div>
+            </details>
+            <details className="faq-min reveal delay-5">
+              <summary>What should I do in an emergency?</summary>
+              <div>Call <strong>000</strong>. You can also use the crisis numbers above for 24/7 support.</div>
+            </details>
           </div>
         </Container>
       </section>

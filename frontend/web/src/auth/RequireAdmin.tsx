@@ -1,5 +1,6 @@
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from './AuthContext';
+import { JSX } from 'react';
 
 /**
  * Minimal admin gate:

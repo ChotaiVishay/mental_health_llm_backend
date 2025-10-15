@@ -8,9 +8,9 @@ from datetime import datetime
 import uuid
 import structlog
 
-from core.database.supabase_only import get_supabase_db
-from core.llm.openai_client import get_openai_client
-from app.config import get_settings
+from ..core.database.supabase_only import get_supabase_db
+from ..core.llm.openai_client import get_openai_client
+from ..app.config import get_settings
 
 logger = structlog.get_logger(__name__)
 

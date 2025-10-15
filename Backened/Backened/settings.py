@@ -74,8 +74,11 @@ MIDDLEWARE = [
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
-    "https://comp-30022-group-30-mental-health-s.vercel.app/",
-    "https://*.vercel.app", 
+    "https://comp-30022-group-30-mental-health-s.vercel.app",
+]
+
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^https://.+\.vercel\.app$",
 ]
 
 ROOT_URLCONF = 'Backened.urls'

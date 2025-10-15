@@ -1,16 +1,26 @@
 // web/src/api/chat.ts
-
-const API_BASE = (import.meta.env.VITE_API_BASE_URL ?? '').toString().replace(/\/+$/,'');
-
-// Chat endpoint
-const CHAT_ENDPOINT = `${API_BASE}/api/v1/chat/chat`;
-
-// Interfaces
 export interface ChatSession {
   id: string;
   title: string;
   created_at: string;
   updated_at: string;
+  // add more fields if your API returns them
+}
+
+const CHAT_API_URL = 'http://localhost:8000/chat/chat-sessions/';
+
+export async function fetchChatSessions(): Promise<ChatSession[]> {
+  const response = await fetch(CHAT_API_URL, {
+    headers: { Accept: 'application/json' },
+  });
+
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(`HTTP ${response.status} on ${CHAT_API_URL}: ${text.slice(0, 120)}`);
+  }
+
+  const data = await response.json();
+  return data as ChatSession[];
 }
 
 export interface ChatReply {
@@ -18,42 +28,18 @@ export interface ChatReply {
   session_id: string | null;
 }
 
-// Fetch chat sessions - NOTE: Backend endpoint doesn't exist yet
-export async function fetchChatSessions(): Promise<ChatSession[]> {
-  console.warn('fetchChatSessions: Backend endpoint not implemented yet');
-  // Return empty array for now since backend doesn't have this endpoint
-  return [];
-  
-  // Uncomment this when adding the backend endpoint:
-  /*
-  const url = `${API_BASE}/api/v1/chat/sessions`;
-  const response = await fetch(url, {
-    headers: { Accept: 'application/json' },
-  });
-  
-  if (!response.ok) {
-    const text = await response.text();
-    throw new Error(`HTTP ${response.status}: ${text}`);
-  }
-  
-  return response.json() as Promise<ChatSession[]>;
-  */
-}
+const CHAT_MESSAGE_URL = 'http://localhost:8000/chat/chat-message/';
 
-// Send message to chat
 export async function sendMessageToAPI(message: string, sessionId: string | null): Promise<ChatReply> {
-  console.log('Sending to:', CHAT_ENDPOINT);
-  
-  const response = await fetch(CHAT_ENDPOINT, {
+  const response = await fetch(CHAT_MESSAGE_URL, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       Accept: 'application/json',
     },
-    body: JSON.stringify({ 
-      message,
+    body: JSON.stringify({  message,
       session_id: sessionId,
-    }),
+     }),
   });
 
   if (!response.ok) {

@@ -6,7 +6,7 @@ from typing import Optional, Dict, Any
 import openai
 import structlog
 
-from app.config import get_settings
+from ...app.config import get_settings
 
 logger = structlog.get_logger(__name__)
 

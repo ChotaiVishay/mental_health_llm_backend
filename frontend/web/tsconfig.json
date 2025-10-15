@@ -21,8 +21,7 @@
   "files": [],
   "references": [
     { "path": "./tsconfig.app.json" },
-    { "path": "./tsconfig.node.json" }
-    // If you actually have tests in a separate project file, re-add:
-    // { "path": "./tsconfig.test.json" }
+    { "path": "./tsconfig.node.json" },
+    { "path": "./tsconfig.test.json" }
   ]
 }
