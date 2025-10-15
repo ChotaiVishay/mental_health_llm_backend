@@ -7,7 +7,13 @@ export interface ChatSession {
   // add more fields if your API returns them
 }
 
-const CHAT_API_URL = 'http://localhost:8000/chat/chat-sessions/';
+const BASE =
+  (typeof import.meta !== 'undefined' && import.meta.env?.VITE_CHAT_API_BASE) ||
+  'http://mental-health-prod-v2.eba-cxhtfs2h.us-east-1.elasticbeanstalk.com';
+
+const CHAT_API_URL = `${BASE.replace(/\/$/, '')}/chat/chat-sessions/`;
+const CHAT_MESSAGE_URL = `${BASE.replace(/\/$/, '')}/chat/chat-message/`;
+
 
 export async function fetchChatSessions(): Promise<ChatSession[]> {
   const response = await fetch(CHAT_API_URL, {
@@ -27,8 +33,6 @@ export interface ChatReply {
   response: string;
   session_id: string | null;
 }
-
-const CHAT_MESSAGE_URL = 'http://localhost:8000/chat/chat-message/';
 
 export async function sendMessageToAPI(message: string, sessionId: string | null): Promise<ChatReply> {
   const response = await fetch(CHAT_MESSAGE_URL, {
