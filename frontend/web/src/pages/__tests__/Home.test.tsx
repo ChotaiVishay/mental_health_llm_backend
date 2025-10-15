@@ -17,6 +17,6 @@ it('shows Start Chat and navigates (when logged in)', () => {
     </MemoryRouter>
   );
 
-  fireEvent.click(screen.getByText('Start Chat'));
+  fireEvent.click(screen.getByRole('button', { name: /^start chat —/i }));
   expect(screen.getByRole('textbox', { name: /message/i })).toBeInTheDocument();
 });

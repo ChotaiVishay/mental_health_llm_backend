@@ -17,7 +17,7 @@ it('starts chat anonymously when logged out', () => {
     </MemoryRouter>
   );
 
-  fireEvent.click(screen.getByText('Start Chat'));
+  fireEvent.click(screen.getByRole('button', { name: /^start chat —/i }));
   // We should be on the Chat page, not /login.
   expect(screen.getByRole('textbox', { name: /message/i })).toBeInTheDocument();
 });

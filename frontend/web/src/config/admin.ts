@@ -1,5 +1,6 @@
 // Centralised helpers for Django Admin URLs used by the frontend.
 // All values are read from Vite envs so we can swap per environment.
+import { VITE } from '@/utils/env';
 
 function trimTrailingSlash(s: string) {
   return s.replace(/\/+$/, '');
@@ -11,8 +12,8 @@ function join(origin: string, path: string) {
   return `${trimTrailingSlash(origin)}${ensureLeadingSlash(path)}`;
 }
 
-const BACKEND_ORIGIN = (import.meta.env.VITE_BACKEND_ORIGIN ?? '').toString();
-const DJANGO_ADMIN_PATH = (import.meta.env.VITE_DJANGO_ADMIN_PATH ?? '/admin/').toString();
+const BACKEND_ORIGIN = (VITE.VITE_BACKEND_ORIGIN ?? '').toString();
+const DJANGO_ADMIN_PATH = (VITE.VITE_DJANGO_ADMIN_PATH ?? '/admin/').toString();
 
 export const ADMIN_CONSOLE_URL = BACKEND_ORIGIN
   ? join(BACKEND_ORIGIN, DJANGO_ADMIN_PATH)
@@ -20,9 +21,9 @@ export const ADMIN_CONSOLE_URL = BACKEND_ORIGIN
 
 // Optional social auth start endpoints on the backend (Django side)
 const OAUTH_PATHS = {
-  google: import.meta.env.VITE_ADMIN_AUTH_GOOGLE?.toString(),
-  github: import.meta.env.VITE_ADMIN_AUTH_GITHUB?.toString(),
-  apple: import.meta.env.VITE_ADMIN_AUTH_APPLE?.toString(),
+  google: VITE.VITE_ADMIN_AUTH_GOOGLE?.toString(),
+  github: VITE.VITE_ADMIN_AUTH_GITHUB?.toString(),
+  apple: VITE.VITE_ADMIN_AUTH_APPLE?.toString(),
 } as const;
 
 export type AdminProvider = keyof typeof OAUTH_PATHS;
@@ -42,5 +43,4 @@ export function getAdminOAuthUrl(provider: AdminProvider): string | null {
 }
 
 /** Optional: turn on Admin link in header via env */
-export const SHOW_ADMIN_LINK =
-  String(import.meta.env.VITE_SHOW_ADMIN_LINK ?? '') === '1';
+export const SHOW_ADMIN_LINK = String(VITE.VITE_SHOW_ADMIN_LINK ?? '') === '1';
