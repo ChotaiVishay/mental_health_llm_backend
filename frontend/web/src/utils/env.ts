@@ -4,10 +4,18 @@ export type ViteEnv = {
   VITE_API_BASE_URL?: string;
   VITE_SUPPORTED_LANGS?: string;
   VITE_SERVICES_MOCK?: string; // '1' enables mock services
+  VITE_SUPABASE_URL?: string;
+  VITE_SUPABASE_ANON_KEY?: string;
+  VITE_BACKEND_ORIGIN?: string;
+  VITE_DJANGO_ADMIN_PATH?: string;
+  VITE_ADMIN_AUTH_GOOGLE?: string;
+  VITE_ADMIN_AUTH_GITHUB?: string;
+  VITE_ADMIN_AUTH_APPLE?: string;
+  VITE_SHOW_ADMIN_LINK?: string;
 };
 
-type ImportMetaLike = { env?: Record<string, string | undefined> };
+const metaEnv = (import.meta as ImportMeta & {
+  env?: Record<string, string | undefined>;
+}).env ?? {};
 
-// Avoid `any`: cast through `unknown` to a structural type
-const meta = (import.meta as unknown as ImportMetaLike) ?? {};
-export const VITE: ViteEnv = (meta.env as ViteEnv) ?? {};
+export const VITE: ViteEnv = metaEnv as ViteEnv;

@@ -1,3 +1,4 @@
+import { FormEvent, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/auth/AuthContext';
 import '@/styles/pages/login.css';
@@ -5,63 +6,433 @@ import '@/styles/pages/login.css';
 type FromState = { from?: string };
 
 export default function Login() {
-  const { signIn } = useAuth();
+  const {
+    signIn,
+    emailSignIn,
+    emailSignUp,
+    verifyEmailSignUp,
+    resendEmailSignUp,
+    requestPasswordReset,
+    loading,
+  } = useAuth();
   const nav = useNavigate();
   const loc = useLocation();
   const from = (loc.state as FromState)?.from ?? '/';
+  const [mode, setMode] = useState<'signin' | 'signup'>('signin');
+  const [phase, setPhase] = useState<'form' | 'verify' | 'forgot'>('form');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirm, setConfirm] = useState('');
+  const [name, setName] = useState('');
+  const [verificationCode, setVerificationCode] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [status, setStatus] = useState<string | null>(null);
+  const [pendingSignup, setPendingSignup] = useState<{ email: string; password: string; name?: string } | null>(null);
+
+  const isSignup = mode === 'signup';
 
   const start = async (provider: 'google' | 'apple' | 'github') => {
-    if (signIn) {
-      await signIn(provider, from);
+    if (!signIn) return;
+    try {
+      const result = await signIn(provider, from);
+      if (!result?.redirected) {
+        nav(from, { replace: true });
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unable to start sign-in.');
+    }
+  };
+
+  const onSubmitEmail = async (evt: FormEvent<HTMLFormElement>) => {
+    evt.preventDefault();
+    setError(null);
+    setStatus(null);
+    setPhase('form');
+
+    const trimmedEmail = email.trim();
+    if (!trimmedEmail || !password) {
+      setError('Email and password are required.');
+      return;
+    }
+
+    if (isSignup) {
+      if (password.length < 6) {
+        setError('Password must be at least 6 characters long.');
+        return;
+      }
+      if (password !== confirm) {
+        setError('Passwords do not match.');
+        return;
+      }
+      if (!emailSignUp) {
+        setError('Email sign-up is unavailable right now.');
+        return;
+      }
+      const result = await emailSignUp({ email: trimmedEmail, password, name: name.trim() || undefined });
+      if (!result.ok) {
+        setError(result.error ?? 'Unable to sign up.');
+        return;
+      }
+      if (result.needsVerification) {
+        setPendingSignup({ email: trimmedEmail, password, name: name.trim() || undefined });
+        setVerificationCode('');
+        setPhase('verify');
+        setStatus('Enter the 6-digit code sent to your email to verify your account.');
+        return;
+      }
+      nav(from, { replace: true });
+      return;
+    }
+
+    if (!emailSignIn) {
+      setError('Email sign-in is unavailable right now.');
+      return;
+    }
+    const result = await emailSignIn({ email: trimmedEmail, password });
+    if (!result.ok) {
+      setError(result.error ?? 'Unable to sign in.');
+      return;
     }
     nav(from, { replace: true });
   };
 
-  const disabled = !signIn;
+  const onSubmitVerification = async (evt: FormEvent<HTMLFormElement>) => {
+    evt.preventDefault();
+    setError(null);
+    setStatus(null);
+
+    if (!pendingSignup) {
+      setError('No sign-up in progress.');
+      return;
+    }
+    if (!verifyEmailSignUp) {
+      setError('Verification is unavailable right now.');
+      return;
+    }
+    const cleanedCode = verificationCode.trim();
+    if (!cleanedCode) {
+      setError('Enter the verification code from your email.');
+      return;
+    }
+
+    const result = await verifyEmailSignUp({
+      email: pendingSignup.email,
+      password: pendingSignup.password,
+      token: cleanedCode,
+      name: pendingSignup.name,
+    });
+    if (!result.ok) {
+      setError(result.error ?? 'Verification failed.');
+      return;
+    }
+    nav(from, { replace: true });
+  };
+
+  const resendVerification = async () => {
+    if (!pendingSignup) {
+      setError('No sign-up in progress.');
+      return;
+    }
+    if (!resendEmailSignUp) {
+      setError('Unable to resend verification right now.');
+      return;
+    }
+
+    const result = await resendEmailSignUp(pendingSignup.email);
+    if (!result.ok) {
+      setError(result.error ?? 'Unable to resend verification code.');
+      return;
+    }
+    setStatus('We sent a new verification code to your email.');
+  };
+
+  const toggleMode = () => {
+    setMode((prev) => (prev === 'signin' ? 'signup' : 'signin'));
+    setError(null);
+    setStatus(null);
+    setPhase('form');
+    setPendingSignup(null);
+    setVerificationCode('');
+  };
+
+  const oauthDisabled = !signIn || loading;
+  const submitDisabled = loading || phase === 'verify';
+
+  const resetToForm = () => {
+    setPhase('form');
+    setPendingSignup(null);
+    setVerificationCode('');
+    setStatus(null);
+  };
+
+  const beginForgot = () => {
+    setPhase('forgot');
+    setError(null);
+    setStatus(null);
+  };
+
+  const cancelForgot = () => {
+    setPhase('form');
+    setStatus(null);
+    setError(null);
+  };
+
+  const onSubmitForgot = async (evt: FormEvent<HTMLFormElement>) => {
+    evt.preventDefault();
+    setError(null);
+    setStatus(null);
+
+    const trimmedEmail = email.trim();
+    if (!trimmedEmail) {
+      setError('Enter the email associated with your account.');
+      return;
+    }
+    if (!requestPasswordReset) {
+      setError('Password reset is unavailable right now.');
+      return;
+    }
+    const result = await requestPasswordReset(trimmedEmail);
+    if (!result.ok) {
+      setError(result.error ?? 'Unable to send password reset email.');
+      return;
+    }
+
+    setStatus('Check your inbox for a password reset link. The link will expire after a short time.');
+  };
 
   return (
     <section className="auth-page" aria-labelledby="auth-title">
       <div className="auth-card" role="dialog" aria-modal="true" aria-labelledby="auth-title">
-        <h1 id="auth-title" className="h1">Sign in</h1>
-        <p className="muted">Authenticate to continue.</p>
+        {phase === 'verify' && pendingSignup ? (
+          <>
+            <h1 id="auth-title" className="h1">Verify your email</h1>
+            <p className="muted">
+              Enter the 6-digit code sent to&nbsp;
+              <strong>{pendingSignup.email}</strong>
+              .
+            </p>
 
-        <div className="oauth-list" role="group" aria-label="Sign in with">
-          <button
-            className="oauth-btn -google"
-            onClick={() => start('google')}
-            disabled={disabled}
-            aria-disabled={disabled}
-          >
-            <GoogleIcon />
-            Continue with Google
-          </button>
+            <form className="email-auth" onSubmit={onSubmitVerification} noValidate>
+              <fieldset disabled={loading}>
+                <legend className="sr-only">Verify your account</legend>
+                <label className="field">
+                  <span>Verification code</span>
+                  <input
+                    type="text"
+                    name="verification-code"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    autoComplete="one-time-code"
+                    required
+                    value={verificationCode}
+                    onChange={(evt) => setVerificationCode(evt.target.value)}
+                  />
+                </label>
 
-          <button
-            className="oauth-btn -github"
-            onClick={() => start('github')}
-            disabled={disabled}
-            aria-disabled={disabled}
-          >
-            <GitHubIcon />
-            Continue with GitHub
-          </button>
+                {error && (
+                  <p className="error" role="alert">
+                    {error}
+                  </p>
+                )}
+                {status && (
+                  <p className="status" role="status">
+                    {status}
+                  </p>
+                )}
 
-          <button
-            className="oauth-btn -apple"
-            onClick={() => start('apple')}
-            disabled={disabled}
-            aria-disabled={disabled}
-          >
-            <AppleIcon />
-            Continue with Apple
-          </button>
-        </div>
+                <button type="submit" className="btn btn-primary">
+                  Verify and finish
+                </button>
+              </fieldset>
+            </form>
 
-        <div className="auth-foot">
-          <span className="muted">
-            New here? No problem — pick a provider above and we’ll create your account on first sign-in.
-          </span>
-        </div>
+            <div className="auth-foot">
+              <button type="button" className="linklike" onClick={resendVerification} disabled={loading}>
+                Resend code
+              </button>
+              <button type="button" className="linklike" onClick={resetToForm}>
+                  Use a different email
+              </button>
+            </div>
+          </>
+        ) : phase === 'forgot' ? (
+          <>
+            <h1 id="auth-title" className="h1">Reset your password</h1>
+            <p className="muted">
+              Enter the email you used to sign up. We&apos;ll send a link to reset your password.
+            </p>
+
+            <form className="email-auth" onSubmit={onSubmitForgot} noValidate>
+              <fieldset disabled={loading}>
+                <legend className="sr-only">Request a password reset link</legend>
+
+                <label className="field">
+                  <span>Email</span>
+                  <input
+                    type="email"
+                    name="forgot-email"
+                    autoComplete="email"
+                    required
+                    value={email}
+                    onChange={(evt) => setEmail(evt.target.value)}
+                  />
+                </label>
+
+                {error && (
+                  <p className="error" role="alert">
+                    {error}
+                  </p>
+                )}
+                {status && (
+                  <p className="status" role="status">
+                    {status}
+                  </p>
+                )}
+
+                <button type="submit" className="btn btn-primary">
+                  Email me a reset link
+                </button>
+              </fieldset>
+            </form>
+
+            <div className="auth-foot">
+              <button type="button" className="linklike" onClick={cancelForgot}>
+                Back to sign in
+              </button>
+            </div>
+          </>
+        ) : (
+          <>
+            <h1 id="auth-title" className="h1">Sign in</h1>
+            <p className="muted">Authenticate to continue.</p>
+
+            <div className="oauth-list" role="group" aria-label="Sign in with">
+              <button
+                className="oauth-btn -google"
+                onClick={() => start('google')}
+                disabled={oauthDisabled}
+                aria-disabled={oauthDisabled}
+              >
+                <GoogleIcon />
+                Continue with Google
+              </button>
+
+              <button
+                className="oauth-btn -github"
+                onClick={() => start('github')}
+                disabled={oauthDisabled}
+                aria-disabled={oauthDisabled}
+              >
+                <GitHubIcon />
+                Continue with GitHub
+              </button>
+
+              <button
+                className="oauth-btn -apple"
+                onClick={() => start('apple')}
+                disabled={oauthDisabled}
+                aria-disabled={oauthDisabled}
+              >
+                <AppleIcon />
+                Continue with Apple
+              </button>
+            </div>
+
+            <div className="auth-divider" role="presentation">
+              <span>or</span>
+            </div>
+
+            <form className="email-auth" onSubmit={onSubmitEmail} noValidate>
+              <fieldset disabled={submitDisabled}>
+                <legend className="sr-only">{isSignup ? 'Sign up with email' : 'Sign in with email'}</legend>
+
+                <label className="field">
+                  <span>Email</span>
+                  <input
+                    type="email"
+                    name="email"
+                    autoComplete="email"
+                    required
+                    value={email}
+                    onChange={(evt) => setEmail(evt.target.value)}
+                  />
+                </label>
+
+                {isSignup && (
+                  <label className="field">
+                    <span>Full name (optional)</span>
+                    <input
+                      type="text"
+                      name="name"
+                      autoComplete="name"
+                      value={name}
+                      onChange={(evt) => setName(evt.target.value)}
+                    />
+                  </label>
+                )}
+
+                <label className="field">
+                  <span>Password</span>
+                  <input
+                    type="password"
+                    name="password"
+                    autoComplete={isSignup ? 'new-password' : 'current-password'}
+                    required
+                    minLength={6}
+                    value={password}
+                    onChange={(evt) => setPassword(evt.target.value)}
+                  />
+                </label>
+
+                {isSignup && (
+                  <label className="field">
+                    <span>Confirm password</span>
+                    <input
+                      type="password"
+                      name="confirm-password"
+                      autoComplete="new-password"
+                      required
+                      minLength={6}
+                      value={confirm}
+                      onChange={(evt) => setConfirm(evt.target.value)}
+                    />
+                  </label>
+                )}
+
+                {error && (
+                  <p className="error" role="alert">
+                    {error}
+                  </p>
+                )}
+                {status && (
+                  <p className="status" role="status">
+                    {status}
+                  </p>
+                )}
+
+                <button type="submit" className="btn btn-primary">
+                  {isSignup ? 'Create account' : 'Sign in with email'}
+                </button>
+              </fieldset>
+            </form>
+
+            <div className="auth-foot">
+              <span className="muted">
+                {isSignup ? 'Already have an account?' : 'New here? Prefer to use email instead?'}
+              </span>
+              <button type="button" className="linklike" onClick={toggleMode}>
+                {isSignup ? 'Sign in with email' : 'Create an email account'}
+              </button>
+            </div>
+            {!isSignup && (
+              <div className="auth-foot">
+                <button type="button" className="linklike" onClick={beginForgot}>
+                  Forgot password?
+                </button>
+              </div>
+            )}
+          </>
+        )}
       </div>
     </section>
   );

@@ -13,7 +13,7 @@ it('renders primary nav links (no Admin in header)', () => {
   // Scope to the header’s primary navigation so footer links don’t interfere
   const nav = screen.getByRole('navigation', { name: /primary/i });
 
-  ['Home', 'Chat', 'Services', 'Help & Crisis'].forEach((label) => {
+  ['Home', 'Chat', 'Help & Crisis', 'FAQ'].forEach((label) => {
     expect(within(nav).getByRole('link', { name: label })).toBeInTheDocument();
   });
 

@@ -6,6 +6,7 @@ import { Providers } from '@/test-utils';
 // Force the API call to fail so we can assert the banner & composer behaviour
 vi.mock('@/api/chat', () => ({
   sendMessageToAPI: vi.fn(async () => { throw new Error('Failed to fetch'); }),
+  fetchChatSessions: vi.fn(async () => []),
 }));
 
 it('shows a friendly banner when API fails and keeps composer enabled', async () => {

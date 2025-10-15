@@ -49,6 +49,80 @@
 /* Footer hint */
 .auth-foot{ margin-top:14px; }
 .auth-foot .muted{ font-size:.9rem; line-height:1.35; }
+.auth-foot .linklike{ margin-top:8px; }
+
+.auth-divider{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  margin:24px 0 16px;
+  color: var(--muted);
+  font-size: .85rem;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+.auth-divider::before,
+.auth-divider::after{
+  content:"";
+  flex:1;
+  height:1px;
+  background: var(--grey-300);
+}
+.auth-divider span{ white-space:nowrap; }
+
+.email-auth fieldset{
+  border:0;
+  margin:0;
+  padding:0;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+.email-auth .field span{
+  display:block;
+  font-weight:600;
+  margin-bottom:6px;
+}
+.email-auth .field input{
+  width:100%;
+  padding:10px 12px;
+  border:1px solid var(--grey-300);
+  border-radius:10px;
+  font:inherit;
+  transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+.email-auth .field input:focus{
+  outline:none;
+  border-color: var(--focus);
+  box-shadow:0 0 0 3px rgba(47,132,104,0.25);
+}
+.email-auth fieldset:disabled .field input{
+  opacity:.7;
+  cursor:not-allowed;
+}
+.email-auth .error,
+.email-auth .status{
+  font-size:.9rem;
+  margin-top:4px;
+}
+.email-auth .error{ color: var(--danger); }
+.email-auth .status{ color: var(--success); }
+.email-auth .btn{ width:100%; margin-top:4px; }
+
+.linklike{
+  background:none;
+  border:0;
+  padding:0;
+  font:inherit;
+  color: var(--link);
+  cursor:pointer;
+  text-decoration: underline;
+}
+.linklike:hover,
+.linklike:focus{
+  text-decoration:none;
+}
 
 /* Headings if your global styles don't define .h1 */
 .h1{ font-size: clamp(1.6rem, 1.2rem + 1vw, 2rem); line-height:1.2; margin:0; }

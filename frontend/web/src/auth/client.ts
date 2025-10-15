@@ -1,35 +1,65 @@
 import type { Provider, User } from './types';
-import { saveAuth } from './storage';
+import { saveAuth, setReturnTo } from './storage';
 import { VITE } from '@/utils/env';
+import { getSupabaseClient } from './supabaseClient';
 
-const isMock = VITE.VITE_AUTH_MOCK === '1';
+const supabase = getSupabaseClient();
+const isMock = VITE.VITE_AUTH_MOCK === '1' || !supabase;
 
 export async function signIn(provider: Provider, returnTo?: string) {
   if (isMock) {
     const token = 'dev-token';
     const user: User = { id: 'dev1', name: 'Dev User', email: 'dev@example.com' };
     saveAuth(token, user);
-    if (returnTo) sessionStorage.setItem('sa_return_to', returnTo);
+    if (returnTo) setReturnTo(returnTo);
     return { ok: true as const, redirected: false };
   }
-  const base = VITE.VITE_API_BASE_URL ?? '';
-  const redirect = `${window.location.origin}/auth/callback`;
-  const url = `${base}/api/auth/${provider}?redirect_uri=${encodeURIComponent(redirect)}${
-    returnTo ? `&state=${encodeURIComponent(returnTo)}` : ''
-  }`;
-  window.location.href = url;
-  return { ok: true as const, redirected: true };
+  if (returnTo) setReturnTo(returnTo);
+
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider,
+    options: {
+      redirectTo: `${window.location.origin}/auth/callback`,
+    },
+  });
+  if (error) throw error;
+  if (data?.url) {
+    window.location.href = data.url;
+    return { ok: true as const, redirected: true };
+  }
+  return { ok: true as const, redirected: false };
 }
 
-export function parseCallbackAndStore() {
+export async function parseCallbackAndStore(): Promise<string | undefined> {
   const url = new URL(window.location.href);
-  const token = url.searchParams.get('token') ?? 'dev-token';
-  const name = url.searchParams.get('name') ?? 'Authenticated User';
-  const email = url.searchParams.get('email') ?? undefined;
-  const user: User = { id: 'u1', name, email };
-  saveAuth(token, user);
+  const hashParams = new URLSearchParams(url.hash.startsWith('#') ? url.hash.slice(1) : url.hash);
+  const state = url.searchParams.get('state') ?? hashParams.get('state') ?? undefined;
 
-  const state = url.searchParams.get('state') ?? sessionStorage.getItem('sa_return_to') ?? '/';
-  sessionStorage.removeItem('sa_return_to');
+  if (isMock) {
+    const token = url.searchParams.get('token') ?? 'dev-token';
+    const name = url.searchParams.get('name') ?? 'Authenticated User';
+    const email = url.searchParams.get('email') ?? undefined;
+    const user: User = { id: 'u1', name, email };
+    saveAuth(token, user);
+    return state;
+  }
+
+  const client = getSupabaseClient();
+  if (client) {
+    const accessToken = hashParams.get('access_token');
+    const refreshToken = hashParams.get('refresh_token');
+    if (accessToken && refreshToken) {
+      const { error } = await client.auth.setSession({ access_token: accessToken, refresh_token: refreshToken });
+      if (error) throw error;
+    } else if (url.searchParams.has('code')) {
+      const { error } = await client.auth.exchangeCodeForSession(url.toString());
+      if (error) throw error;
+    }
+  }
+
+  if (url.hash) {
+    window.history.replaceState(null, '', `${url.origin}${url.pathname}${url.search}`);
+  }
+
   return state;
 }

@@ -6,12 +6,10 @@ import AuthCallback from '@/pages/AuthCallback';
 import Chat from '@/pages/Chat';
 
 // Mock the OAuth client so we don't depend on import.meta.env in tests
-vi.mock('@/auth/client', () => {
-  return {
-    // Pretend the callback parsing succeeded and asked us to go to /chat
-    parseCallbackAndStore: vi.fn(() => '/chat'),
-  };
-});
+vi.mock('@/auth/client', () => ({
+  // Pretend the callback parsing succeeded and asked us to go to /chat
+  parseCallbackAndStore: vi.fn(async () => '/chat'),
+}));
 
 it('goes to /chat after OAuth callback with state=/chat (smoke)', async () => {
   render(

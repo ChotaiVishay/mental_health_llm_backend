@@ -13,7 +13,7 @@ it('renders core navigation links in the header only', () => {
   // Only look in the header’s Primary navigation (avoids footer duplicates)
   const nav = screen.getByRole('navigation', { name: /primary/i });
 
-  ['Home', 'Chat', 'Services', 'Help & Crisis'].forEach((label) => {
+  ['Home', 'Chat', 'Help & Crisis', 'FAQ'].forEach((label) => {
     expect(within(nav).getByRole('link', { name: label })).toBeInTheDocument();
   });
 
