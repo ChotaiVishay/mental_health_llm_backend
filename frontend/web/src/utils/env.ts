@@ -14,8 +14,4 @@ export type ViteEnv = {
   VITE_SHOW_ADMIN_LINK?: string;
 };
 
-type ImportMetaLike = { env?: Record<string, string | undefined> };
-
-// Avoid `any`: cast through `unknown` to a structural type
-const meta = (import.meta as unknown as ImportMetaLike) ?? {};
-export const VITE: ViteEnv = (meta.env as ViteEnv) ?? {};
+export const VITE: ViteEnv = import.meta.env as ViteEnv;

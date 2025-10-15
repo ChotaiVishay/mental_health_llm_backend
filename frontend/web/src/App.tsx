@@ -4,11 +4,13 @@ import Chat from '@/pages/Chat';
 import AdminSignIn from '@/pages/admin/AdminSignIn';
 import AdminIndex from '@/pages/admin/AdminIndex';
 import Login from '@/pages/Login';
+import Profile from '@/pages/Profile';
 import AuthCallback from '@/pages/AuthCallback';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import Container from '@/components/layout/Container';
 import RequireAdmin from '@/auth/RequireAdmin';
+import RequireAuth from '@/auth/RequireAuth';
 import Styleguide from '@/pages/Styleguide';
 import '@/styles/index.css';
 import NotFound from '@/pages/NotFound';
@@ -30,6 +32,14 @@ export default function App() {
           {/* Regular user auth */}
           <Route path="/login" element={<Login />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
+          <Route
+            path="/profile"
+            element={(
+              <RequireAuth>
+                <Profile />
+              </RequireAuth>
+            )}
+          />
 
           {/* Admin */}
           <Route path="/admin/signin" element={<AdminSignIn />} />

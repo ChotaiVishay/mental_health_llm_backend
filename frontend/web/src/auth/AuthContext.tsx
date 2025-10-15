@@ -10,12 +10,29 @@ import { mergePreloginIntoUser } from '@/features/chat/sessionStore';
 import { getSupabaseClient } from './supabaseClient';
 import { VITE } from '@/utils/env';
 
+type EmailCredentials = { email: string; password: string };
+type EmailSignUpPayload = EmailCredentials & { name?: string };
+type EmailAuthResult = { ok: boolean; error?: string; needsVerification?: boolean };
+type EmailVerificationPayload = {
+  email: string;
+  password: string;
+  token: string;
+  name?: string;
+};
+type EmailVerificationResult = { ok: boolean; error?: string };
+
+type SignInResult = { redirected: boolean };
+
 type Ctx = {
   user: User | null;
   loading: boolean;
-  signIn: (provider: 'google' | 'github' | 'apple', returnTo?: string) => Promise<void>;
+  signIn: (provider: 'google' | 'github' | 'apple', returnTo?: string) => Promise<SignInResult | void>;
   signOut: () => Promise<void>;
   finishAuth: () => Promise<string | undefined>;
+  emailSignIn: (creds: EmailCredentials) => Promise<EmailAuthResult>;
+  emailSignUp: (payload: EmailSignUpPayload) => Promise<EmailAuthResult>;
+  verifyEmailSignUp: (payload: EmailVerificationPayload) => Promise<EmailVerificationResult>;
+  resendEmailSignUp: (email: string) => Promise<EmailAuthResult>;
   setUser?: React.Dispatch<React.SetStateAction<User | null>>; // handy for tests
 };
 
@@ -23,10 +40,36 @@ const AuthContext = createContext<Ctx>({
   user: null,
   loading: false,
   // safe no-ops as defaults
-  async signIn() {},
+  async signIn() { return undefined; },
   async signOut() {},
   async finishAuth() { return undefined; },
+  async emailSignIn() { return { ok: false, error: 'Email sign-in unavailable' }; },
+  async emailSignUp() { return { ok: false, error: 'Email sign-up unavailable' }; },
+  async verifyEmailSignUp() { return { ok: false, error: 'Email verification unavailable' }; },
+  async resendEmailSignUp() { return { ok: false, error: 'Email verification unavailable' }; },
 });
+
+function commitSession(session: Session | null, setUser: React.Dispatch<React.SetStateAction<User | null>>) {
+  if (!session?.user) {
+    clearAuth();
+    setUser(null);
+    return;
+  }
+
+  const supaUser = session.user;
+  const metadata = (supaUser.user_metadata ?? {}) as Record<string, unknown>;
+  const mapped: User = {
+    id: supaUser.id,
+    name: (metadata.full_name as string | undefined) ?? supaUser.email ?? undefined,
+    email: supaUser.email ?? undefined,
+    avatarUrl: (metadata.avatar_url as string | undefined) ?? undefined,
+  };
+
+  setUser(mapped);
+  if (session.access_token) saveAuth(session.access_token, mapped);
+  const uid = String(mapped.id ?? '');
+  if (uid) mergePreloginIntoUser(uid);
+}
 
 type AuthProviderProps = {
   children: ReactNode;
@@ -38,31 +81,6 @@ export function AuthProvider({ children, initialState }: AuthProviderProps) {
   const [loading, setLoading] = useState<boolean>(initialState?.loading ?? false);
   const supabase = getSupabaseClient();
   const isMockAuth = VITE.VITE_AUTH_MOCK === '1' || !supabase;
-
-  const applySession = useCallback(
-    (session: Session | null) => {
-      if (!session?.user) {
-        clearAuth();
-        setUser(null);
-        return;
-      }
-      const supaUser = session.user;
-      const mapped: User = {
-        id: supaUser.id,
-        name: (supaUser.user_metadata as Record<string, unknown> | undefined)?.full_name as string
-          ?? supaUser.email
-          ?? undefined,
-        email: supaUser.email ?? undefined,
-        avatarUrl: (supaUser.user_metadata as Record<string, unknown> | undefined)?.avatar_url as string
-          ?? undefined,
-      };
-      setUser(mapped);
-      if (session.access_token) saveAuth(session.access_token, mapped);
-      const uid = String(mapped.id ?? '');
-      if (uid) mergePreloginIntoUser(uid);
-    },
-    [],
-  );
 
   useEffect(() => {
     let mounted = true;
@@ -79,7 +97,7 @@ export function AuthProvider({ children, initialState }: AuthProviderProps) {
         if (!supabase) return;
         const { data } = await supabase.auth.getSession();
         if (!mounted) return;
-        applySession(data.session);
+        commitSession(data.session, setUser);
       } finally {
         if (mounted) setLoading(false);
       }
@@ -90,7 +108,7 @@ export function AuthProvider({ children, initialState }: AuthProviderProps) {
     if (!isMockAuth && supabase) {
       const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
         if (!mounted) return;
-        applySession(session);
+        commitSession(session, setUser);
       });
       return () => {
         mounted = false;
@@ -101,12 +119,13 @@ export function AuthProvider({ children, initialState }: AuthProviderProps) {
     return () => {
       mounted = false;
     };
-  }, [applySession, isMockAuth, supabase]);
+  }, [isMockAuth, supabase]);
 
   const signIn = useCallback(async (provider: 'google' | 'github' | 'apple', returnTo?: string) => {
     setLoading(true);
     try {
-      await clientSignIn(provider, returnTo);
+      const { redirected } = await clientSignIn(provider, returnTo);
+      return { redirected } as SignInResult;
       // In real OAuth you’ll be redirected; in mock mode you’ll return here.
     } finally {
       setLoading(false);
@@ -142,17 +161,203 @@ export function AuthProvider({ children, initialState }: AuthProviderProps) {
       }
       if (supabase) {
         const { data } = await supabase.auth.getSession();
-        applySession(data.session);
+        commitSession(data.session, setUser);
       }
       return state;
     } finally {
       setLoading(false);
     }
-  }, [applySession, isMockAuth, supabase]);
+  }, [isMockAuth, supabase]);
+
+  const emailSignIn = useCallback(async ({ email, password }: EmailCredentials): Promise<EmailAuthResult> => {
+    setLoading(true);
+    try {
+      const normalisedEmail = email.trim().toLowerCase();
+      if (!normalisedEmail || !password) {
+        return { ok: false, error: 'Email and password are required.' };
+      }
+
+      if (isMockAuth || !supabase) {
+        const mockUser: User = { id: normalisedEmail, email: normalisedEmail, name: normalisedEmail };
+        saveAuth('mock-token', mockUser);
+        setUser(mockUser);
+        mergePreloginIntoUser(mockUser.id);
+        return { ok: true };
+      }
+
+      const { data, error } = await supabase.auth.signInWithPassword({ email: normalisedEmail, password });
+      if (error) return { ok: false, error: error.message };
+      commitSession(data.session, setUser);
+      return { ok: true };
+    } catch (err) {
+      return {
+        ok: false,
+        error: err instanceof Error ? err.message : 'Email sign-in failed.',
+      };
+    } finally {
+      setLoading(false);
+    }
+  }, [isMockAuth, supabase]);
+
+  const emailSignUp = useCallback(async ({ email, password, name }: EmailSignUpPayload): Promise<EmailAuthResult> => {
+    setLoading(true);
+    try {
+      const normalisedEmail = email.trim().toLowerCase();
+      if (!normalisedEmail || !password) {
+        return { ok: false, error: 'Email and password are required.' };
+      }
+
+      if (isMockAuth || !supabase) {
+        const mockUser: User = { id: normalisedEmail, email: normalisedEmail, name: name || normalisedEmail };
+        saveAuth('mock-token', mockUser);
+        setUser(mockUser);
+        mergePreloginIntoUser(mockUser.id);
+        return { ok: true };
+      }
+
+      const { error } = await supabase.auth.signInWithOtp({
+        email: normalisedEmail,
+        options: {
+          shouldCreateUser: true,
+          emailRedirectTo: typeof window !== 'undefined'
+            ? `${window.location.origin}/auth/callback`
+            : undefined,
+          data: name ? { full_name: name } : undefined,
+        },
+      });
+
+      if (error) {
+        return { ok: false, error: error.message };
+      }
+
+      return { ok: true, needsVerification: true };
+    } catch (err) {
+      return {
+        ok: false,
+        error: err instanceof Error ? err.message : 'Sign-up failed.',
+      };
+    } finally {
+      setLoading(false);
+    }
+  }, [isMockAuth, supabase]);
+
+  const verifyEmailSignUp = useCallback(async ({
+    email,
+    password,
+    token,
+    name,
+  }: EmailVerificationPayload): Promise<EmailVerificationResult> => {
+    setLoading(true);
+    try {
+      const normalisedEmail = email.trim().toLowerCase();
+      const trimmedToken = token.trim();
+      if (!normalisedEmail || !trimmedToken) {
+        return { ok: false, error: 'Email and verification code are required.' };
+      }
+
+      if (isMockAuth || !supabase) {
+        const mockUser: User = {
+          id: normalisedEmail,
+          email: normalisedEmail,
+          name: name || normalisedEmail,
+        };
+        saveAuth('mock-token', mockUser);
+        setUser(mockUser);
+        mergePreloginIntoUser(mockUser.id);
+        return { ok: true };
+      }
+
+      const { data, error } = await supabase.auth.verifyOtp({
+        email: normalisedEmail,
+        token: trimmedToken,
+        type: 'email',
+      });
+
+      if (error || !data.session) {
+        return { ok: false, error: error?.message ?? 'Invalid or expired verification code.' };
+      }
+
+      commitSession(data.session, setUser);
+
+      const updatePayload: {
+        password?: string;
+        data?: Record<string, unknown>;
+      } = {};
+
+      if (password) updatePayload.password = password;
+      if (name) updatePayload.data = { full_name: name };
+
+      if (Object.keys(updatePayload).length > 0) {
+        const { data: updated, error: updateError } = await supabase.auth.updateUser(updatePayload); 
+        if (updateError) {
+          return { ok: false, error: updateError.message };
+        }
+        const { data: sessionData } = await supabase.auth.getSession();
+        if (sessionData.session) commitSession(sessionData.session, setUser);
+      }
+
+      return { ok: true };
+    } catch (err) {
+      return {
+        ok: false,
+        error: err instanceof Error ? err.message : 'Verification failed.',
+      };
+    } finally {
+      setLoading(false);
+    }
+  }, [isMockAuth, supabase]);
+
+  const resendEmailSignUp = useCallback(async (email: string): Promise<EmailAuthResult> => {
+    setLoading(true);
+    try {
+      const normalisedEmail = email.trim().toLowerCase();
+      if (!normalisedEmail) {
+        return { ok: false, error: 'Email is required.' };
+      }
+
+      if (isMockAuth || !supabase) {
+        return { ok: true, needsVerification: true };
+      }
+
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email: normalisedEmail,
+        options: {
+          emailRedirectTo: typeof window !== 'undefined'
+            ? `${window.location.origin}/auth/callback`
+            : undefined,
+        },
+      });
+
+      if (error) {
+        return { ok: false, error: error.message };
+      }
+
+      return { ok: true, needsVerification: true };
+    } catch (err) {
+      return {
+        ok: false,
+        error: err instanceof Error ? err.message : 'Unable to resend verification code.',
+      };
+    } finally {
+      setLoading(false);
+    }
+  }, [isMockAuth, supabase]);
 
   const value = useMemo<Ctx>(
-    () => ({ user, loading, signIn, signOut, finishAuth, setUser }),
-    [user, loading, signIn, signOut, finishAuth]
+    () => ({
+      user,
+      loading,
+      signIn,
+      signOut,
+      finishAuth,
+      emailSignIn,
+      emailSignUp,
+      verifyEmailSignUp,
+      resendEmailSignUp,
+      setUser,
+    }),
+    [user, loading, signIn, signOut, finishAuth, emailSignIn, emailSignUp, verifyEmailSignUp, resendEmailSignUp]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

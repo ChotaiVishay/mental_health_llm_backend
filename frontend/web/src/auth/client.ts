@@ -15,11 +15,11 @@ export async function signIn(provider: Provider, returnTo?: string) {
     return { ok: true as const, redirected: false };
   }
   if (returnTo) setReturnTo(returnTo);
+
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider,
     options: {
       redirectTo: `${window.location.origin}/auth/callback`,
-      queryParams: returnTo ? { state: returnTo } : undefined,
     },
   });
   if (error) throw error;
@@ -32,21 +32,33 @@ export async function signIn(provider: Provider, returnTo?: string) {
 
 export async function parseCallbackAndStore(): Promise<string | undefined> {
   const url = new URL(window.location.href);
-  const token = url.searchParams.get('token') ?? 'dev-token';
-  const name = url.searchParams.get('name') ?? 'Authenticated User';
-  const email = url.searchParams.get('email') ?? undefined;
-  const user: User = { id: 'u1', name, email };
-  const state = url.searchParams.get('state') ?? undefined;
+  const hashParams = new URLSearchParams(url.hash.startsWith('#') ? url.hash.slice(1) : url.hash);
+  const state = url.searchParams.get('state') ?? hashParams.get('state') ?? undefined;
 
   if (isMock) {
+    const token = url.searchParams.get('token') ?? 'dev-token';
+    const name = url.searchParams.get('name') ?? 'Authenticated User';
+    const email = url.searchParams.get('email') ?? undefined;
+    const user: User = { id: 'u1', name, email };
     saveAuth(token, user);
     return state;
   }
 
   const client = getSupabaseClient();
-  if (client && url.searchParams.has('code')) {
-    const { error } = await client.auth.exchangeCodeForSession(url.toString());
-    if (error) throw error;
+  if (client) {
+    const accessToken = hashParams.get('access_token');
+    const refreshToken = hashParams.get('refresh_token');
+    if (accessToken && refreshToken) {
+      const { error } = await client.auth.setSession({ access_token: accessToken, refresh_token: refreshToken });
+      if (error) throw error;
+    } else if (url.searchParams.has('code')) {
+      const { error } = await client.auth.exchangeCodeForSession(url.toString());
+      if (error) throw error;
+    }
+  }
+
+  if (url.hash) {
+    window.history.replaceState(null, '', `${url.origin}${url.pathname}${url.search}`);
   }
 
   return state;
