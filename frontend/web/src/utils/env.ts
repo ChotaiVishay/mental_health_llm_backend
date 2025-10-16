@@ -2,6 +2,7 @@
 export type ViteEnv = {
   VITE_AUTH_MOCK?: string;
   VITE_API_BASE_URL?: string;
+  VITE_CHAT_API_BASE?: string;
   VITE_SUPPORTED_LANGS?: string;
   VITE_SERVICES_MOCK?: string; // '1' enables mock services
   VITE_SUPABASE_URL?: string;
