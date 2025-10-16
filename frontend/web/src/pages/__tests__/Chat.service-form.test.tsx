@@ -14,7 +14,7 @@ afterEach(() => {
   sendMessageMock.mockReset();
 });
 
-it('opens the service form and submits the required payload', async () => {
+it('opens the service form after the assistant request and submits the required payload', async () => {
   sendMessageMock
     .mockResolvedValueOnce({
       response: "Great - let's add a new service.",
@@ -31,6 +31,8 @@ it('opens the service form and submits the required payload', async () => {
       <Chat />
     </Providers>,
   );
+
+  expect(screen.queryByRole('button', { name: /^Add service$/i })).not.toBeInTheDocument();
 
   const textbox = await screen.findByRole('textbox', { name: /message/i });
   fireEvent.change(textbox, { target: { value: 'add a new service' } });
@@ -99,10 +101,11 @@ it('opens the service form and submits the required payload', async () => {
   expect(screen.getByText('[Service form submitted]')).toBeInTheDocument();
 });
 
-it('lets a user open and cancel the service form without sending a message', async () => {
+it('does not expose a manual add service button and lets the user cancel the form once triggered', async () => {
   sendMessageMock.mockResolvedValue({
-    response: 'Hi! How can I help you today?',
-    session_id: null,
+    response: "Great - let's add a new service.",
+    session_id: 'sid-001',
+    action: 'show_service_form',
   });
 
   render(
@@ -111,10 +114,15 @@ it('lets a user open and cancel the service form without sending a message', asy
     </Providers>,
   );
 
-  fireEvent.click(await screen.findByRole('button', { name: /^Add service$/i }));
+  expect(screen.queryByRole('button', { name: /^Add service$/i })).not.toBeInTheDocument();
+
+  const textbox = await screen.findByRole('textbox', { name: /message/i });
+  fireEvent.change(textbox, { target: { value: 'i need to add a service' } });
+  fireEvent.click(screen.getByRole('button', { name: /send/i }));
+
   expect(await screen.findByRole('heading', { level: 3, name: /submit a service/i })).toBeInTheDocument();
 
   fireEvent.click(screen.getByRole('button', { name: /cancel/i }));
   await waitFor(() => expect(screen.queryByRole('heading', { level: 3, name: /submit a service/i })).toBeNull());
-  expect(sendMessageMock).not.toHaveBeenCalled();
+  expect(sendMessageMock).toHaveBeenCalledTimes(1);
 });

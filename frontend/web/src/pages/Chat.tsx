@@ -1,5 +1,5 @@
 // Chat page
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Title from '@/components/misc/Title';
 import MessageList, { Message } from '@/components/chat/MessageList';
 import MessageInput from '@/components/chat/MessageInput';
@@ -54,7 +54,14 @@ function useAtBottom(ref: React.RefObject<HTMLDivElement>, threshold = 64) {
     onScroll();
     return () => el.removeEventListener('scroll', onScroll);
   }, [ref, threshold]);
-  const scrollToBottom = () => ref.current?.scrollTo({ top: ref.current.scrollHeight, behavior: 'smooth' });
+  const scrollToBottom = useCallback(
+    (behavior: ScrollBehavior = 'smooth') => {
+      const el = ref.current;
+      if (!el) return;
+      el.scrollTo({ top: el.scrollHeight, behavior });
+    },
+    [ref],
+  );
   return { atBottom, scrollToBottom };
 }
 
@@ -107,7 +114,9 @@ export default function Chat() {
   useEffect(() => { if (atBottom) scrollToBottom(); }, [messages.length, atBottom, scrollToBottom]);
 
   useEffect(() => {
-    if (serviceFormOpen) scrollToBottom();
+    if (!serviceFormOpen) return;
+    const raf = requestAnimationFrame(() => scrollToBottom('auto'));
+    return () => cancelAnimationFrame(raf);
   }, [serviceFormOpen, scrollToBottom]);
 
   const effectiveSessionId = sessionId ?? (user?.id ? String(user.id) : null);
@@ -243,14 +252,6 @@ export default function Chat() {
             <h2 className="h2" style={{ margin: 0 }}>Chat</h2>
             <div className="chat-head-actions">
               <span className="muted small">Last activity {lastActivityLabel}</span>
-              <button
-                type="button"
-                className="btn secondary"
-                onClick={() => setServiceFormOpen(true)}
-                disabled={serviceFormOpen}
-              >
-                Add a service
-              </button>
             </div>
           </header>
 
@@ -291,7 +292,7 @@ export default function Chat() {
             </div>
 
             {!atBottom && (
-              <button className="jump-latest" onClick={scrollToBottom}>Jump to latest</button>
+              <button className="jump-latest" onClick={() => scrollToBottom('smooth')}>Jump to latest</button>
             )}
           </div>
         </section>
@@ -301,8 +302,6 @@ export default function Chat() {
           <MessageInput
             onSend={onSend}
             disabled={busy || serviceFormOpen}
-            onOpenServiceForm={() => setServiceFormOpen(true)}
-            disableServiceButton={serviceFormOpen}
           />
         </div>
       </div>

@@ -5,11 +5,9 @@ import { useMicRecorder } from '@/hooks/useMicRecorder';
 type Props = {
   onSend: (text: string) => void | Promise<void>;
   disabled?: boolean;
-  onOpenServiceForm?: () => void;
-  disableServiceButton?: boolean;
 };
 
-export default function MessageInput({ onSend, disabled, onOpenServiceForm, disableServiceButton }: Props) {
+export default function MessageInput({ onSend, disabled }: Props) {
   const [value, setValue] = useState('');
   const stt = useSpeechToText();           // Chrome path
   const rec = useMicRecorder();            // Fallback path
@@ -91,16 +89,6 @@ export default function MessageInput({ onSend, disabled, onOpenServiceForm, disa
         >
           🎤
         </button>
-        {onOpenServiceForm && (
-          <button
-            type="button"
-            className="btn"
-            onClick={onOpenServiceForm}
-            disabled={Boolean(disabled) || disableServiceButton}
-          >
-            Add service
-          </button>
-        )}
         <button className="btn primary" type="submit" disabled={disabled || !value.trim()}>
           Send
         </button>
