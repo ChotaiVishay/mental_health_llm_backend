@@ -4,8 +4,9 @@ pydantic==2.5.0
 pydantic-settings==2.1.0
 python-dotenv==1.0.0
 
-# Only httpx - NO supabase library
-httpx==0.25.2
+# HTTP client + Supabase
+httpx==0.27.2
+supabase==2.4.5
 
 # LLM
 openai==1.12.0
