@@ -50,6 +50,7 @@
   min-height: 0;                                    /* allow the 1fr row to shrink inside grid */
 }
 .chat-head{ display:flex; align-items:center; justify-content:space-between; padding:12px 16px; border-bottom:1px solid var(--grey-300); }
+.chat-head-actions{ display:flex; align-items:center; gap:12px; }
 
 /* --- Compact network alert --- */
 .chat-alert{
@@ -141,4 +142,82 @@
 .icon-inline{
   margin-left:8px; padding:2px 6px; border:1px solid var(--grey-300);
   border-radius:10px; background:var(--surface); cursor:pointer; font-size:12px;
+}
+
+/* Service form card */
+.service-form{
+  margin-top:8px;
+  border:1px solid var(--grey-300);
+  border-radius:var(--radius-lg);
+  background:var(--surface);
+  padding:16px;
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+.service-form__header{
+  display:flex;
+  justify-content:space-between;
+  gap:16px;
+  align-items:flex-start;
+}
+.service-form__section{ display:flex; flex-direction:column; gap:12px; }
+.service-form__section-title{ margin:0; font-size:1rem; font-weight:600; color:var(--grey-800); }
+.service-form__grid{
+  display:grid;
+  gap:12px;
+  grid-template-columns:repeat(auto-fit, minmax(220px,1fr));
+}
+.service-form__field{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  font-size:0.95rem;
+}
+.service-form__field input,
+.service-form__field select,
+.service-form__field textarea{
+  border:1px solid var(--grey-300);
+  border-radius:var(--radius-md, 8px);
+  padding:10px;
+  font:inherit;
+  background:var(--surface-alt, #fff);
+}
+.service-form__checkboxes{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  max-height:160px;
+  overflow:auto;
+  padding:8px;
+  border:1px solid var(--grey-200);
+  border-radius:var(--radius-md, 8px);
+  background:var(--surface-alt, #fff);
+}
+.service-form__checkbox{
+  display:flex;
+  gap:8px;
+  align-items:flex-start;
+  font-size:0.95rem;
+}
+.service-form__checkbox input{ margin-top:4px; }
+.service-form__flags{
+  gap:6px;
+  border-radius:var(--radius-md, 8px);
+  border:1px solid var(--grey-300);
+  padding:12px;
+}
+.service-form__flags legend{ padding:0 4px; font-weight:600; }
+.service-form__textarea{ margin-top:6px; }
+.service-form__footer{ display:flex; justify-content:flex-end; }
+.service-form__error{
+  color:var(--error-600, #b42318);
+  font-size:0.85rem;
+}
+.service-form__alert{
+  border:1px solid var(--error-200, #fca19c);
+  background:var(--error-50, #fef3f2);
+  color:var(--error-900, #7a271a);
+  border-radius:var(--radius-md, 8px);
+  padding:10px 12px;
 }
