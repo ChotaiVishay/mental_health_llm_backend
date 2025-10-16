@@ -7,22 +7,37 @@ export interface ChatSession {
   // add more fields if your API returns them
 }
 
-const BASE =
-  (typeof import.meta !== 'undefined' && import.meta.env?.VITE_CHAT_API_BASE) ||
-  'http://mental-health-prod-v2.eba-cxhtfs2h.us-east-1.elasticbeanstalk.com';
+const envBase =
+  typeof import.meta !== 'undefined' && import.meta.env
+    ? import.meta.env.VITE_CHAT_API_BASE
+    : undefined;
 
-const CHAT_API_URL = `${BASE.replace(/\/$/, '')}/chat/chat-sessions/`;
-const CHAT_MESSAGE_URL = `${BASE.replace(/\/$/, '')}/chat/chat-message/`;
+const DEFAULT_BASE = 'https://mental-health-prod-v2.eba-cxhtfs2h.us-east-1.elasticbeanstalk.com/api/v1/chat';
+const RAW_BASE = (envBase && envBase.trim()) || DEFAULT_BASE;
+const BASE = RAW_BASE.replace(/\/+$/, '');
+
+function join(base: string, path: string) {
+  return `${base}/${path.replace(/^\/+/, '')}`;
+}
+
+const LOOKS_LIKE_FASTAPI = /\/api\/v\d+\/chat$/i.test(BASE);
+const CHAT_SESSIONS_URL = join(BASE, LOOKS_LIKE_FASTAPI ? 'sessions/' : 'chat/chat-sessions/');
+const CHAT_MESSAGE_URL = join(BASE, LOOKS_LIKE_FASTAPI ? 'chat' : 'chat/chat-message/');
+const CHAT_SESSIONS_SUPPORTED = !LOOKS_LIKE_FASTAPI;
 
 
 export async function fetchChatSessions(): Promise<ChatSession[]> {
-  const response = await fetch(CHAT_API_URL, {
+  if (!CHAT_SESSIONS_SUPPORTED) return [];
+
+  const response = await fetch(CHAT_SESSIONS_URL, {
     headers: { Accept: 'application/json' },
   });
 
+  if (response.status === 404) return [];
+
   if (!response.ok) {
     const text = await response.text();
-    throw new Error(`HTTP ${response.status} on ${CHAT_API_URL}: ${text.slice(0, 120)}`);
+    throw new Error(`HTTP ${response.status} on ${CHAT_SESSIONS_URL}: ${text.slice(0, 120)}`);
   }
 
   const data = await response.json();
@@ -67,7 +82,12 @@ export interface ChatReply {
   action?: string | null;
 }
 
-export async function sendMessageToAPI(message: string, sessionId: string | null): Promise<ChatReply> {
+export async function sendMessageToAPI(payload: ChatRequestPayload): Promise<ChatReply> {
+  const body =
+    'type' in payload
+      ? { ...payload, session_id: payload.session_id ?? null }
+      : { message: payload.message, session_id: payload.session_id ?? null };
+
   const response = await fetch(CHAT_MESSAGE_URL, {
     method: 'POST',
     headers: {
