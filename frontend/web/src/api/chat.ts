@@ -102,5 +102,12 @@ export async function sendMessageToAPI(payload: ChatRequestPayload): Promise<Cha
     throw new Error(`HTTP ${response.status}: ${text}`);
   }
 
-  return response.json() as Promise<ChatReply>;
+  const raw = (await response.json()) as Record<string, unknown>;
+  const text = (raw.response ?? raw.message ?? '') as string;
+
+  return {
+    response: text,
+    session_id: (raw.session_id ?? null) as string | null,
+    action: (raw.action ?? null) as string | null,
+  };
 }
