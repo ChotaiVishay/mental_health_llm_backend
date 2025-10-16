@@ -1,5 +1,5 @@
 // Chat page
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Title from '@/components/misc/Title';
 import MessageList, { Message } from '@/components/chat/MessageList';
 import MessageInput from '@/components/chat/MessageInput';
@@ -14,6 +14,7 @@ import {
 } from '@/features/chat/sessionStore';
 import ChatList from '@/components/chat/ChatList';
 import { sendMessageToAPI } from '@/api/chat';
+import ServiceForm, { type ServiceFormValues, toServiceFormPayload } from '@/components/chat/ServiceForm';
 import '@/styles/pages/chat.css';
 
 type ChatMessageStore = { id: string; role: 'user' | 'assistant'; text: string; at: number };
@@ -53,13 +54,21 @@ function useAtBottom(ref: React.RefObject<HTMLDivElement>, threshold = 64) {
     onScroll();
     return () => el.removeEventListener('scroll', onScroll);
   }, [ref, threshold]);
-  const scrollToBottom = () => ref.current?.scrollTo({ top: ref.current.scrollHeight, behavior: 'smooth' });
+  const scrollToBottom = useCallback(
+    (behavior: ScrollBehavior = 'smooth') => {
+      const el = ref.current;
+      if (!el) return;
+      el.scrollTo({ top: el.scrollHeight, behavior });
+    },
+    [ref],
+  );
   return { atBottom, scrollToBottom };
 }
 
 export default function Chat() {
   const { user } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sessionId, setSessionId] = useState<string | null>(null);
 
   // Refs
   const pageRef = useRef<HTMLDivElement>(null);     // whole [sidebar|main] + composer grid
@@ -71,9 +80,12 @@ export default function Chat() {
   const [busy, setBusy] = useState(false);
   const [lastActivity, setLastActivity] = useState<number>(Date.now());
   const [netErr, setNetErr] = useState<string | null>(null);
+  const [serviceFormOpen, setServiceFormOpen] = useState(false);
+  const [serviceFormSubmitting, setServiceFormSubmitting] = useState(false);
 
   // initial load
   useEffect(() => {
+    setSessionId(user?.id ? String(user.id) : null);
     const session: ChatSession | null = user?.id
       ? loadUserChat(String(user.id)) ?? loadPreloginChat()
       : loadPreloginChat();
@@ -101,19 +113,54 @@ export default function Chat() {
   // auto-scroll only when already near the bottom
   useEffect(() => { if (atBottom) scrollToBottom(); }, [messages.length, atBottom, scrollToBottom]);
 
+  useEffect(() => {
+    if (!serviceFormOpen) return;
+    const raf = requestAnimationFrame(() => scrollToBottom('auto'));
+    return () => cancelAnimationFrame(raf);
+  }, [serviceFormOpen, scrollToBottom]);
+
+  const effectiveSessionId = sessionId ?? (user?.id ? String(user.id) : null);
+
   const onSend = async (text: string) => {
     setNetErr(null);
     const userMsg: Message = { id: mkId(), role: 'user', text };
     setMessages((prev) => [...prev, userMsg]);
     setBusy(true);
     try {
-      const reply = await sendMessageToAPI(text, user?.id ?? null);
+      const reply = await sendMessageToAPI({ message: text, session_id: effectiveSessionId });
+      if (reply.session_id) setSessionId(reply.session_id);
+      if (reply.action === 'show_service_form') setServiceFormOpen(true);
       setMessages((prev) => [...prev, { id: mkId(), role: 'assistant', text: reply.response }]);
     } catch {
-      setNetErr('Network error — please try again.');
+      setNetErr('Network error - please try again.');
       setMessages((prev) => [...prev, { id: mkId(), role: 'assistant', text: 'Sorry, something went wrong.' }]);
     } finally {
       setBusy(false);
+    }
+  };
+
+  const handleServiceFormSubmit = async (values: ServiceFormValues) => {
+    setServiceFormSubmitting(true);
+    setBusy(true);
+    try {
+      const reply = await sendMessageToAPI({
+        type: 'service_form',
+        session_id: effectiveSessionId,
+        data: toServiceFormPayload(values),
+      });
+      if (reply.session_id) setSessionId(reply.session_id);
+      setMessages((prev) => [
+        ...prev,
+        { id: mkId(), role: 'user', text: '[Service form submitted]' },
+        { id: mkId(), role: 'assistant', text: reply.response },
+      ]);
+      setServiceFormOpen(false);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'We could not submit the service. Please try again.';
+      throw new Error(message);
+    } finally {
+      setBusy(false);
+      setServiceFormSubmitting(false);
     }
   };
 
@@ -138,7 +185,7 @@ export default function Chat() {
 
     schedule();
 
-    // fonts.ready isn't in JSDOM — guard it without using `any`
+    // fonts.ready isn't in JSDOM - guard it without using `any`
     type DocWithFonts = Document & { fonts?: { ready?: Promise<unknown> } };
     const fontsReady = (document as DocWithFonts).fonts?.ready;
     fontsReady?.then(() => schedule());
@@ -172,12 +219,12 @@ export default function Chat() {
 
   return (
     <>
-      <Title value="Support Atlas — Chat" />
+      <Title value="Support Atlas - Chat" />
 
       {/* Signed-out banner */}
       {!user && (
         <div className="anon-banner" role="note" aria-live="polite">
-          <span>You’re chatting <strong>anonymously</strong>. Sign in to save your conversation for later.</span>
+          <span>You're chatting <strong>anonymously</strong>. Sign in to save your conversation for later.</span>
           <a className="btn btn-secondary" href="/login">Sign in</a>
         </div>
       )}
@@ -203,7 +250,9 @@ export default function Chat() {
         <section className="chat-main">
           <header className="chat-head">
             <h2 className="h2" style={{ margin: 0 }}>Chat</h2>
-            <span className="muted small">Last activity {lastActivityLabel}</span>
+            <div className="chat-head-actions">
+              <span className="muted small">Last activity {lastActivityLabel}</span>
+            </div>
           </header>
 
           {netErr && (
@@ -224,6 +273,13 @@ export default function Chat() {
           <div ref={scrollerRef} className="chat-scroller">
             <div className="chat-body">
               <MessageList items={messages} />
+              {serviceFormOpen && (
+                <ServiceForm
+                  onSubmit={handleServiceFormSubmit}
+                  onCancel={() => setServiceFormOpen(false)}
+                  submitting={serviceFormSubmitting}
+                />
+              )}
               {busy && (
                 <div className="typing-row" aria-live="polite" aria-label="Assistant is typing">
                   <div className="typing-bubble">
@@ -236,14 +292,17 @@ export default function Chat() {
             </div>
 
             {!atBottom && (
-              <button className="jump-latest" onClick={scrollToBottom}>Jump to latest</button>
+              <button className="jump-latest" onClick={() => scrollToBottom('smooth')}>Jump to latest</button>
             )}
           </div>
         </section>
 
-        {/* Composer dock — separate row pinned at grid bottom */}
+        {/* Composer dock - separate row pinned at grid bottom */}
         <div className="composer-dock">
-          <MessageInput onSend={onSend} disabled={busy} />
+          <MessageInput
+            onSend={onSend}
+            disabled={busy || serviceFormOpen}
+          />
         </div>
       </div>
     </>

@@ -29,9 +29,42 @@ export async function fetchChatSessions(): Promise<ChatSession[]> {
   return data as ChatSession[];
 }
 
+export interface ServiceFormPayload {
+  service_name: string;
+  organisation_name: string;
+  campus_name: string;
+  region_name: string;
+  service_type: string[];
+  delivery_method: string;
+  level_of_care: string;
+  address: string;
+  suburb: string;
+  state: string;
+  postcode: string;
+  phone?: string;
+  email?: string;
+  website?: string;
+  referral_pathway: string;
+  cost: string;
+  target_population: string[];
+  workforce_type: string;
+  notes?: string;
+  wait_time?: string;
+  expected_wait_time?: string;
+  opening_hours_24_7?: boolean;
+  opening_hours_standard?: boolean;
+  opening_hours_extended?: boolean;
+  op_hours_extended_details?: string;
+}
+
+export type ChatRequestPayload =
+  | { message: string; session_id?: string | null }
+  | { type: 'service_form'; data: ServiceFormPayload; session_id?: string | null };
+
 export interface ChatReply {
   response: string;
   session_id: string | null;
+  action?: string | null;
 }
 
 export async function sendMessageToAPI(message: string, sessionId: string | null): Promise<ChatReply> {
@@ -41,9 +74,7 @@ export async function sendMessageToAPI(message: string, sessionId: string | null
       'Content-Type': 'application/json',
       Accept: 'application/json',
     },
-    body: JSON.stringify({  message,
-      session_id: sessionId,
-     }),
+    body: JSON.stringify(body),
   });
 
   if (!response.ok) {

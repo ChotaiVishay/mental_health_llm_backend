@@ -1,12 +1,13 @@
 import { ReactNode } from 'react';
 import { MemoryRouter, MemoryRouterProps } from 'react-router-dom';
 import { AuthProvider } from './auth/AuthContext';
+import type { User } from './auth/types';
 
 type ProvidersProps = {
   children: ReactNode;
   router?: Partial<MemoryRouterProps>;
   /** If you pass a user, we simulate logged-in state via localStorage */
-  auth?: { user?: { id: string; name: string } | null };
+  auth?: { user?: User | null };
 };
 
 /**
