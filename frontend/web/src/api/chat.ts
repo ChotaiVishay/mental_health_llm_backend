@@ -8,6 +8,47 @@ export interface ChatSession {
   updated_at: string;
 }
 
+<<<<<<< HEAD
+=======
+const envBase = VITE.VITE_CHAT_API_BASE?.trim();
+const backendOrigin = VITE.VITE_BACKEND_ORIGIN?.trim();
+
+// Always use FastAPI base path `/api/v1/chat`
+const DEFAULT_BASE =
+  'https://mental-health-prod-v2.eba-cxhtfs2h.us-east-1.elasticbeanstalk.com/api/v1/chat';
+const RAW_BASE = envBase || (backendOrigin ? join(backendOrigin, 'api/v1/chat') : DEFAULT_BASE);
+const BASE = RAW_BASE.replace(/\/+$/, '');
+
+function join(base: string, path: string) {
+  return `${base}/${path.replace(/^\/+/, '')}`;
+}
+
+// FastAPI-only endpoints
+const CHAT_SESSIONS_URL = join(BASE, 'sessions/');
+const CHAT_MESSAGE_URL = join(BASE, 'chat');
+// Chat sessions are not implemented on FastAPI yet
+const CHAT_SESSIONS_SUPPORTED = false;
+
+
+export async function fetchChatSessions(): Promise<ChatSession[]> {
+  if (!CHAT_SESSIONS_SUPPORTED) return [];
+
+  const response = await fetch(CHAT_SESSIONS_URL, {
+    headers: { Accept: 'application/json' },
+  });
+
+  if (response.status === 404) return [];
+
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(`HTTP ${response.status} on ${CHAT_SESSIONS_URL}: ${text.slice(0, 120)}`);
+  }
+
+  const data = await response.json();
+  return data as ChatSession[];
+}
+
+>>>>>>> 5ad4ca64 (removed the django fall back option from frontend)
 export interface ServiceFormPayload {
   service_name: string;
   organisation_name: string;
