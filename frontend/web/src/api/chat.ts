@@ -8,42 +8,6 @@ export interface ChatSession {
   updated_at: string;
 }
 
-const envBase = VITE.VITE_CHAT_API_BASE?.trim();
-const backendOrigin = VITE.VITE_BACKEND_ORIGIN?.trim();
-
-const DEFAULT_BASE =
-  'https://mental-health-prod-v2.eba-cxhtfs2h.us-east-1.elasticbeanstalk.com/api/v1/chat';
-const RAW_BASE = envBase || (backendOrigin ? join(backendOrigin, 'api/v1/chat') : DEFAULT_BASE);
-const BASE = RAW_BASE.replace(/\/+$/, '');
-
-function join(base: string, path: string) {
-  return `${base}/${path.replace(/^\/+/, '')}`;
-}
-
-const LOOKS_LIKE_FASTAPI = /\/api\/v\d+\/chat$/i.test(BASE);
-const CHAT_SESSIONS_URL = join(BASE, LOOKS_LIKE_FASTAPI ? 'sessions/' : 'chat/chat-sessions/');
-const CHAT_MESSAGE_URL = join(BASE, LOOKS_LIKE_FASTAPI ? 'chat' : 'chat/chat-message/');
-const CHAT_SESSIONS_SUPPORTED = !LOOKS_LIKE_FASTAPI;
-
-
-export async function fetchChatSessions(): Promise<ChatSession[]> {
-  if (!CHAT_SESSIONS_SUPPORTED) return [];
-
-  const response = await fetch(CHAT_SESSIONS_URL, {
-    headers: { Accept: 'application/json' },
-  });
-
-  if (response.status === 404) return [];
-
-  if (!response.ok) {
-    const text = await response.text();
-    throw new Error(`HTTP ${response.status} on ${CHAT_SESSIONS_URL}: ${text.slice(0, 120)}`);
-  }
-
-  const data = await response.json();
-  return data as ChatSession[];
-}
-
 export interface ServiceFormPayload {
   service_name: string;
   organisation_name: string;
@@ -82,13 +46,23 @@ export interface ChatReply {
   action?: string | null;
 }
 
+// Simple: Just one environment variable
+const API_BASE_URL = VITE.VITE_API_BASE_URL || 'http://mental-health-prod-v2.eba-cxhtfs2h.us-east-1.elasticbeanstalk.com';
+
+const CHAT_ENDPOINT = `${API_BASE_URL}/api/v1/chat/chat`;
+
+export async function fetchChatSessions(): Promise<ChatSession[]> {
+  // Not supported in FastAPI version
+  return [];
+}
+
 export async function sendMessageToAPI(payload: ChatRequestPayload): Promise<ChatReply> {
   const body =
     'type' in payload
       ? { ...payload, session_id: payload.session_id ?? null }
       : { message: payload.message, session_id: payload.session_id ?? null };
 
-  const response = await fetch(CHAT_MESSAGE_URL, {
+  const response = await fetch(CHAT_ENDPOINT, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -103,8 +77,10 @@ export async function sendMessageToAPI(payload: ChatRequestPayload): Promise<Cha
   }
 
   const raw = (await response.json()) as Record<string, unknown>;
-  const text = (raw.response ?? raw.message ?? '') as string;
-
+  
+  // Backend returns "message", frontend expects "response"
+  const text = (raw.message ?? raw.response ?? '') as string;
+  
   return {
     response: text,
     session_id: (raw.session_id ?? null) as string | null,
