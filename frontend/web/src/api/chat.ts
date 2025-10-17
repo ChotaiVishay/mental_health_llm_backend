@@ -8,8 +8,6 @@ export interface ChatSession {
   updated_at: string;
 }
 
-<<<<<<< HEAD
-=======
 const envBase = VITE.VITE_CHAT_API_BASE?.trim();
 const backendOrigin = VITE.VITE_BACKEND_ORIGIN?.trim();
 
@@ -48,7 +46,6 @@ export async function fetchChatSessions(): Promise<ChatSession[]> {
   return data as ChatSession[];
 }
 
->>>>>>> 5ad4ca64 (removed the django fall back option from frontend)
 export interface ServiceFormPayload {
   service_name: string;
   organisation_name: string;
@@ -92,10 +89,10 @@ const API_BASE_URL = VITE.VITE_API_BASE_URL || 'http://mental-health-prod-v2.eba
 
 const CHAT_ENDPOINT = `${API_BASE_URL}/api/v1/chat/chat`;
 
-export async function fetchChatSessions(): Promise<ChatSession[]> {
+// export async function fetchChatSessions(): Promise<ChatSession[]> {
   // Not supported in FastAPI version
-  return [];
-}
+//   return [];
+// }
 
 export async function sendMessageToAPI(payload: ChatRequestPayload): Promise<ChatReply> {
   const body =
