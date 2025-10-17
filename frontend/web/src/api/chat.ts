@@ -4,7 +4,6 @@ export interface ChatSession {
   title: string;
   created_at: string;
   updated_at: string;
-  // add more fields if your API returns them
 }
 
 const envBase =
@@ -12,7 +11,7 @@ const envBase =
     ? import.meta.env.VITE_CHAT_API_BASE
     : undefined;
 
-const DEFAULT_BASE = 'https://mental-health-prod-v2.eba-cxhtfs2h.us-east-1.elasticbeanstalk.com/api/v1/chat';
+const DEFAULT_BASE = 'https://mental-health-prod-v2.eba-cxhtfs2h.us-east-1.elasticbeanstalk.com';
 const RAW_BASE = (envBase && envBase.trim()) || DEFAULT_BASE;
 const BASE = RAW_BASE.replace(/\/+$/, '');
 
