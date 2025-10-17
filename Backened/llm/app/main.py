@@ -25,7 +25,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "https://comp-30022-group-30-mental-health-s.vercel.app",
-        "https://*.vercel.app",
+        "https://support-atlas-7r2yz92io-gurshan-singh-nandas-projects.vercel.app",
         "http://localhost:5173",
         "http://localhost:3000",
     ],
