@@ -10,7 +10,6 @@ from typing import Optional
 from app.config import get_settings
 from core.database.supabase_only import get_supabase_db, SupabaseOnlyConnection
 from services.chat_service import get_chat_service
-from search_router import router as search_router # Import the search router
 
 settings = get_settings()
 
@@ -22,16 +21,14 @@ app = FastAPI(
     redoc_url=f"/redoc"
 )
 
-app.include_router(search_router)
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "https://comp-30022-group-30-mental-health-s.vercel.app",
+        "https://*.vercel.app",
         "http://localhost:5173",
         "http://localhost:3000",
     ],
-    allow_origin_regex=r"https://.*\.vercel\.app",
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],

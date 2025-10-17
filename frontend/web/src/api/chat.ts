@@ -1,4 +1,6 @@
 // web/src/api/chat.ts
+import { VITE } from '@/utils/env';
+
 export interface ChatSession {
   id: string;
   title: string;
@@ -6,13 +8,12 @@ export interface ChatSession {
   updated_at: string;
 }
 
-const envBase =
-  typeof import.meta !== 'undefined' && import.meta.env
-    ? import.meta.env.VITE_CHAT_API_BASE
-    : undefined;
+const envBase = VITE.VITE_CHAT_API_BASE?.trim();
+const backendOrigin = VITE.VITE_BACKEND_ORIGIN?.trim();
 
-const DEFAULT_BASE = 'https://mental-health-prod-v2.eba-cxhtfs2h.us-east-1.elasticbeanstalk.com';
-const RAW_BASE = (envBase && envBase.trim()) || DEFAULT_BASE;
+const DEFAULT_BASE =
+  'https://mental-health-prod-v2.eba-cxhtfs2h.us-east-1.elasticbeanstalk.com/api/v1/chat';
+const RAW_BASE = envBase || (backendOrigin ? join(backendOrigin, 'api/v1/chat') : DEFAULT_BASE);
 const BASE = RAW_BASE.replace(/\/+$/, '');
 
 function join(base: string, path: string) {

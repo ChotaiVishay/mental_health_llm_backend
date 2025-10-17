@@ -1,282 +1,253 @@
 """
-Supabase-only connection for mental health services database.
+Supabase-only connection using direct REST API calls.
+Bypasses the problematic supabase-py client library.
 """
 
-import json
-from typing import Any, Dict, List, Optional
-from supabase import create_client, Client
+import httpx
+from typing import Any, Dict, List, Optional, Set
 import structlog
 
-from ...app.config import get_settings
+from app.config import get_settings
 
 logger = structlog.get_logger(__name__)
 
 
 class SupabaseOnlyConnection:
-    """Manages Supabase client connections for mental health services database."""
+    """Manages Supabase connections using direct REST API."""
 
     def __init__(self):
         self.settings = get_settings()
-        self._client: Optional[Client] = None
-
-        # Your actual table names from the schema
-        self.table_names = [
-            "campus",
-            "cost",
-            "cost_lookup",
-            "delivery_method",
-            "delivery_method_lookup",
-            "level_of_care",
-            "level_of_care_lookup",
-            "messages",
-            "organisation",
-            "postcode",
-            "referral_pathway",
-            "referral_pathway_lookup",
-            "region",
-            "service",
-            "service_campus",
-            "service_region",
-            "service_type",
-            "service_type_lookup",
-            "spatial_ref_sys",
-            "staging_services",
-            "target_population",
-            "target_population_lookup",
-            "workforce_type",
-            "workforce_type_lookup",
-        ]
+        self._http_client: Optional[httpx.Client] = None
 
     @property
-    def client(self) -> Client:
-        """Get or create Supabase client in a version-safe way."""
-        if self._client is None:
-            url = self.settings.supabase_url
-            key = self.settings.supabase_service_key or self.settings.supabase_key
+    def http_client(self) -> httpx.Client:
+        """Get or create httpx client for direct API calls."""
+        if self._http_client is None:
+            self._http_client = httpx.Client(timeout=30.0)
+        return self._http_client
 
-            # Ensure only supported args are passed to create_client
-            try:
-                logger.info("Creating Supabase client", url=url)
-                self._client = create_client(url, key)
-            except TypeError as e:
-                logger.error("Supabase client creation failed", error=str(e))
-                raise
-
-        return self._client
-
-    def query_table(
-        self,
-        table_name: str,
-        select: str = "*",
-        filters: Dict[str, Any] = None,
-        limit: int = 100,
-    ) -> List[Dict[str, Any]]:
-        """Query a specific table using Supabase client."""
-        try:
-            query = self.client.table(table_name).select(select)
-
-            if filters:
-                for key, value in filters.items():
-                    query = query.eq(key, value)
-
-            if limit:
-                query = query.limit(limit)
-
-            result = query.execute()
-            return result.data if result.data else []
-
-        except Exception as e:
-            logger.error("Table query failed", table=table_name, error=str(e))
-            return []
-
-
-    def insert_service(self, payload: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Inserts a new row into the 'staging_services' table.
-
-        Returns:
-            { 'status': 'success', 'data': <row> }
-            or
-            { 'status': 'error', 'error': '...' }
-        """
-        try:
-            resp = self.client.table("staging_services").insert(payload).execute()
-            if resp.data:
-                return {"status": "success", "data": resp.data[0]}
-            return {"status": "error", "error": "Insert returned no data"}
-        except Exception as e:
-            logger.error("Service insert failed", error=str(e))
-            return {"status": "error", "error": str(e)}
-        
-
-    def get_available_tables(self) -> List[str]:
-        """Get list of tables that are accessible via Supabase API."""
-        available_tables = []
-
-        for table in self.table_names:
-            try:
-                # Try to query just one row to see if table exists and is accessible
-                result = self.client.table(table).select("*").limit(1).execute()
-                available_tables.append(table)
-                logger.info(f"Table '{table}' is accessible")
-            except Exception as e:
-                logger.warning(f"Table '{table}' is not accessible", error=str(e))
-                continue
-
-        return available_tables
-
-    def get_table_schema_info(self) -> Dict[str, Any]:
-        """Get schema information about your mental health services database."""
+    def _get_headers(self) -> Dict[str, str]:
+        """Get headers for Supabase REST API."""
+        key = self.settings.supabase_service_key or self.settings.supabase_key
         return {
-            "database_type": "Mental Health Services Directory",
-            "main_entities": {
-                "organisations": "Healthcare organizations providing mental health services",
-                "services": "Mental health services offered by organizations",
-                "campuses": "Physical locations where services are provided",
-                "service_campus": "Main junction table linking services to locations with details",
-                "staging_services": "Comprehensive staging table with all service information",
-            },
-            "lookup_tables": {
-                "cost_lookup": "Cost categories for services",
-                "delivery_method_lookup": "How services are delivered (in-person, online, etc.)",
-                "level_of_care_lookup": "Intensity levels of care provided",
-                "referral_pathway_lookup": "How users can access services",
-                "service_type_lookup": "Types of mental health services",
-                "target_population_lookup": "Demographics services are designed for",
-                "workforce_type_lookup": "Types of healthcare professionals",
-            },
-            "geographic_tables": {
-                "region": "Geographic regions",
-                "postcode": "Postal codes linked to regions",
-                "service_region": "Which regions each service covers",
-            },
-            "system_tables": {
-                "messages": "Chat messages for the mental health chatbot",
-                "spatial_ref_sys": "Spatial reference system data",
-            },
-            "total_tables": len(self.table_names),
+            "apikey": key,
+            "Authorization": f"Bearer {key}",
+            "Content-Type": "application/json",
+            "Prefer": "return=representation"
         }
 
-    def get_service_data_sample(self) -> Dict[str, Any]:
-        """Get a sample of actual service data to understand the database content."""
-        try:
-            # Get sample data from key tables
-            organisations = self.query_table("organisation", limit=5)
-            services = self.query_table("service", limit=5)
-            service_campus = self.query_table("service_campus", limit=3)
-            staging_services = self.query_table("staging_services", limit=3)
+    def _extract_search_keywords(self, text: str) -> List[str]:
+        """Extract meaningful keywords from user query."""
+        # Common stop words to remove
+        stop_words = {
+            'find', 'show', 'me', 'get', 'list', 'search', 'for', 'looking', 'need',
+            'want', 'help', 'with', 'about', 'the', 'a', 'an', 'in', 'on', 'at',
+            'to', 'of', 'and', 'or', 'mental', 'health', 'service', 'services',
+            'can', 'you', 'please', 'i', 'my', 'are', 'is', 'there', 'any'
+        }
+        
+        # Split and clean
+        words = text.lower().split()
+        keywords = [w.strip('.,!?;:') for w in words if w.lower() not in stop_words and len(w) > 2]
+        
+        # Return unique keywords
+        return list(set(keywords))
 
-            return {
-                "sample_data": {
-                    "organisations": organisations,
-                    "services": services,
-                    "service_campus": service_campus,
-                    "staging_services": staging_services,
-                },
-                "record_counts": {
-                    "organisations": len(organisations),
-                    "services": len(services),
-                    "service_campus": len(service_campus),
-                    "staging_services": len(staging_services),
-                },
-            }
-
-        except Exception as e:
-            logger.error("Failed to get sample service data", error=str(e))
-            return {"error": str(e)}
-
-    def search_services_by_text(
-        self, search_term: str, limit: int = 10
+    def query_table(
+        self, 
+        table_name: str, 
+        select: str = "*", 
+        filters: Optional[Dict[str, Any]] = None, 
+        limit: int = 100
     ) -> List[Dict[str, Any]]:
-        """Search for services using text search in the staging_services table."""
+        """Query a specific table using direct REST API."""
         try:
-
-            parsed = json.loads(search_term)
-
-            search_term = parsed.get("search_term", [])
-            location_filter = parsed.get("location_filter")  # >>> changed
-            service_filter = parsed.get("service_filter")  # >>> changed
-            cost_filter = parsed.get("cost_filter")
-
-            logger.info("Performing service text search", search_term=search_term)
+            url = f"{self.settings.supabase_url}/rest/v1/{table_name}"
+            params = {"select": select, "limit": limit}
             
-            filters = []
+            if filters:
+                for key, value in filters.items():
+                    params[key] = f"eq.{value}"
+            
+            response = self.http_client.get(url, headers=self._get_headers(), params=params)
+            response.raise_for_status()
+            
+            data = response.json()
+            logger.info("Query completed", table=table_name, results=len(data))
+            return data
+            
+        except Exception as e:
+            logger.error("Table query failed", table=table_name, error=str(e), exc_info=True)
+            raise Exception(f"Failed to query table {table_name}: {str(e)}")
 
-            if location_filter:
-                filters.append(f"suburb.ilike.%{location_filter}%")
-
-            if service_filter:
-                filters.append(f"service_type.ilike.%{service_filter}%")
-
-            if cost_filter:
-                filters.append(f"cost.ilike.%{cost_filter}%")
-
-            for term in search_term:
-                filters.extend([
-                    f"service_name.ilike.%{term}%",
-                    f"organisation_name.ilike.%{term}%",
-                    f"notes.ilike.%{term}%",
-                    f"address.ilike.%{term}%",
-                ])
-
-            if not filters:
-                logger.warning("No valid search parameters provided")
+    def search_services_by_text(self, search_term: str, limit: int = 10) -> List[Dict[str, Any]]:
+        """Search for services using text search via REST API with keyword extraction."""
+        try:
+            logger.info("Searching for services", search_term=search_term, limit=limit)
+            
+            if not search_term or not search_term.strip():
+                logger.warning("Empty search term provided")
                 return []
             
-            or_clause = ",".join(filters)
-
-            result = (
-                self.client.table("staging_services")
-                .select("*")
-                .or_(or_clause)
-                .limit(limit)
-                .execute()
-            )
-
-            return result.data if result.data else []
+            # Extract keywords from the search term
+            keywords = self._extract_search_keywords(search_term)
+            
+            # If no meaningful keywords, fall back to original search term
+            if not keywords:
+                keywords = [search_term.strip()]
+            
+            logger.info("Extracted keywords", keywords=keywords)
+            
+            # Search for each keyword and collect unique results
+            all_results = {}
+            
+            for keyword in keywords:
+                pattern = f"*{keyword}*"
+                or_filter = (
+                    f"service_name.ilike.{pattern},"
+                    f"organisation_name.ilike.{pattern},"
+                    f"suburb.ilike.{pattern},"
+                    f"address.ilike.{pattern},"
+                    f"notes.ilike.{pattern},"
+                    f"service_type.ilike.{pattern},"
+                    f"state.ilike.{pattern}"
+                )
+                
+                url = f"{self.settings.supabase_url}/rest/v1/staging_services"
+                params = {
+                    "select": "*",
+                    "or": f"({or_filter})",
+                    "limit": str(limit * 2)  # Get more results to filter
+                }
+                
+                response = self.http_client.get(url, headers=self._get_headers(), params=params)
+                response.raise_for_status()
+                
+                results = response.json()
+                
+                # Add to dictionary using ID as key to avoid duplicates
+                for result in results:
+                    result_id = result.get('id')
+                    if result_id not in all_results:
+                        all_results[result_id] = result
+            
+            # Convert back to list and limit
+            final_results = list(all_results.values())[:limit]
+            
+            logger.info("Search completed", 
+                       search_term=search_term, 
+                       keywords=keywords,
+                       results=len(final_results))
+            
+            return final_results
 
         except Exception as e:
-            logger.error(
-                "Service text search failed", search_term=search_term, error=str(e)
-            )
-            return []
+            logger.error("Service text search failed", search_term=search_term, error=str(e), exc_info=True)
+            raise Exception(f"Database search failed for '{search_term}': {str(e)}")
 
-    def test_connection(self) -> Dict[str, Any]:
-        """Test Supabase connection and get database overview."""
+    def get_service_by_id(self, service_id: str) -> Optional[Dict[str, Any]]:
+        """Get a specific service by ID."""
         try:
-            # Test basic client initialization
-            client_status = "connected" if self.client else "failed"
+            url = f"{self.settings.supabase_url}/rest/v1/staging_services"
+            params = {"id": f"eq.{service_id}", "limit": 1}
+            
+            response = self.http_client.get(url, headers=self._get_headers(), params=params)
+            response.raise_for_status()
+            
+            data = response.json()
+            return data[0] if data else None
+            
+        except Exception as e:
+            logger.error("Failed to get service by ID", service_id=service_id, error=str(e))
+            raise Exception(f"Failed to retrieve service {service_id}: {str(e)}")
 
-            # Try to get available tables
-            tables = self.get_available_tables()
+    def search_by_location(self, suburb: Optional[str] = None, state: Optional[str] = None, postcode: Optional[str] = None, limit: int = 10) -> List[Dict[str, Any]]:
+        """Search for services by location."""
+        try:
+            url = f"{self.settings.supabase_url}/rest/v1/staging_services"
+            params = {"select": "*", "limit": limit}
+            
+            filters = []
+            if suburb:
+                filters.append(f"suburb.ilike.*{suburb}*")
+            if state:
+                filters.append(f"state.ilike.*{state}*")
+            if postcode:
+                filters.append(f"postcode.eq.{postcode}")
+            
+            if filters:
+                params["or"] = f"({','.join(filters)})"
+            
+            response = self.http_client.get(url, headers=self._get_headers(), params=params)
+            response.raise_for_status()
+            return response.json()
+            
+        except Exception as e:
+            logger.error("Location search failed", suburb=suburb, state=state, postcode=postcode, error=str(e))
+            raise Exception(f"Location search failed: {str(e)}")
 
-            # Get sample data to verify we can read actual content
-            sample_data = self.get_service_data_sample()
+    def search_by_cost(self, cost_type: str, limit: int = 10) -> List[Dict[str, Any]]:
+        """Search for services by cost type (e.g., 'Free', 'Bulk-billed')."""
+        try:
+            url = f"{self.settings.supabase_url}/rest/v1/staging_services"
+            params = {
+                "select": "*",
+                "cost": f"ilike.*{cost_type}*",
+                "limit": limit
+            }
+            
+            response = self.http_client.get(url, headers=self._get_headers(), params=params)
+            response.raise_for_status()
+            return response.json()
+            
+        except Exception as e:
+            logger.error("Cost search failed", cost_type=cost_type, error=str(e))
+            raise Exception(f"Cost search failed: {str(e)}")
 
+    async def test_connection(self) -> Dict[str, Any]:
+        """Test Supabase connection using direct REST API."""
+        try:
+            # Test if we can query the table
+            url = f"{self.settings.supabase_url}/rest/v1/staging_services"
+            params = {"select": "id", "limit": 1}
+            
+            response = self.http_client.get(url, headers=self._get_headers(), params=params)
+            response.raise_for_status()
+            
+            data = response.json()
+            
             return {
                 "status": "connected",
-                "connection_type": "supabase_rest_api",
-                "client_status": client_status,
-                "accessible_tables": tables,
-                "table_count": len(tables),
-                "database_description": "Mental Health Services Directory Database",
-                "sample_data_available": "sample_data" in sample_data,
-                "ready_for_queries": len(tables) > 0,
+                "connection_type": "supabase_rest_api_direct",
+                "ready_for_queries": True,
+                "test_query_success": True,
+                "sample_data_available": bool(data)
             }
-
+            
         except Exception as e:
-            logger.error("Supabase connection test failed", error=str(e))
+            logger.error("Supabase connection test failed", error=str(e), exc_info=True)
             return {
                 "status": "error",
                 "error": str(e),
-                "connection_type": "supabase_rest_api",
+                "ready_for_queries": False,
+                "suggestion": "Check SUPABASE_URL and SUPABASE_KEY environment variables"
             }
 
+    def get_table_sample(self, table_name: str = "staging_services", limit: int = 3) -> List[Dict[str, Any]]:
+        """Get a sample of data from a table for debugging."""
+        try:
+            return self.query_table(table_name, limit=limit)
+        except Exception as e:
+            logger.error("Failed to get table sample", table=table_name, error=str(e))
+            return []
 
-# Global connection instance
+    def close(self):
+        """Close the HTTP client."""
+        if self._http_client:
+            self._http_client.close()
+
+
 supabase_db = SupabaseOnlyConnection()
 
-
 async def get_supabase_db() -> SupabaseOnlyConnection:
-    """Dependency to get Supabase database connection."""
     return supabase_db
