@@ -84,15 +84,15 @@ class MentalHealthChatService:
                                suburb=first.get('suburb'),
                                state=first.get('state'))
                 else:
-                    logger.warning("⚠ Search returned zero results", search_term=message)
+                    logger.warning("Search returned zero results", search_term=message)
                     
             except Exception as e:
-                logger.error("✗ Database search FAILED", 
+                logger.error("Database search FAILED", 
                             error=str(e), 
                             search_term=message,
                             exc_info=True)
                 return {
-                    "message": "I apologize, but I'm having trouble accessing the service database right now. Please try again later or contact support.",
+                    "message": "I apologise, but I'm having trouble accessing the service database right now. Please try again later or contact support.",
                     "session_id": session_id,
                     "services_found": 0,
                     "query_successful": False,
