@@ -1,6 +1,6 @@
 """
-Supabase-only connection with corrected wildcard syntax.
-Uses % wildcards (PostgREST standard) not * wildcards.
+Supabase-only connection with CORRECT PostgREST wildcard syntax.
+PostgREST uses * for wildcards in query params (not %).
 """
 
 import httpx
@@ -36,8 +36,8 @@ class SupabaseOnlyConnection:
 
     def search_services_by_text(self, search_term: str, limit: int = 20) -> List[Dict[str, Any]]:
         """
-        Search with correct Supabase PostgREST syntax.
-        Uses % for wildcards (not *).
+        Search with CORRECT PostgREST syntax.
+        In URL params, use * for wildcards (PostgREST converts it internally).
         """
         try:
             logger.info("=== SEARCH START ===", query=search_term, limit=limit)
@@ -48,8 +48,8 @@ class SupabaseOnlyConnection:
             
             search_lower = search_term.lower().strip()
             
-            # CORRECT wildcard format for Supabase: %keyword%
-            pattern = f"%{search_lower}%"
+            # CORRECT wildcard format for PostgREST URL params: *keyword*
+            pattern = f"*{search_lower}*"
             
             url = f"{self.settings.supabase_url}/rest/v1/staging_services"
             
@@ -83,7 +83,6 @@ class SupabaseOnlyConnection:
                        results_count=len(results))
             
             if results:
-                # Log first result for debugging
                 first = results[0]
                 logger.info("First result", 
                            service=first.get('service_name'),
