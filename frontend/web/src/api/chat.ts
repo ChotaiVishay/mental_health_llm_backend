@@ -85,7 +85,7 @@ export interface ChatReply {
 }
 
 // Simple: Just one environment variable
-const API_BASE_URL = VITE.VITE_API_BASE_URL || 'http://mental-health-prod-v2.eba-cxhtfs2h.us-east-1.elasticbeanstalk.com';
+const API_BASE_URL = VITE.VITE_API_BASE_URL || 'https://d1hfq1dvtow5bt.cloudfront.net';
 
 const CHAT_ENDPOINT = `${API_BASE_URL}/api/v1/chat/chat`;
 
