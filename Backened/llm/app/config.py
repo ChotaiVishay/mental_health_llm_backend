@@ -16,7 +16,7 @@ class Settings(BaseSettings):
 
     # ========= OpenAI =========
     openai_api_key: Optional[str] = Field(default=None, alias="OPENAI_API_KEY")
-    openai_model: str = Field(default="gpt-4.1-nano", alias="OPENAI_MODEL")
+    openai_model: str = Field(default="gpt-4o-mini", alias="OPENAI_MODEL")
     embed_model: str = Field(default="text-embedding-3-small", alias="EMBED_MODEL")
     openai_temperature: float = Field(default=0.7, alias="OPENAI_TEMPERATURE")  # ADD THIS
 
