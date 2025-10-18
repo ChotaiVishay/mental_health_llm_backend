@@ -7,7 +7,9 @@ import { JSX } from 'react';
  * - If no user is logged in, go to /admin/signin (with return path).
  * - If you later add roles, check user.role === 'admin' here.
  */
-export default function RequireAdmin({ children }: { children: JSX.Element }) {
+type Props = { children: JSX.Element; roles?: Array<'superadmin' | 'admin' | 'org_admin'> };
+
+export default function RequireAdmin({ children, roles = ['superadmin', 'admin', 'org_admin'] }: Props) {
   const { user } = useAuth();
   const location = useLocation();
 
@@ -15,8 +17,11 @@ export default function RequireAdmin({ children }: { children: JSX.Element }) {
     return <Navigate to="/admin/signin" state={{ from: location.pathname }} replace />;
   }
 
-  // If you add role-based access:
-  // if ((user as any).role !== 'admin') return <Navigate to="/" replace />;
+  // Role-based access: allow superadmin/admin/org_admin by default
+  const userRole = (user as any).role as string | undefined;
+  if (userRole && !roles.includes(userRole as any)) {
+    return <Navigate to="/" replace />;
+  }
 
   return children;
 }
