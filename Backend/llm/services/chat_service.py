@@ -11,6 +11,8 @@ import structlog
 from core.database.supabase_only import get_supabase_db
 from core.llm.openai_client import get_openai_client
 from app.config import get_settings
+from services.intent_router import detect_intent
+from services.flows.service_creation import prepare_payload
 
 logger = structlog.get_logger(__name__)
 
@@ -27,6 +29,24 @@ class MentalHealthChatService:
                 session_id = str(uuid.uuid4())
 
             logger.info("=== CHAT SERVICE START ===", message=message, session_id=session_id)
+
+            # Step 0: Detect intent early. If it's an add-service intent, signal frontend to open the form.
+            try:
+                intent = detect_intent(message)
+            except Exception:
+                intent = "query_services"
+
+            if intent == "add_service":
+                logger.info("Detected add_service intent; prompting for form")
+                return {
+                    "message": (
+                        "I can help add a new service. Please provide the service details via the form."
+                    ),
+                    "session_id": session_id,
+                    "services_found": 0,
+                    "query_successful": True,
+                    "action": "request_service_form",
+                }
 
             # Validate configuration
             if not self.settings.openai_api_key:
@@ -216,6 +236,43 @@ Please provide a supportive response that:
             return {
                 "message": "I apologize, but I'm experiencing technical difficulties. Please try again later or contact support.",
                 "session_id": session_id or str(uuid.uuid4()),
+                "services_found": 0,
+                "query_successful": False,
+                "error": str(e),
+            }
+
+    async def process_service_form(self, form_data: Dict[str, Any], session_id: Optional[str] = None) -> Dict[str, Any]:
+        """Validate form data and insert a new service into Supabase."""
+        if not session_id:
+            session_id = str(uuid.uuid4())
+
+        try:
+            logger.info("=== SERVICE CREATION START ===", session_id=session_id)
+
+            # Validate/normalize via flow helper
+            payload = prepare_payload(form_data)
+            logger.info("Service form validated", keys=list(payload.keys()))
+
+            # Insert into Supabase
+            supabase_db = await get_supabase_db()
+            created = supabase_db.insert_service(payload)
+
+            name = created.get("service_name") or payload.get("service_name")
+            sid = created.get("id")
+
+            return {
+                "message": f"Thanks! The service '{name}' has been submitted successfully.",
+                "session_id": session_id,
+                "services_found": 0,
+                "query_successful": True,
+                "action": "service_created",
+                "raw_data": [created],
+            }
+        except Exception as e:
+            logger.error("Service creation failed", error=str(e), exc_info=True)
+            return {
+                "message": "I couldn't submit that service due to a validation or database error.",
+                "session_id": session_id,
                 "services_found": 0,
                 "query_successful": False,
                 "error": str(e),

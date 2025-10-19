@@ -106,13 +106,14 @@ class SupabaseOnlyConnection:
         service_types = {
             'anxiety': ['anxiety', 'anxious', 'panic', 'worry'],
             'depression': ['depression', 'depressed', 'sad', 'low mood'],
-            'counseling': ['counseling', 'counselling', 'therapy', 'therapist'],
+            'counseling': ['counseling', 'counselling', 'counselor', 'therapist', 'therapy', 'psychotherapy'],
             'psychology': ['psychology', 'psychologist', 'psych'],
             'psychiatry': ['psychiatry', 'psychiatrist'],
             'crisis': ['crisis', 'emergency', 'urgent', 'suicide'],
             'youth': ['youth', 'young people', 'adolescent', 'teen', 'teenager'],
             'family': ['family', 'couples', 'relationship'],
             'addiction': ['addiction', 'alcohol', 'drugs', 'substance'],
+            'general': ['mental health', 'mental-health', 'wellbeing', 'well-being'],
         }
         
         found_services = []
@@ -121,6 +122,14 @@ class SupabaseOnlyConnection:
                 found_services.extend(keywords)
         
         return found_services
+
+    def _has_location_intent(self, text: str, locations: List[str]) -> bool:
+        """Detect whether the user is asking for location-based results."""
+        if locations:
+            return True
+        tl = text.lower()
+        markers = [" near ", " in ", " around ", " nearby ", " close to ", " within "]
+        return any(m in f" {tl} " for m in markers)
 
     def _extract_cost_keywords(self, text: str) -> Optional[str]:
         """Extract cost-related keywords."""
@@ -132,6 +141,105 @@ class SupabaseOnlyConnection:
             return 'paid'
         
         return None
+
+    def _normalize_service_payload(self, payload: Dict[str, Any]) -> Dict[str, Any]:
+        """Normalize incoming service form payload for Supabase insert.
+
+        - Trims strings
+        - Converts empty strings to None
+        - Keeps arrays as JSON arrays (works for text[]/jsonb columns)
+        - Coerces booleans if provided as strings
+        """
+        def _trim(v: Any) -> Any:
+            if isinstance(v, str):
+                s = v.strip()
+                return s if s != "" else None
+            return v
+
+        cleaned: Dict[str, Any] = {}
+        for k, v in payload.items():
+            if isinstance(v, list):
+                cleaned[k] = [ _trim(x) for x in v ]
+            elif isinstance(v, bool):
+                cleaned[k] = v
+            elif isinstance(v, (int, float)):
+                cleaned[k] = v
+            elif isinstance(v, str):
+                # common boolean-like strings
+                low = v.strip().lower()
+                if low in {"true", "false"}:
+                    cleaned[k] = (low == "true")
+                else:
+                    cleaned[k] = _trim(v)
+            else:
+                cleaned[k] = v
+
+        # Optional: normalize postcode to string of digits or None
+        pc = cleaned.get("postcode")
+        if pc is not None:
+            if isinstance(pc, (int, float)):
+                cleaned["postcode"] = str(int(pc))
+            elif isinstance(pc, str):
+                digits = re.sub(r"\D", "", pc)
+                cleaned["postcode"] = digits if digits else None
+
+        return cleaned
+
+    def insert_service(self, data: Dict[str, Any]) -> Dict[str, Any]:
+        """Insert a new service row into Supabase staging_services.
+
+        Returns the created row as a dict. Raises on failure.
+        """
+        try:
+            if not isinstance(data, dict):
+                raise ValueError("Service payload must be a JSON object")
+
+            # Basic validation for essential fields (adjust as needed)
+            required = ["service_name", "organisation_name"]
+            missing = [k for k in required if not data.get(k)]
+            if missing:
+                raise ValueError(f"Missing required fields: {', '.join(missing)}")
+
+            cleaned = self._normalize_service_payload(data)
+
+            url = f"{self.settings.supabase_url}/rest/v1/staging_services"
+            logger.info("Inserting new service", table="staging_services", payload_keys=list(cleaned.keys()))
+
+            response = self.http_client.post(
+                url,
+                headers=self._get_headers(),
+                json=cleaned,
+            )
+            response.raise_for_status()
+
+            created = response.json()
+            # PostgREST returns a list when Prefer:return=representation; handle both shapes
+            if isinstance(created, list):
+                if not created:
+                    raise Exception("Insert succeeded but no row returned")
+                created_row = created[0]
+            elif isinstance(created, dict):
+                created_row = created
+            else:
+                raise Exception("Unexpected insert response shape")
+
+            logger.info("Service insert completed", id=created_row.get("id"))
+            return created_row
+
+        except httpx.HTTPStatusError as e:
+            body = None
+            try:
+                body = e.response.json()
+            except Exception:
+                try:
+                    body = e.response.text
+                except Exception:
+                    body = None
+            logger.error("Service insert failed (HTTP)", status=e.response.status_code, body=body)
+            raise
+        except Exception as e:
+            logger.error("Service insert failed", error=str(e), exc_info=True)
+            raise
 
     def search_services_by_text(self, search_term: str, limit: int = 10) -> List[Dict[str, Any]]:
         """
@@ -154,22 +262,45 @@ class SupabaseOnlyConnection:
                        services=services,
                        cost_filter=cost_filter)
             
-            # Build PostgREST boolean logic: OR within groups, AND across groups
+            # Helper to build AND/OR boolean params
+            def build_params(location_conditions: List[str], service_conditions: List[str], cost: Optional[str], exclude_online: bool, fetch_limit: int) -> Dict[str, str]:
+                url_params: Dict[str, str] = {"select": "*", "limit": str(fetch_limit)}
+                and_parts: List[str] = []
+                if location_conditions:
+                    and_parts.append(f"or=({','.join(location_conditions)})")
+                if service_conditions:
+                    and_parts.append(f"or=({','.join(service_conditions)})")
+                if cost:
+                    and_parts.append(f"cost.ilike.*{cost}*")
+                if exclude_online:
+                    and_parts.append("delivery_method.not.ilike.*Online*")
+
+                if not and_parts:
+                    # General OR across common fields
+                    pattern = f"*{search_term.strip()}*"
+                    url_params["or"] = (
+                        f"(service_name.ilike.{pattern},"
+                        f"organisation_name.ilike.{pattern},"
+                        f"suburb.ilike.{pattern},"
+                        f"service_type.ilike.{pattern},"
+                        f"notes.ilike.{pattern})"
+                    )
+                    return url_params
+
+                if len(and_parts) == 1:
+                    only = and_parts[0]
+                    if only.startswith("or="):
+                        url_params["or"] = only[len("or="):]
+                    else:
+                        field, rest = only.split(".", 1)
+                        url_params[field] = rest
+                else:
+                    url_params["and"] = f"({','.join(and_parts)})"
+                return url_params
+
             url = f"{self.settings.supabase_url}/rest/v1/staging_services"
-            params: Dict[str, str] = {"select": "*", "limit": str(limit)}
 
-            location_exprs: List[str] = []
-            if locations:
-                for loc in locations:
-                    pattern = f"*{loc}*"
-                    location_exprs.extend([
-                        f"suburb.ilike.{pattern}",
-                        f"state.ilike.{pattern}",
-                        f"address.ilike.{pattern}",
-                        f"postcode.eq.{loc}" if loc.isdigit() else None,
-                    ])
-                location_exprs = [f for f in location_exprs if f]
-
+            # Build service conditions from extracted keywords (broad contains)
             service_exprs: List[str] = []
             if services:
                 for service in services:
@@ -180,52 +311,65 @@ class SupabaseOnlyConnection:
                         f"notes.ilike.{pattern}",
                     ])
 
-            cost_expr: Optional[str] = None
-            if cost_filter:
-                cost_expr = f"cost.ilike.*{cost_filter}*"
+            # Determine if we should prefer local/in-person results
+            location_intent = self._has_location_intent(search_term, locations)
+            online_requested = any(w in search_term.lower() for w in ["online", "telehealth", "virtual"])
+            exclude_online = bool(location_intent and not online_requested)
 
-            # If no specific keywords found, do a general OR search across common fields
-            if not location_exprs and not service_exprs and not cost_expr:
-                pattern = f"*{search_term.strip()}*"
-                params["or"] = (
-                    f"(service_name.ilike.{pattern},"
-                    f"organisation_name.ilike.{pattern},"
-                    f"suburb.ilike.{pattern},"
-                    f"service_type.ilike.{pattern},"
-                    f"notes.ilike.{pattern})"
-                )
-            else:
-                and_parts: List[str] = []
-                if location_exprs:
-                    and_parts.append(f"or=({','.join(location_exprs)})")
-                if service_exprs:
-                    and_parts.append(f"or=({','.join(service_exprs)})")
-                if cost_expr:
-                    and_parts.append(cost_expr)
+            results: List[Dict[str, Any]] = []
 
-                if len(and_parts) == 1:
-                    only = and_parts[0]
-                    if only.startswith("or="):
-                        params["or"] = only[len("or="):]
+            # Stage A: Strict suburb/postcode match if we have location intent
+            if locations and location_intent:
+                strict_location_exprs: List[str] = []
+                for loc in locations:
+                    if loc.isdigit():
+                        strict_location_exprs.append(f"postcode.eq.{loc}")
                     else:
-                        # field.op.value as top-level param: field=op.value
-                        field, rest = only.split(".", 1)
-                        params[field] = rest
-                else:
-                    params["and"] = f"({','.join(and_parts)})"
-            
-            logger.info("Executing search", url=url, params=params)
-            
-            response = self.http_client.get(url, headers=self._get_headers(), params=params)
-            response.raise_for_status()
-            
-            results = response.json()
-            
+                        # Case-insensitive exact by using ILIKE without wildcards
+                        strict_location_exprs.append(f"suburb.ilike.{loc}")
+
+                params_a = build_params(strict_location_exprs, service_exprs, cost_filter, exclude_online, limit)
+                logger.info("Executing search (stage A: strict)", url=url, params=params_a)
+                resp_a = self.http_client.get(url, headers=self._get_headers(), params=params_a)
+                resp_a.raise_for_status()
+                results = resp_a.json()
+
+            # Stage B: Fallback to broader contains if not enough results
+            if len(results) < limit:
+                broad_location_exprs: List[str] = []
+                for loc in locations:
+                    pattern = f"*{loc}*"
+                    broad_location_exprs.extend([
+                        f"suburb.ilike.{pattern}",
+                        f"state.ilike.{pattern}",
+                        f"address.ilike.{pattern}",
+                        f"postcode.eq.{loc}" if loc.isdigit() else None,
+                    ])
+                broad_location_exprs = [f for f in broad_location_exprs if f]
+
+                remaining = max(0, limit - len(results))
+                params_b = build_params(broad_location_exprs, service_exprs, cost_filter, exclude_online, remaining or limit)
+                logger.info("Executing search (stage B: broad)", url=url, params=params_b)
+                resp_b = self.http_client.get(url, headers=self._get_headers(), params=params_b)
+                resp_b.raise_for_status()
+                more = resp_b.json()
+
+                # Merge with de-duplication by id if present
+                if more:
+                    seen_ids = {r.get('id') for r in results if isinstance(r, dict) and 'id' in r}
+                    for r in more:
+                        rid = r.get('id') if isinstance(r, dict) else None
+                        if rid is None or rid not in seen_ids:
+                            results.append(r)
+
+                # Trim to limit
+                results = results[:limit]
+
             logger.info("Search completed", 
                        search_term=search_term,
                        results_count=len(results),
                        had_location_filter=bool(locations),
-                       had_service_filter=bool(services))
+                        had_service_filter=bool(services))
             
             return results
 
