@@ -10,6 +10,7 @@ from services.chat_service import get_chat_service
 
 settings = get_settings()
 
+# FastAPI application setup - Pre-production setup
 app = FastAPI(
     title="Mental Health LLM Backend",
     description="LLM-powered chatbot",
