@@ -1,0 +1,126 @@
+2025-10-17 13:42:45,737 [INFO] -----------------------Starting build-----------------------
+2025-10-17 13:42:45,742 [INFO] Running configSets: _OnInstanceBoot
+2025-10-17 13:42:45,745 [INFO] Running configSet _OnInstanceBoot
+2025-10-17 13:42:45,747 [INFO] Running config AWSEBBaseConfig
+2025-10-17 13:42:45,999 [INFO] Command clearbackupfiles succeeded
+2025-10-17 13:42:46,002 [INFO] Running config AWSEBCfnHupEndpointOverride
+2025-10-17 13:42:46,008 [INFO] Command clearbackupfiles succeeded
+2025-10-17 13:42:46,009 [INFO] ConfigSets completed
+2025-10-17 13:42:46,009 [INFO] -----------------------Build complete-----------------------
+2025-10-17 13:45:23,249 [INFO] -----------------------Starting build-----------------------
+2025-10-17 13:45:23,254 [INFO] Running configSets: Infra-EmbeddedPreBuild
+2025-10-17 13:45:23,256 [INFO] Running configSet Infra-EmbeddedPreBuild
+2025-10-17 13:45:23,258 [INFO] Running config prebuild_0_mental_health_llm
+2025-10-17 13:45:23,261 [INFO] ConfigSets completed
+2025-10-17 13:45:23,261 [INFO] -----------------------Build complete-----------------------
+2025-10-17 13:45:30,543 [INFO] -----------------------Starting build-----------------------
+2025-10-17 13:45:30,548 [INFO] Running configSets: Infra-EmbeddedPostBuild
+2025-10-17 13:45:30,550 [INFO] Running configSet Infra-EmbeddedPostBuild
+2025-10-17 13:45:30,552 [INFO] Running config postbuild_0_mental_health_llm
+2025-10-17 13:45:30,593 [INFO] Command 01_reload_nginx succeeded
+2025-10-17 13:45:30,594 [INFO] ConfigSets completed
+2025-10-17 13:45:30,595 [INFO] -----------------------Build complete-----------------------
+2025-10-17 14:28:26,930 [INFO] -----------------------Starting build-----------------------
+2025-10-17 14:28:26,935 [INFO] Running configSets: Infra-EmbeddedPreBuild
+2025-10-17 14:28:26,938 [INFO] Running configSet Infra-EmbeddedPreBuild
+2025-10-17 14:28:26,940 [INFO] Running config prebuild_0_mental_health_llm
+2025-10-17 14:28:26,942 [INFO] ConfigSets completed
+2025-10-17 14:28:26,942 [INFO] -----------------------Build complete-----------------------
+2025-10-17 14:28:30,136 [INFO] -----------------------Starting build-----------------------
+2025-10-17 14:28:30,141 [INFO] Running configSets: Infra-EmbeddedPostBuild
+2025-10-17 14:28:30,143 [INFO] Running configSet Infra-EmbeddedPostBuild
+2025-10-17 14:28:30,146 [INFO] Running config postbuild_0_mental_health_llm
+2025-10-17 14:28:30,237 [INFO] Command 01_reload_nginx succeeded
+2025-10-17 14:28:30,239 [INFO] ConfigSets completed
+2025-10-17 14:28:30,239 [INFO] -----------------------Build complete-----------------------
+2025-10-17 22:10:08,158 [INFO] -----------------------Starting build-----------------------
+2025-10-17 22:10:08,163 [INFO] Running configSets: Infra-EmbeddedPreBuild
+2025-10-17 22:10:08,165 [INFO] Running configSet Infra-EmbeddedPreBuild
+2025-10-17 22:10:08,167 [INFO] Running config prebuild_0_mental_health_llm
+2025-10-17 22:10:08,169 [INFO] ConfigSets completed
+2025-10-17 22:10:08,170 [INFO] -----------------------Build complete-----------------------
+2025-10-17 22:10:11,514 [INFO] -----------------------Starting build-----------------------
+2025-10-17 22:10:11,518 [INFO] Running configSets: Infra-EmbeddedPostBuild
+2025-10-17 22:10:11,521 [INFO] Running configSet Infra-EmbeddedPostBuild
+2025-10-17 22:10:11,523 [INFO] Running config postbuild_0_mental_health_llm
+2025-10-17 22:10:11,594 [INFO] Command 01_reload_nginx succeeded
+2025-10-17 22:10:11,595 [INFO] ConfigSets completed
+2025-10-17 22:10:11,596 [INFO] -----------------------Build complete-----------------------
+2025-10-17 22:32:14,597 [INFO] -----------------------Starting build-----------------------
+2025-10-17 22:32:14,603 [INFO] Running configSets: Infra-EmbeddedPreBuild
+2025-10-17 22:32:14,605 [INFO] Running configSet Infra-EmbeddedPreBuild
+2025-10-17 22:32:14,607 [INFO] Running config prebuild_0_mental_health_llm
+2025-10-17 22:32:14,609 [INFO] ConfigSets completed
+2025-10-17 22:32:14,609 [INFO] -----------------------Build complete-----------------------
+2025-10-17 22:32:17,928 [INFO] -----------------------Starting build-----------------------
+2025-10-17 22:32:17,933 [INFO] Running configSets: Infra-EmbeddedPostBuild
+2025-10-17 22:32:17,935 [INFO] Running configSet Infra-EmbeddedPostBuild
+2025-10-17 22:32:17,938 [INFO] Running config postbuild_0_mental_health_llm
+2025-10-17 22:32:18,026 [INFO] Command 01_reload_nginx succeeded
+2025-10-17 22:32:18,028 [INFO] ConfigSets completed
+2025-10-17 22:32:18,028 [INFO] -----------------------Build complete-----------------------
+2025-10-18 03:10:51,818 [INFO] -----------------------Starting build-----------------------
+2025-10-18 03:10:51,823 [INFO] Running configSets: Infra-EmbeddedPreBuild
+2025-10-18 03:10:51,826 [INFO] Running configSet Infra-EmbeddedPreBuild
+2025-10-18 03:10:51,828 [INFO] Running config prebuild_0_mental_health_llm
+2025-10-18 03:10:51,830 [INFO] ConfigSets completed
+2025-10-18 03:10:51,830 [INFO] -----------------------Build complete-----------------------
+2025-10-18 03:10:55,102 [INFO] -----------------------Starting build-----------------------
+2025-10-18 03:10:55,107 [INFO] Running configSets: Infra-EmbeddedPostBuild
+2025-10-18 03:10:55,110 [INFO] Running configSet Infra-EmbeddedPostBuild
+2025-10-18 03:10:55,112 [INFO] Running config postbuild_0_mental_health_llm
+2025-10-18 03:10:55,195 [INFO] Command 01_reload_nginx succeeded
+2025-10-18 03:10:55,196 [INFO] ConfigSets completed
+2025-10-18 03:10:55,196 [INFO] -----------------------Build complete-----------------------
+2025-10-18 05:32:52,750 [INFO] -----------------------Starting build-----------------------
+2025-10-18 05:32:52,754 [INFO] Running configSets: Infra-EmbeddedPreBuild
+2025-10-18 05:32:52,757 [INFO] Running configSet Infra-EmbeddedPreBuild
+2025-10-18 05:32:52,759 [INFO] Running config prebuild_0_mental_health_llm
+2025-10-18 05:32:52,761 [INFO] ConfigSets completed
+2025-10-18 05:32:52,761 [INFO] -----------------------Build complete-----------------------
+2025-10-18 05:32:55,843 [INFO] -----------------------Starting build-----------------------
+2025-10-18 05:32:55,847 [INFO] Running configSets: Infra-EmbeddedPostBuild
+2025-10-18 05:32:55,850 [INFO] Running configSet Infra-EmbeddedPostBuild
+2025-10-18 05:32:55,852 [INFO] Running config postbuild_0_mental_health_llm
+2025-10-18 05:32:55,945 [INFO] Command 01_reload_nginx succeeded
+2025-10-18 05:32:55,946 [INFO] ConfigSets completed
+2025-10-18 05:32:55,946 [INFO] -----------------------Build complete-----------------------
+2025-10-18 05:37:18,898 [INFO] -----------------------Starting build-----------------------
+2025-10-18 05:37:18,903 [INFO] Running configSets: Infra-EmbeddedPreBuild
+2025-10-18 05:37:18,905 [INFO] Running configSet Infra-EmbeddedPreBuild
+2025-10-18 05:37:18,908 [INFO] Running config prebuild_0_mental_health_llm
+2025-10-18 05:37:18,910 [INFO] ConfigSets completed
+2025-10-18 05:37:18,910 [INFO] -----------------------Build complete-----------------------
+2025-10-18 05:37:22,133 [INFO] -----------------------Starting build-----------------------
+2025-10-18 05:37:22,138 [INFO] Running configSets: Infra-EmbeddedPostBuild
+2025-10-18 05:37:22,140 [INFO] Running configSet Infra-EmbeddedPostBuild
+2025-10-18 05:37:22,143 [INFO] Running config postbuild_0_mental_health_llm
+2025-10-18 05:37:22,244 [INFO] Command 01_reload_nginx succeeded
+2025-10-18 05:37:22,246 [INFO] ConfigSets completed
+2025-10-18 05:37:22,246 [INFO] -----------------------Build complete-----------------------
+2025-10-18 05:39:24,752 [INFO] -----------------------Starting build-----------------------
+2025-10-18 05:39:24,757 [INFO] Running configSets: Infra-EmbeddedPreBuild
+2025-10-18 05:39:24,759 [INFO] Running configSet Infra-EmbeddedPreBuild
+2025-10-18 05:39:24,762 [INFO] Running config prebuild_0_mental_health_llm
+2025-10-18 05:39:24,764 [INFO] ConfigSets completed
+2025-10-18 05:39:24,764 [INFO] -----------------------Build complete-----------------------
+2025-10-18 05:39:27,972 [INFO] -----------------------Starting build-----------------------
+2025-10-18 05:39:27,977 [INFO] Running configSets: Infra-EmbeddedPostBuild
+2025-10-18 05:39:27,979 [INFO] Running configSet Infra-EmbeddedPostBuild
+2025-10-18 05:39:27,982 [INFO] Running config postbuild_0_mental_health_llm
+2025-10-18 05:39:28,075 [INFO] Command 01_reload_nginx succeeded
+2025-10-18 05:39:28,076 [INFO] ConfigSets completed
+2025-10-18 05:39:28,076 [INFO] -----------------------Build complete-----------------------
+2025-10-18 05:48:56,455 [INFO] -----------------------Starting build-----------------------
+2025-10-18 05:48:56,460 [INFO] Running configSets: Infra-EmbeddedPreBuild
+2025-10-18 05:48:56,463 [INFO] Running configSet Infra-EmbeddedPreBuild
+2025-10-18 05:48:56,465 [INFO] Running config prebuild_0_mental_health_llm
+2025-10-18 05:48:56,467 [INFO] ConfigSets completed
+2025-10-18 05:48:56,467 [INFO] -----------------------Build complete-----------------------
+2025-10-18 05:48:59,818 [INFO] -----------------------Starting build-----------------------
+2025-10-18 05:48:59,823 [INFO] Running configSets: Infra-EmbeddedPostBuild
+2025-10-18 05:48:59,825 [INFO] Running configSet Infra-EmbeddedPostBuild
+2025-10-18 05:48:59,827 [INFO] Running config postbuild_0_mental_health_llm
+2025-10-18 05:48:59,934 [INFO] Command 01_reload_nginx succeeded
+2025-10-18 05:48:59,935 [INFO] ConfigSets completed
+2025-10-18 05:48:59,936 [INFO] -----------------------Build complete-----------------------

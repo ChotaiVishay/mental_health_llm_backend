@@ -1,0 +1,1569 @@
+Oct 12 04:58:21 ip-172-31-12-18 web[2118]: INFO:     Started server process [2118]
+Oct 12 04:58:21 ip-172-31-12-18 web[2118]: INFO:     Waiting for application startup.
+Oct 12 04:58:21 ip-172-31-12-18 web[2118]: INFO:     Application startup complete.
+Oct 12 04:58:21 ip-172-31-12-18 web[2118]: INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+Oct 12 04:59:55 ip-172-31-12-18 web[2118]: INFO:     128.250.0.222:0 - "GET / HTTP/1.1" 200 OK
+Oct 12 05:00:57 ip-172-31-12-18 web[2118]: INFO:     128.250.0.222:0 - "GET /health HTTP/1.1" 200 OK
+Oct 12 05:01:11 ip-172-31-12-18 web[2118]: INFO:     128.250.0.222:0 - "GET / HTTP/1.1" 200 OK
+Oct 12 05:01:11 ip-172-31-12-18 web[2118]: INFO:     128.250.0.222:0 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+Oct 12 05:01:15 ip-172-31-12-18 web[2118]: INFO:     205.169.39.24:0 - "GET / HTTP/1.1" 200 OK
+Oct 12 05:01:37 ip-172-31-12-18 web[2118]: INFO:     205.169.39.25:0 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+Oct 12 05:02:21 ip-172-31-12-18 web[2118]: WARNING:  Invalid HTTP request received.
+Oct 12 05:02:48 ip-172-31-12-18 web[2118]: INFO:     Shutting down
+Oct 12 05:02:48 ip-172-31-12-18 web[2118]: INFO:     Waiting for application shutdown.
+Oct 12 05:02:48 ip-172-31-12-18 web[2118]: INFO:     Application shutdown complete.
+Oct 12 05:02:48 ip-172-31-12-18 web[2118]: INFO:     Finished server process [2118]
+Oct 12 05:02:50 ip-172-31-12-18 web[2840]: INFO:     Started server process [2840]
+Oct 12 05:02:50 ip-172-31-12-18 web[2840]: INFO:     Waiting for application startup.
+Oct 12 05:02:50 ip-172-31-12-18 web[2840]: INFO:     Application startup complete.
+Oct 12 05:02:50 ip-172-31-12-18 web[2840]: INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+Oct 12 05:06:26 ip-172-31-12-18 web[2840]: INFO:     Shutting down
+Oct 12 05:06:26 ip-172-31-12-18 web[2840]: INFO:     Waiting for application shutdown.
+Oct 12 05:06:26 ip-172-31-12-18 web[2840]: INFO:     Application shutdown complete.
+Oct 12 05:06:26 ip-172-31-12-18 web[2840]: INFO:     Finished server process [2840]
+Oct 12 05:06:28 ip-172-31-12-18 web[3456]: INFO:     Started server process [3456]
+Oct 12 05:06:28 ip-172-31-12-18 web[3456]: INFO:     Waiting for application startup.
+Oct 12 05:06:28 ip-172-31-12-18 web[3456]: INFO:     Application startup complete.
+Oct 12 05:06:28 ip-172-31-12-18 web[3456]: INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+Oct 12 05:06:32 ip-172-31-12-18 web[3456]: INFO:     91.224.92.17:0 - "GET / HTTP/1.1" 200 OK
+Oct 12 05:06:55 ip-172-31-12-18 web[3456]: WARNING:  Invalid HTTP request received.
+Oct 12 05:07:38 ip-172-31-12-18 web[3456]: INFO:     216.180.246.30:0 - "GET / HTTP/1.1" 200 OK
+Oct 12 05:09:12 ip-172-31-12-18 web[3456]: INFO:     Shutting down
+Oct 12 05:09:12 ip-172-31-12-18 web[3456]: INFO:     Waiting for application shutdown.
+Oct 12 05:09:12 ip-172-31-12-18 web[3456]: INFO:     Application shutdown complete.
+Oct 12 05:09:12 ip-172-31-12-18 web[3456]: INFO:     Finished server process [3456]
+Oct 12 05:09:15 ip-172-31-12-18 web[4040]: Traceback (most recent call last):
+Oct 12 05:09:15 ip-172-31-12-18 web[4040]:  File "/var/app/venv/staging-LQM1lest/bin/uvicorn", line 7, in <module>
+Oct 12 05:09:15 ip-172-31-12-18 web[4040]:    sys.exit(main())
+Oct 12 05:09:15 ip-172-31-12-18 web[4040]:             ^^^^^^
+Oct 12 05:09:15 ip-172-31-12-18 web[4040]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1462, in __call__
+Oct 12 05:09:15 ip-172-31-12-18 web[4040]:    return self.main(*args, **kwargs)
+Oct 12 05:09:15 ip-172-31-12-18 web[4040]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:09:15 ip-172-31-12-18 web[4040]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1383, in main
+Oct 12 05:09:15 ip-172-31-12-18 web[4040]:    rv = self.invoke(ctx)
+Oct 12 05:09:15 ip-172-31-12-18 web[4040]:         ^^^^^^^^^^^^^^^^
+Oct 12 05:09:15 ip-172-31-12-18 web[4040]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1246, in invoke
+Oct 12 05:09:15 ip-172-31-12-18 web[4040]:    return ctx.invoke(self.callback, **ctx.params)
+Oct 12 05:09:15 ip-172-31-12-18 web[4040]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:09:15 ip-172-31-12-18 web[4040]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 814, in invoke
+Oct 12 05:09:15 ip-172-31-12-18 web[4040]:    return callback(*args, **kwargs)
+Oct 12 05:09:15 ip-172-31-12-18 web[4040]:           ^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:09:15 ip-172-31-12-18 web[4040]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/main.py", line 416, in main
+Oct 12 05:09:15 ip-172-31-12-18 web[4040]:    run(
+Oct 12 05:09:15 ip-172-31-12-18 web[4040]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/main.py", line 587, in run
+Oct 12 05:09:15 ip-172-31-12-18 web[4040]:    server.run()
+Oct 12 05:09:15 ip-172-31-12-18 web[4040]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/server.py", line 61, in run
+Oct 12 05:09:15 ip-172-31-12-18 web[4040]:    return asyncio.run(self.serve(sockets=sockets))
+Oct 12 05:09:15 ip-172-31-12-18 web[4040]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:09:15 ip-172-31-12-18 web[4040]:  File "/usr/lib64/python3.11/asyncio/runners.py", line 190, in run
+Oct 12 05:09:15 ip-172-31-12-18 web[4040]:    return runner.run(main)
+Oct 12 05:09:15 ip-172-31-12-18 web[4040]:           ^^^^^^^^^^^^^^^^
+Oct 12 05:09:15 ip-172-31-12-18 web[4040]:  File "/usr/lib64/python3.11/asyncio/runners.py", line 118, in run
+Oct 12 05:09:15 ip-172-31-12-18 web[4040]:    return self._loop.run_until_complete(task)
+Oct 12 05:09:15 ip-172-31-12-18 web[4040]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:09:15 ip-172-31-12-18 web[4040]:  File "/usr/lib64/python3.11/asyncio/base_events.py", line 654, in run_until_complete
+Oct 12 05:09:15 ip-172-31-12-18 web[4040]:    return future.result()
+Oct 12 05:09:15 ip-172-31-12-18 web[4040]:           ^^^^^^^^^^^^^^^
+Oct 12 05:09:15 ip-172-31-12-18 web[4040]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/server.py", line 68, in serve
+Oct 12 05:09:15 ip-172-31-12-18 web[4040]:    config.load()
+Oct 12 05:09:15 ip-172-31-12-18 web[4040]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/config.py", line 467, in load
+Oct 12 05:09:15 ip-172-31-12-18 web[4040]:    self.loaded_app = import_from_string(self.app)
+Oct 12 05:09:15 ip-172-31-12-18 web[4040]:                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:09:15 ip-172-31-12-18 web[4040]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/importer.py", line 24, in import_from_string
+Oct 12 05:09:15 ip-172-31-12-18 web[4040]:    raise exc from None
+Oct 12 05:09:15 ip-172-31-12-18 web[4040]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/importer.py", line 21, in import_from_string
+Oct 12 05:09:15 ip-172-31-12-18 web[4040]:    module = importlib.import_module(module_str)
+Oct 12 05:09:15 ip-172-31-12-18 web[4040]:             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:09:15 ip-172-31-12-18 web[4040]:  File "/usr/lib64/python3.11/importlib/__init__.py", line 126, in import_module
+Oct 12 05:09:15 ip-172-31-12-18 web[4040]:    return _bootstrap._gcd_import(name[level:], package, level)
+Oct 12 05:09:15 ip-172-31-12-18 web[4040]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:09:15 ip-172-31-12-18 web[4040]:  File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
+Oct 12 05:09:15 ip-172-31-12-18 web[4040]:  File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
+Oct 12 05:09:15 ip-172-31-12-18 web[4040]:  File "<frozen importlib._bootstrap>", line 1147, in _find_and_load_unlocked
+Oct 12 05:09:15 ip-172-31-12-18 web[4040]:  File "<frozen importlib._bootstrap>", line 690, in _load_unlocked
+Oct 12 05:09:15 ip-172-31-12-18 web[4040]:  File "<frozen importlib._bootstrap_external>", line 940, in exec_module
+Oct 12 05:09:15 ip-172-31-12-18 web[4040]:  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+Oct 12 05:09:15 ip-172-31-12-18 web[4040]:  File "/var/app/current/app/main.py", line 15, in <module>
+Oct 12 05:09:15 ip-172-31-12-18 web[4040]:    from core.database.connection import get_db_connection, SupabaseConnection
+Oct 12 05:09:15 ip-172-31-12-18 web[4040]:  File "/var/app/current/core/database/connection.py", line 8, in <module>
+Oct 12 05:09:15 ip-172-31-12-18 web[4040]:    from sqlalchemy import create_engine, text
+Oct 12 05:09:15 ip-172-31-12-18 web[4040]: ModuleNotFoundError: No module named 'sqlalchemy'
+Oct 12 05:09:16 ip-172-31-12-18 web[4096]: Traceback (most recent call last):
+Oct 12 05:09:16 ip-172-31-12-18 web[4096]:  File "/var/app/venv/staging-LQM1lest/bin/uvicorn", line 7, in <module>
+Oct 12 05:09:16 ip-172-31-12-18 web[4096]:    sys.exit(main())
+Oct 12 05:09:16 ip-172-31-12-18 web[4096]:             ^^^^^^
+Oct 12 05:09:16 ip-172-31-12-18 web[4096]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1462, in __call__
+Oct 12 05:09:16 ip-172-31-12-18 web[4096]:    return self.main(*args, **kwargs)
+Oct 12 05:09:16 ip-172-31-12-18 web[4096]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:09:16 ip-172-31-12-18 web[4096]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1383, in main
+Oct 12 05:09:16 ip-172-31-12-18 web[4096]:    rv = self.invoke(ctx)
+Oct 12 05:09:16 ip-172-31-12-18 web[4096]:         ^^^^^^^^^^^^^^^^
+Oct 12 05:09:16 ip-172-31-12-18 web[4096]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1246, in invoke
+Oct 12 05:09:16 ip-172-31-12-18 web[4096]:    return ctx.invoke(self.callback, **ctx.params)
+Oct 12 05:09:16 ip-172-31-12-18 web[4096]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:09:16 ip-172-31-12-18 web[4096]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 814, in invoke
+Oct 12 05:09:16 ip-172-31-12-18 web[4096]:    return callback(*args, **kwargs)
+Oct 12 05:09:16 ip-172-31-12-18 web[4096]:           ^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:09:16 ip-172-31-12-18 web[4096]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/main.py", line 416, in main
+Oct 12 05:09:16 ip-172-31-12-18 web[4096]:    run(
+Oct 12 05:09:16 ip-172-31-12-18 web[4096]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/main.py", line 587, in run
+Oct 12 05:09:16 ip-172-31-12-18 web[4096]:    server.run()
+Oct 12 05:09:16 ip-172-31-12-18 web[4096]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/server.py", line 61, in run
+Oct 12 05:09:16 ip-172-31-12-18 web[4096]:    return asyncio.run(self.serve(sockets=sockets))
+Oct 12 05:09:16 ip-172-31-12-18 web[4096]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:09:16 ip-172-31-12-18 web[4096]:  File "/usr/lib64/python3.11/asyncio/runners.py", line 190, in run
+Oct 12 05:09:16 ip-172-31-12-18 web[4096]:    return runner.run(main)
+Oct 12 05:09:16 ip-172-31-12-18 web[4096]:           ^^^^^^^^^^^^^^^^
+Oct 12 05:09:16 ip-172-31-12-18 web[4096]:  File "/usr/lib64/python3.11/asyncio/runners.py", line 118, in run
+Oct 12 05:09:16 ip-172-31-12-18 web[4096]:    return self._loop.run_until_complete(task)
+Oct 12 05:09:16 ip-172-31-12-18 web[4096]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:09:16 ip-172-31-12-18 web[4096]:  File "/usr/lib64/python3.11/asyncio/base_events.py", line 654, in run_until_complete
+Oct 12 05:09:16 ip-172-31-12-18 web[4096]:    return future.result()
+Oct 12 05:09:16 ip-172-31-12-18 web[4096]:           ^^^^^^^^^^^^^^^
+Oct 12 05:09:16 ip-172-31-12-18 web[4096]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/server.py", line 68, in serve
+Oct 12 05:09:16 ip-172-31-12-18 web[4096]:    config.load()
+Oct 12 05:09:16 ip-172-31-12-18 web[4096]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/config.py", line 467, in load
+Oct 12 05:09:16 ip-172-31-12-18 web[4096]:    self.loaded_app = import_from_string(self.app)
+Oct 12 05:09:16 ip-172-31-12-18 web[4096]:                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:09:16 ip-172-31-12-18 web[4096]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/importer.py", line 24, in import_from_string
+Oct 12 05:09:16 ip-172-31-12-18 web[4096]:    raise exc from None
+Oct 12 05:09:16 ip-172-31-12-18 web[4096]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/importer.py", line 21, in import_from_string
+Oct 12 05:09:16 ip-172-31-12-18 web[4096]:    module = importlib.import_module(module_str)
+Oct 12 05:09:16 ip-172-31-12-18 web[4096]:             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:09:16 ip-172-31-12-18 web[4096]:  File "/usr/lib64/python3.11/importlib/__init__.py", line 126, in import_module
+Oct 12 05:09:16 ip-172-31-12-18 web[4096]:    return _bootstrap._gcd_import(name[level:], package, level)
+Oct 12 05:09:16 ip-172-31-12-18 web[4096]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:09:16 ip-172-31-12-18 web[4096]:  File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
+Oct 12 05:09:16 ip-172-31-12-18 web[4096]:  File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
+Oct 12 05:09:16 ip-172-31-12-18 web[4096]:  File "<frozen importlib._bootstrap>", line 1147, in _find_and_load_unlocked
+Oct 12 05:09:16 ip-172-31-12-18 web[4096]:  File "<frozen importlib._bootstrap>", line 690, in _load_unlocked
+Oct 12 05:09:16 ip-172-31-12-18 web[4096]:  File "<frozen importlib._bootstrap_external>", line 940, in exec_module
+Oct 12 05:09:16 ip-172-31-12-18 web[4096]:  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+Oct 12 05:09:16 ip-172-31-12-18 web[4096]:  File "/var/app/current/app/main.py", line 15, in <module>
+Oct 12 05:09:16 ip-172-31-12-18 web[4096]:    from core.database.connection import get_db_connection, SupabaseConnection
+Oct 12 05:09:16 ip-172-31-12-18 web[4096]:  File "/var/app/current/core/database/connection.py", line 8, in <module>
+Oct 12 05:09:16 ip-172-31-12-18 web[4096]:    from sqlalchemy import create_engine, text
+Oct 12 05:09:16 ip-172-31-12-18 web[4096]: ModuleNotFoundError: No module named 'sqlalchemy'
+Oct 12 05:09:17 ip-172-31-12-18 web[4101]: Traceback (most recent call last):
+Oct 12 05:09:17 ip-172-31-12-18 web[4101]:  File "/var/app/venv/staging-LQM1lest/bin/uvicorn", line 7, in <module>
+Oct 12 05:09:17 ip-172-31-12-18 web[4101]:    sys.exit(main())
+Oct 12 05:09:17 ip-172-31-12-18 web[4101]:             ^^^^^^
+Oct 12 05:09:17 ip-172-31-12-18 web[4101]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1462, in __call__
+Oct 12 05:09:17 ip-172-31-12-18 web[4101]:    return self.main(*args, **kwargs)
+Oct 12 05:09:17 ip-172-31-12-18 web[4101]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:09:17 ip-172-31-12-18 web[4101]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1383, in main
+Oct 12 05:09:17 ip-172-31-12-18 web[4101]:    rv = self.invoke(ctx)
+Oct 12 05:09:17 ip-172-31-12-18 web[4101]:         ^^^^^^^^^^^^^^^^
+Oct 12 05:09:17 ip-172-31-12-18 web[4101]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1246, in invoke
+Oct 12 05:09:17 ip-172-31-12-18 web[4101]:    return ctx.invoke(self.callback, **ctx.params)
+Oct 12 05:09:17 ip-172-31-12-18 web[4101]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:09:17 ip-172-31-12-18 web[4101]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 814, in invoke
+Oct 12 05:09:17 ip-172-31-12-18 web[4101]:    return callback(*args, **kwargs)
+Oct 12 05:09:17 ip-172-31-12-18 web[4101]:           ^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:09:17 ip-172-31-12-18 web[4101]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/main.py", line 416, in main
+Oct 12 05:09:17 ip-172-31-12-18 web[4101]:    run(
+Oct 12 05:09:17 ip-172-31-12-18 web[4101]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/main.py", line 587, in run
+Oct 12 05:09:17 ip-172-31-12-18 web[4101]:    server.run()
+Oct 12 05:09:17 ip-172-31-12-18 web[4101]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/server.py", line 61, in run
+Oct 12 05:09:17 ip-172-31-12-18 web[4101]:    return asyncio.run(self.serve(sockets=sockets))
+Oct 12 05:09:17 ip-172-31-12-18 web[4101]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:09:17 ip-172-31-12-18 web[4101]:  File "/usr/lib64/python3.11/asyncio/runners.py", line 190, in run
+Oct 12 05:09:17 ip-172-31-12-18 web[4101]:    return runner.run(main)
+Oct 12 05:09:17 ip-172-31-12-18 web[4101]:           ^^^^^^^^^^^^^^^^
+Oct 12 05:09:17 ip-172-31-12-18 web[4101]:  File "/usr/lib64/python3.11/asyncio/runners.py", line 118, in run
+Oct 12 05:09:17 ip-172-31-12-18 web[4101]:    return self._loop.run_until_complete(task)
+Oct 12 05:09:17 ip-172-31-12-18 web[4101]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:09:17 ip-172-31-12-18 web[4101]:  File "/usr/lib64/python3.11/asyncio/base_events.py", line 654, in run_until_complete
+Oct 12 05:09:17 ip-172-31-12-18 web[4101]:    return future.result()
+Oct 12 05:09:17 ip-172-31-12-18 web[4101]:           ^^^^^^^^^^^^^^^
+Oct 12 05:09:17 ip-172-31-12-18 web[4101]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/server.py", line 68, in serve
+Oct 12 05:09:17 ip-172-31-12-18 web[4101]:    config.load()
+Oct 12 05:09:17 ip-172-31-12-18 web[4101]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/config.py", line 467, in load
+Oct 12 05:09:17 ip-172-31-12-18 web[4101]:    self.loaded_app = import_from_string(self.app)
+Oct 12 05:09:17 ip-172-31-12-18 web[4101]:                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:09:17 ip-172-31-12-18 web[4101]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/importer.py", line 24, in import_from_string
+Oct 12 05:09:17 ip-172-31-12-18 web[4101]:    raise exc from None
+Oct 12 05:09:17 ip-172-31-12-18 web[4101]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/importer.py", line 21, in import_from_string
+Oct 12 05:09:17 ip-172-31-12-18 web[4101]:    module = importlib.import_module(module_str)
+Oct 12 05:09:17 ip-172-31-12-18 web[4101]:             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:09:17 ip-172-31-12-18 web[4101]:  File "/usr/lib64/python3.11/importlib/__init__.py", line 126, in import_module
+Oct 12 05:09:17 ip-172-31-12-18 web[4101]:    return _bootstrap._gcd_import(name[level:], package, level)
+Oct 12 05:09:17 ip-172-31-12-18 web[4101]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:09:17 ip-172-31-12-18 web[4101]:  File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
+Oct 12 05:09:17 ip-172-31-12-18 web[4101]:  File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
+Oct 12 05:09:17 ip-172-31-12-18 web[4101]:  File "<frozen importlib._bootstrap>", line 1147, in _find_and_load_unlocked
+Oct 12 05:09:17 ip-172-31-12-18 web[4101]:  File "<frozen importlib._bootstrap>", line 690, in _load_unlocked
+Oct 12 05:09:17 ip-172-31-12-18 web[4101]:  File "<frozen importlib._bootstrap_external>", line 940, in exec_module
+Oct 12 05:09:17 ip-172-31-12-18 web[4101]:  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+Oct 12 05:09:17 ip-172-31-12-18 web[4101]:  File "/var/app/current/app/main.py", line 15, in <module>
+Oct 12 05:09:17 ip-172-31-12-18 web[4101]:    from core.database.connection import get_db_connection, SupabaseConnection
+Oct 12 05:09:17 ip-172-31-12-18 web[4101]:  File "/var/app/current/core/database/connection.py", line 8, in <module>
+Oct 12 05:09:17 ip-172-31-12-18 web[4101]:    from sqlalchemy import create_engine, text
+Oct 12 05:09:17 ip-172-31-12-18 web[4101]: ModuleNotFoundError: No module named 'sqlalchemy'
+Oct 12 05:09:18 ip-172-31-12-18 web[4106]: Traceback (most recent call last):
+Oct 12 05:09:18 ip-172-31-12-18 web[4106]:  File "/var/app/venv/staging-LQM1lest/bin/uvicorn", line 7, in <module>
+Oct 12 05:09:18 ip-172-31-12-18 web[4106]:    sys.exit(main())
+Oct 12 05:09:18 ip-172-31-12-18 web[4106]:             ^^^^^^
+Oct 12 05:09:18 ip-172-31-12-18 web[4106]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1462, in __call__
+Oct 12 05:09:18 ip-172-31-12-18 web[4106]:    return self.main(*args, **kwargs)
+Oct 12 05:09:18 ip-172-31-12-18 web[4106]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:09:18 ip-172-31-12-18 web[4106]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1383, in main
+Oct 12 05:09:18 ip-172-31-12-18 web[4106]:    rv = self.invoke(ctx)
+Oct 12 05:09:18 ip-172-31-12-18 web[4106]:         ^^^^^^^^^^^^^^^^
+Oct 12 05:09:18 ip-172-31-12-18 web[4106]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1246, in invoke
+Oct 12 05:09:18 ip-172-31-12-18 web[4106]:    return ctx.invoke(self.callback, **ctx.params)
+Oct 12 05:09:18 ip-172-31-12-18 web[4106]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:09:18 ip-172-31-12-18 web[4106]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 814, in invoke
+Oct 12 05:09:18 ip-172-31-12-18 web[4106]:    return callback(*args, **kwargs)
+Oct 12 05:09:18 ip-172-31-12-18 web[4106]:           ^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:09:18 ip-172-31-12-18 web[4106]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/main.py", line 416, in main
+Oct 12 05:09:18 ip-172-31-12-18 web[4106]:    run(
+Oct 12 05:09:18 ip-172-31-12-18 web[4106]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/main.py", line 587, in run
+Oct 12 05:09:18 ip-172-31-12-18 web[4106]:    server.run()
+Oct 12 05:09:18 ip-172-31-12-18 web[4106]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/server.py", line 61, in run
+Oct 12 05:09:18 ip-172-31-12-18 web[4106]:    return asyncio.run(self.serve(sockets=sockets))
+Oct 12 05:09:18 ip-172-31-12-18 web[4106]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:09:18 ip-172-31-12-18 web[4106]:  File "/usr/lib64/python3.11/asyncio/runners.py", line 190, in run
+Oct 12 05:09:18 ip-172-31-12-18 web[4106]:    return runner.run(main)
+Oct 12 05:09:18 ip-172-31-12-18 web[4106]:           ^^^^^^^^^^^^^^^^
+Oct 12 05:09:18 ip-172-31-12-18 web[4106]:  File "/usr/lib64/python3.11/asyncio/runners.py", line 118, in run
+Oct 12 05:09:18 ip-172-31-12-18 web[4106]:    return self._loop.run_until_complete(task)
+Oct 12 05:09:18 ip-172-31-12-18 web[4106]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:09:18 ip-172-31-12-18 web[4106]:  File "/usr/lib64/python3.11/asyncio/base_events.py", line 654, in run_until_complete
+Oct 12 05:09:18 ip-172-31-12-18 web[4106]:    return future.result()
+Oct 12 05:09:18 ip-172-31-12-18 web[4106]:           ^^^^^^^^^^^^^^^
+Oct 12 05:09:18 ip-172-31-12-18 web[4106]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/server.py", line 68, in serve
+Oct 12 05:09:18 ip-172-31-12-18 web[4106]:    config.load()
+Oct 12 05:09:18 ip-172-31-12-18 web[4106]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/config.py", line 467, in load
+Oct 12 05:09:18 ip-172-31-12-18 web[4106]:    self.loaded_app = import_from_string(self.app)
+Oct 12 05:09:18 ip-172-31-12-18 web[4106]:                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:09:18 ip-172-31-12-18 web[4106]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/importer.py", line 24, in import_from_string
+Oct 12 05:09:18 ip-172-31-12-18 web[4106]:    raise exc from None
+Oct 12 05:09:18 ip-172-31-12-18 web[4106]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/importer.py", line 21, in import_from_string
+Oct 12 05:09:18 ip-172-31-12-18 web[4106]:    module = importlib.import_module(module_str)
+Oct 12 05:09:18 ip-172-31-12-18 web[4106]:             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:09:18 ip-172-31-12-18 web[4106]:  File "/usr/lib64/python3.11/importlib/__init__.py", line 126, in import_module
+Oct 12 05:09:18 ip-172-31-12-18 web[4106]:    return _bootstrap._gcd_import(name[level:], package, level)
+Oct 12 05:09:18 ip-172-31-12-18 web[4106]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:09:18 ip-172-31-12-18 web[4106]:  File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
+Oct 12 05:09:18 ip-172-31-12-18 web[4106]:  File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
+Oct 12 05:09:18 ip-172-31-12-18 web[4106]:  File "<frozen importlib._bootstrap>", line 1147, in _find_and_load_unlocked
+Oct 12 05:09:18 ip-172-31-12-18 web[4106]:  File "<frozen importlib._bootstrap>", line 690, in _load_unlocked
+Oct 12 05:09:18 ip-172-31-12-18 web[4106]:  File "<frozen importlib._bootstrap_external>", line 940, in exec_module
+Oct 12 05:09:18 ip-172-31-12-18 web[4106]:  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+Oct 12 05:09:18 ip-172-31-12-18 web[4106]:  File "/var/app/current/app/main.py", line 15, in <module>
+Oct 12 05:09:18 ip-172-31-12-18 web[4106]:    from core.database.connection import get_db_connection, SupabaseConnection
+Oct 12 05:09:18 ip-172-31-12-18 web[4106]:  File "/var/app/current/core/database/connection.py", line 8, in <module>
+Oct 12 05:09:18 ip-172-31-12-18 web[4106]:    from sqlalchemy import create_engine, text
+Oct 12 05:09:18 ip-172-31-12-18 web[4106]: ModuleNotFoundError: No module named 'sqlalchemy'
+Oct 12 05:09:20 ip-172-31-12-18 web[4111]: Traceback (most recent call last):
+Oct 12 05:09:20 ip-172-31-12-18 web[4111]:  File "/var/app/venv/staging-LQM1lest/bin/uvicorn", line 7, in <module>
+Oct 12 05:09:20 ip-172-31-12-18 web[4111]:    sys.exit(main())
+Oct 12 05:09:20 ip-172-31-12-18 web[4111]:             ^^^^^^
+Oct 12 05:09:20 ip-172-31-12-18 web[4111]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1462, in __call__
+Oct 12 05:09:20 ip-172-31-12-18 web[4111]:    return self.main(*args, **kwargs)
+Oct 12 05:09:20 ip-172-31-12-18 web[4111]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:09:20 ip-172-31-12-18 web[4111]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1383, in main
+Oct 12 05:09:20 ip-172-31-12-18 web[4111]:    rv = self.invoke(ctx)
+Oct 12 05:09:20 ip-172-31-12-18 web[4111]:         ^^^^^^^^^^^^^^^^
+Oct 12 05:09:20 ip-172-31-12-18 web[4111]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1246, in invoke
+Oct 12 05:09:20 ip-172-31-12-18 web[4111]:    return ctx.invoke(self.callback, **ctx.params)
+Oct 12 05:09:20 ip-172-31-12-18 web[4111]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:09:20 ip-172-31-12-18 web[4111]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 814, in invoke
+Oct 12 05:09:20 ip-172-31-12-18 web[4111]:    return callback(*args, **kwargs)
+Oct 12 05:09:20 ip-172-31-12-18 web[4111]:           ^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:09:20 ip-172-31-12-18 web[4111]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/main.py", line 416, in main
+Oct 12 05:09:20 ip-172-31-12-18 web[4111]:    run(
+Oct 12 05:09:20 ip-172-31-12-18 web[4111]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/main.py", line 587, in run
+Oct 12 05:09:20 ip-172-31-12-18 web[4111]:    server.run()
+Oct 12 05:09:20 ip-172-31-12-18 web[4111]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/server.py", line 61, in run
+Oct 12 05:09:20 ip-172-31-12-18 web[4111]:    return asyncio.run(self.serve(sockets=sockets))
+Oct 12 05:09:20 ip-172-31-12-18 web[4111]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:09:20 ip-172-31-12-18 web[4111]:  File "/usr/lib64/python3.11/asyncio/runners.py", line 190, in run
+Oct 12 05:09:20 ip-172-31-12-18 web[4111]:    return runner.run(main)
+Oct 12 05:09:20 ip-172-31-12-18 web[4111]:           ^^^^^^^^^^^^^^^^
+Oct 12 05:09:20 ip-172-31-12-18 web[4111]:  File "/usr/lib64/python3.11/asyncio/runners.py", line 118, in run
+Oct 12 05:09:20 ip-172-31-12-18 web[4111]:    return self._loop.run_until_complete(task)
+Oct 12 05:09:20 ip-172-31-12-18 web[4111]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:09:20 ip-172-31-12-18 web[4111]:  File "/usr/lib64/python3.11/asyncio/base_events.py", line 654, in run_until_complete
+Oct 12 05:09:20 ip-172-31-12-18 web[4111]:    return future.result()
+Oct 12 05:09:20 ip-172-31-12-18 web[4111]:           ^^^^^^^^^^^^^^^
+Oct 12 05:09:20 ip-172-31-12-18 web[4111]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/server.py", line 68, in serve
+Oct 12 05:09:20 ip-172-31-12-18 web[4111]:    config.load()
+Oct 12 05:09:20 ip-172-31-12-18 web[4111]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/config.py", line 467, in load
+Oct 12 05:09:20 ip-172-31-12-18 web[4111]:    self.loaded_app = import_from_string(self.app)
+Oct 12 05:09:20 ip-172-31-12-18 web[4111]:                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:09:20 ip-172-31-12-18 web[4111]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/importer.py", line 24, in import_from_string
+Oct 12 05:09:20 ip-172-31-12-18 web[4111]:    raise exc from None
+Oct 12 05:09:20 ip-172-31-12-18 web[4111]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/importer.py", line 21, in import_from_string
+Oct 12 05:09:20 ip-172-31-12-18 web[4111]:    module = importlib.import_module(module_str)
+Oct 12 05:09:20 ip-172-31-12-18 web[4111]:             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:09:20 ip-172-31-12-18 web[4111]:  File "/usr/lib64/python3.11/importlib/__init__.py", line 126, in import_module
+Oct 12 05:09:20 ip-172-31-12-18 web[4111]:    return _bootstrap._gcd_import(name[level:], package, level)
+Oct 12 05:09:20 ip-172-31-12-18 web[4111]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:09:20 ip-172-31-12-18 web[4111]:  File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
+Oct 12 05:09:20 ip-172-31-12-18 web[4111]:  File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
+Oct 12 05:09:20 ip-172-31-12-18 web[4111]:  File "<frozen importlib._bootstrap>", line 1147, in _find_and_load_unlocked
+Oct 12 05:09:20 ip-172-31-12-18 web[4111]:  File "<frozen importlib._bootstrap>", line 690, in _load_unlocked
+Oct 12 05:09:20 ip-172-31-12-18 web[4111]:  File "<frozen importlib._bootstrap_external>", line 940, in exec_module
+Oct 12 05:09:20 ip-172-31-12-18 web[4111]:  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+Oct 12 05:09:20 ip-172-31-12-18 web[4111]:  File "/var/app/current/app/main.py", line 15, in <module>
+Oct 12 05:09:20 ip-172-31-12-18 web[4111]:    from core.database.connection import get_db_connection, SupabaseConnection
+Oct 12 05:09:20 ip-172-31-12-18 web[4111]:  File "/var/app/current/core/database/connection.py", line 8, in <module>
+Oct 12 05:09:20 ip-172-31-12-18 web[4111]:    from sqlalchemy import create_engine, text
+Oct 12 05:09:20 ip-172-31-12-18 web[4111]: ModuleNotFoundError: No module named 'sqlalchemy'
+Oct 12 05:09:21 ip-172-31-12-18 web[4116]: Traceback (most recent call last):
+Oct 12 05:09:21 ip-172-31-12-18 web[4116]:  File "/var/app/venv/staging-LQM1lest/bin/uvicorn", line 7, in <module>
+Oct 12 05:09:21 ip-172-31-12-18 web[4116]:    sys.exit(main())
+Oct 12 05:09:21 ip-172-31-12-18 web[4116]:             ^^^^^^
+Oct 12 05:09:21 ip-172-31-12-18 web[4116]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1462, in __call__
+Oct 12 05:09:21 ip-172-31-12-18 web[4116]:    return self.main(*args, **kwargs)
+Oct 12 05:09:21 ip-172-31-12-18 web[4116]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:09:21 ip-172-31-12-18 web[4116]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1383, in main
+Oct 12 05:09:21 ip-172-31-12-18 web[4116]:    rv = self.invoke(ctx)
+Oct 12 05:09:21 ip-172-31-12-18 web[4116]:         ^^^^^^^^^^^^^^^^
+Oct 12 05:09:21 ip-172-31-12-18 web[4116]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1246, in invoke
+Oct 12 05:09:21 ip-172-31-12-18 web[4116]:    return ctx.invoke(self.callback, **ctx.params)
+Oct 12 05:09:21 ip-172-31-12-18 web[4116]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:09:21 ip-172-31-12-18 web[4116]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 814, in invoke
+Oct 12 05:09:21 ip-172-31-12-18 web[4116]:    return callback(*args, **kwargs)
+Oct 12 05:09:21 ip-172-31-12-18 web[4116]:           ^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:09:21 ip-172-31-12-18 web[4116]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/main.py", line 416, in main
+Oct 12 05:09:21 ip-172-31-12-18 web[4116]:    run(
+Oct 12 05:09:21 ip-172-31-12-18 web[4116]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/main.py", line 587, in run
+Oct 12 05:09:21 ip-172-31-12-18 web[4116]:    server.run()
+Oct 12 05:09:21 ip-172-31-12-18 web[4116]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/server.py", line 61, in run
+Oct 12 05:09:21 ip-172-31-12-18 web[4116]:    return asyncio.run(self.serve(sockets=sockets))
+Oct 12 05:09:21 ip-172-31-12-18 web[4116]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:09:21 ip-172-31-12-18 web[4116]:  File "/usr/lib64/python3.11/asyncio/runners.py", line 190, in run
+Oct 12 05:09:21 ip-172-31-12-18 web[4116]:    return runner.run(main)
+Oct 12 05:09:21 ip-172-31-12-18 web[4116]:           ^^^^^^^^^^^^^^^^
+Oct 12 05:09:21 ip-172-31-12-18 web[4116]:  File "/usr/lib64/python3.11/asyncio/runners.py", line 118, in run
+Oct 12 05:09:21 ip-172-31-12-18 web[4116]:    return self._loop.run_until_complete(task)
+Oct 12 05:09:21 ip-172-31-12-18 web[4116]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:09:21 ip-172-31-12-18 web[4116]:  File "/usr/lib64/python3.11/asyncio/base_events.py", line 654, in run_until_complete
+Oct 12 05:09:21 ip-172-31-12-18 web[4116]:    return future.result()
+Oct 12 05:09:21 ip-172-31-12-18 web[4116]:           ^^^^^^^^^^^^^^^
+Oct 12 05:09:21 ip-172-31-12-18 web[4116]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/server.py", line 68, in serve
+Oct 12 05:09:21 ip-172-31-12-18 web[4116]:    config.load()
+Oct 12 05:09:21 ip-172-31-12-18 web[4116]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/config.py", line 467, in load
+Oct 12 05:09:21 ip-172-31-12-18 web[4116]:    self.loaded_app = import_from_string(self.app)
+Oct 12 05:09:21 ip-172-31-12-18 web[4116]:                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:09:21 ip-172-31-12-18 web[4116]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/importer.py", line 24, in import_from_string
+Oct 12 05:09:21 ip-172-31-12-18 web[4116]:    raise exc from None
+Oct 12 05:09:21 ip-172-31-12-18 web[4116]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/importer.py", line 21, in import_from_string
+Oct 12 05:09:21 ip-172-31-12-18 web[4116]:    module = importlib.import_module(module_str)
+Oct 12 05:09:21 ip-172-31-12-18 web[4116]:             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:09:21 ip-172-31-12-18 web[4116]:  File "/usr/lib64/python3.11/importlib/__init__.py", line 126, in import_module
+Oct 12 05:09:21 ip-172-31-12-18 web[4116]:    return _bootstrap._gcd_import(name[level:], package, level)
+Oct 12 05:09:21 ip-172-31-12-18 web[4116]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:09:21 ip-172-31-12-18 web[4116]:  File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
+Oct 12 05:09:21 ip-172-31-12-18 web[4116]:  File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
+Oct 12 05:09:21 ip-172-31-12-18 web[4116]:  File "<frozen importlib._bootstrap>", line 1147, in _find_and_load_unlocked
+Oct 12 05:09:21 ip-172-31-12-18 web[4116]:  File "<frozen importlib._bootstrap>", line 690, in _load_unlocked
+Oct 12 05:09:21 ip-172-31-12-18 web[4116]:  File "<frozen importlib._bootstrap_external>", line 940, in exec_module
+Oct 12 05:09:21 ip-172-31-12-18 web[4116]:  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+Oct 12 05:09:21 ip-172-31-12-18 web[4116]:  File "/var/app/current/app/main.py", line 15, in <module>
+Oct 12 05:09:21 ip-172-31-12-18 web[4116]:    from core.database.connection import get_db_connection, SupabaseConnection
+Oct 12 05:09:21 ip-172-31-12-18 web[4116]:  File "/var/app/current/core/database/connection.py", line 8, in <module>
+Oct 12 05:09:21 ip-172-31-12-18 web[4116]:    from sqlalchemy import create_engine, text
+Oct 12 05:09:21 ip-172-31-12-18 web[4116]: ModuleNotFoundError: No module named 'sqlalchemy'
+Oct 12 05:17:41 ip-172-31-12-18 web[4854]: Traceback (most recent call last):
+Oct 12 05:17:41 ip-172-31-12-18 web[4854]:  File "/var/app/venv/staging-LQM1lest/bin/uvicorn", line 7, in <module>
+Oct 12 05:17:41 ip-172-31-12-18 web[4854]:    sys.exit(main())
+Oct 12 05:17:41 ip-172-31-12-18 web[4854]:             ^^^^^^
+Oct 12 05:17:41 ip-172-31-12-18 web[4854]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1462, in __call__
+Oct 12 05:17:41 ip-172-31-12-18 web[4854]:    return self.main(*args, **kwargs)
+Oct 12 05:17:41 ip-172-31-12-18 web[4854]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:17:41 ip-172-31-12-18 web[4854]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1383, in main
+Oct 12 05:17:41 ip-172-31-12-18 web[4854]:    rv = self.invoke(ctx)
+Oct 12 05:17:41 ip-172-31-12-18 web[4854]:         ^^^^^^^^^^^^^^^^
+Oct 12 05:17:41 ip-172-31-12-18 web[4854]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1246, in invoke
+Oct 12 05:17:41 ip-172-31-12-18 web[4854]:    return ctx.invoke(self.callback, **ctx.params)
+Oct 12 05:17:41 ip-172-31-12-18 web[4854]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:17:41 ip-172-31-12-18 web[4854]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 814, in invoke
+Oct 12 05:17:41 ip-172-31-12-18 web[4854]:    return callback(*args, **kwargs)
+Oct 12 05:17:41 ip-172-31-12-18 web[4854]:           ^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:17:41 ip-172-31-12-18 web[4854]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/main.py", line 416, in main
+Oct 12 05:17:41 ip-172-31-12-18 web[4854]:    run(
+Oct 12 05:17:41 ip-172-31-12-18 web[4854]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/main.py", line 587, in run
+Oct 12 05:17:41 ip-172-31-12-18 web[4854]:    server.run()
+Oct 12 05:17:41 ip-172-31-12-18 web[4854]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/server.py", line 61, in run
+Oct 12 05:17:41 ip-172-31-12-18 web[4854]:    return asyncio.run(self.serve(sockets=sockets))
+Oct 12 05:17:41 ip-172-31-12-18 web[4854]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:17:41 ip-172-31-12-18 web[4854]:  File "/usr/lib64/python3.11/asyncio/runners.py", line 190, in run
+Oct 12 05:17:41 ip-172-31-12-18 web[4854]:    return runner.run(main)
+Oct 12 05:17:41 ip-172-31-12-18 web[4854]:           ^^^^^^^^^^^^^^^^
+Oct 12 05:17:41 ip-172-31-12-18 web[4854]:  File "/usr/lib64/python3.11/asyncio/runners.py", line 118, in run
+Oct 12 05:17:41 ip-172-31-12-18 web[4854]:    return self._loop.run_until_complete(task)
+Oct 12 05:17:41 ip-172-31-12-18 web[4854]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:17:41 ip-172-31-12-18 web[4854]:  File "/usr/lib64/python3.11/asyncio/base_events.py", line 654, in run_until_complete
+Oct 12 05:17:41 ip-172-31-12-18 web[4854]:    return future.result()
+Oct 12 05:17:41 ip-172-31-12-18 web[4854]:           ^^^^^^^^^^^^^^^
+Oct 12 05:17:41 ip-172-31-12-18 web[4854]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/server.py", line 68, in serve
+Oct 12 05:17:41 ip-172-31-12-18 web[4854]:    config.load()
+Oct 12 05:17:41 ip-172-31-12-18 web[4854]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/config.py", line 467, in load
+Oct 12 05:17:41 ip-172-31-12-18 web[4854]:    self.loaded_app = import_from_string(self.app)
+Oct 12 05:17:41 ip-172-31-12-18 web[4854]:                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:17:41 ip-172-31-12-18 web[4854]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/importer.py", line 24, in import_from_string
+Oct 12 05:17:41 ip-172-31-12-18 web[4854]:    raise exc from None
+Oct 12 05:17:41 ip-172-31-12-18 web[4854]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/importer.py", line 21, in import_from_string
+Oct 12 05:17:41 ip-172-31-12-18 web[4854]:    module = importlib.import_module(module_str)
+Oct 12 05:17:41 ip-172-31-12-18 web[4854]:             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:17:41 ip-172-31-12-18 web[4854]:  File "/usr/lib64/python3.11/importlib/__init__.py", line 126, in import_module
+Oct 12 05:17:41 ip-172-31-12-18 web[4854]:    return _bootstrap._gcd_import(name[level:], package, level)
+Oct 12 05:17:41 ip-172-31-12-18 web[4854]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:17:41 ip-172-31-12-18 web[4854]:  File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
+Oct 12 05:17:41 ip-172-31-12-18 web[4854]:  File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
+Oct 12 05:17:41 ip-172-31-12-18 web[4854]:  File "<frozen importlib._bootstrap>", line 1147, in _find_and_load_unlocked
+Oct 12 05:17:41 ip-172-31-12-18 web[4854]:  File "<frozen importlib._bootstrap>", line 690, in _load_unlocked
+Oct 12 05:17:41 ip-172-31-12-18 web[4854]:  File "<frozen importlib._bootstrap_external>", line 940, in exec_module
+Oct 12 05:17:41 ip-172-31-12-18 web[4854]:  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+Oct 12 05:17:41 ip-172-31-12-18 web[4854]:  File "/var/app/current/app/main.py", line 15, in <module>
+Oct 12 05:17:41 ip-172-31-12-18 web[4854]:    from core.database.connection import get_db_connection, SupabaseConnection
+Oct 12 05:17:41 ip-172-31-12-18 web[4854]:  File "/var/app/current/core/database/connection.py", line 8, in <module>
+Oct 12 05:17:41 ip-172-31-12-18 web[4854]:    from sqlalchemy import create_engine, text
+Oct 12 05:17:41 ip-172-31-12-18 web[4854]: ModuleNotFoundError: No module named 'sqlalchemy'
+Oct 12 05:17:42 ip-172-31-12-18 web[4910]: Traceback (most recent call last):
+Oct 12 05:17:42 ip-172-31-12-18 web[4910]:  File "/var/app/venv/staging-LQM1lest/bin/uvicorn", line 7, in <module>
+Oct 12 05:17:42 ip-172-31-12-18 web[4910]:    sys.exit(main())
+Oct 12 05:17:42 ip-172-31-12-18 web[4910]:             ^^^^^^
+Oct 12 05:17:42 ip-172-31-12-18 web[4910]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1462, in __call__
+Oct 12 05:17:42 ip-172-31-12-18 web[4910]:    return self.main(*args, **kwargs)
+Oct 12 05:17:42 ip-172-31-12-18 web[4910]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:17:42 ip-172-31-12-18 web[4910]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1383, in main
+Oct 12 05:17:42 ip-172-31-12-18 web[4910]:    rv = self.invoke(ctx)
+Oct 12 05:17:42 ip-172-31-12-18 web[4910]:         ^^^^^^^^^^^^^^^^
+Oct 12 05:17:42 ip-172-31-12-18 web[4910]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1246, in invoke
+Oct 12 05:17:42 ip-172-31-12-18 web[4910]:    return ctx.invoke(self.callback, **ctx.params)
+Oct 12 05:17:42 ip-172-31-12-18 web[4910]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:17:42 ip-172-31-12-18 web[4910]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 814, in invoke
+Oct 12 05:17:42 ip-172-31-12-18 web[4910]:    return callback(*args, **kwargs)
+Oct 12 05:17:42 ip-172-31-12-18 web[4910]:           ^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:17:42 ip-172-31-12-18 web[4910]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/main.py", line 416, in main
+Oct 12 05:17:42 ip-172-31-12-18 web[4910]:    run(
+Oct 12 05:17:42 ip-172-31-12-18 web[4910]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/main.py", line 587, in run
+Oct 12 05:17:42 ip-172-31-12-18 web[4910]:    server.run()
+Oct 12 05:17:42 ip-172-31-12-18 web[4910]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/server.py", line 61, in run
+Oct 12 05:17:42 ip-172-31-12-18 web[4910]:    return asyncio.run(self.serve(sockets=sockets))
+Oct 12 05:17:42 ip-172-31-12-18 web[4910]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:17:42 ip-172-31-12-18 web[4910]:  File "/usr/lib64/python3.11/asyncio/runners.py", line 190, in run
+Oct 12 05:17:42 ip-172-31-12-18 web[4910]:    return runner.run(main)
+Oct 12 05:17:42 ip-172-31-12-18 web[4910]:           ^^^^^^^^^^^^^^^^
+Oct 12 05:17:42 ip-172-31-12-18 web[4910]:  File "/usr/lib64/python3.11/asyncio/runners.py", line 118, in run
+Oct 12 05:17:42 ip-172-31-12-18 web[4910]:    return self._loop.run_until_complete(task)
+Oct 12 05:17:42 ip-172-31-12-18 web[4910]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:17:42 ip-172-31-12-18 web[4910]:  File "/usr/lib64/python3.11/asyncio/base_events.py", line 654, in run_until_complete
+Oct 12 05:17:42 ip-172-31-12-18 web[4910]:    return future.result()
+Oct 12 05:17:42 ip-172-31-12-18 web[4910]:           ^^^^^^^^^^^^^^^
+Oct 12 05:17:42 ip-172-31-12-18 web[4910]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/server.py", line 68, in serve
+Oct 12 05:17:42 ip-172-31-12-18 web[4910]:    config.load()
+Oct 12 05:17:42 ip-172-31-12-18 web[4910]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/config.py", line 467, in load
+Oct 12 05:17:42 ip-172-31-12-18 web[4910]:    self.loaded_app = import_from_string(self.app)
+Oct 12 05:17:42 ip-172-31-12-18 web[4910]:                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:17:42 ip-172-31-12-18 web[4910]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/importer.py", line 24, in import_from_string
+Oct 12 05:17:42 ip-172-31-12-18 web[4910]:    raise exc from None
+Oct 12 05:17:42 ip-172-31-12-18 web[4910]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/importer.py", line 21, in import_from_string
+Oct 12 05:17:42 ip-172-31-12-18 web[4910]:    module = importlib.import_module(module_str)
+Oct 12 05:17:42 ip-172-31-12-18 web[4910]:             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:17:42 ip-172-31-12-18 web[4910]:  File "/usr/lib64/python3.11/importlib/__init__.py", line 126, in import_module
+Oct 12 05:17:42 ip-172-31-12-18 web[4910]:    return _bootstrap._gcd_import(name[level:], package, level)
+Oct 12 05:17:42 ip-172-31-12-18 web[4910]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:17:42 ip-172-31-12-18 web[4910]:  File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
+Oct 12 05:17:42 ip-172-31-12-18 web[4910]:  File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
+Oct 12 05:17:42 ip-172-31-12-18 web[4910]:  File "<frozen importlib._bootstrap>", line 1147, in _find_and_load_unlocked
+Oct 12 05:17:42 ip-172-31-12-18 web[4910]:  File "<frozen importlib._bootstrap>", line 690, in _load_unlocked
+Oct 12 05:17:42 ip-172-31-12-18 web[4910]:  File "<frozen importlib._bootstrap_external>", line 940, in exec_module
+Oct 12 05:17:42 ip-172-31-12-18 web[4910]:  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+Oct 12 05:17:42 ip-172-31-12-18 web[4910]:  File "/var/app/current/app/main.py", line 15, in <module>
+Oct 12 05:17:42 ip-172-31-12-18 web[4910]:    from core.database.connection import get_db_connection, SupabaseConnection
+Oct 12 05:17:42 ip-172-31-12-18 web[4910]:  File "/var/app/current/core/database/connection.py", line 8, in <module>
+Oct 12 05:17:42 ip-172-31-12-18 web[4910]:    from sqlalchemy import create_engine, text
+Oct 12 05:17:42 ip-172-31-12-18 web[4910]: ModuleNotFoundError: No module named 'sqlalchemy'
+Oct 12 05:17:43 ip-172-31-12-18 web[4915]: Traceback (most recent call last):
+Oct 12 05:17:43 ip-172-31-12-18 web[4915]:  File "/var/app/venv/staging-LQM1lest/bin/uvicorn", line 7, in <module>
+Oct 12 05:17:43 ip-172-31-12-18 web[4915]:    sys.exit(main())
+Oct 12 05:17:43 ip-172-31-12-18 web[4915]:             ^^^^^^
+Oct 12 05:17:43 ip-172-31-12-18 web[4915]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1462, in __call__
+Oct 12 05:17:43 ip-172-31-12-18 web[4915]:    return self.main(*args, **kwargs)
+Oct 12 05:17:43 ip-172-31-12-18 web[4915]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:17:43 ip-172-31-12-18 web[4915]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1383, in main
+Oct 12 05:17:43 ip-172-31-12-18 web[4915]:    rv = self.invoke(ctx)
+Oct 12 05:17:43 ip-172-31-12-18 web[4915]:         ^^^^^^^^^^^^^^^^
+Oct 12 05:17:43 ip-172-31-12-18 web[4915]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1246, in invoke
+Oct 12 05:17:43 ip-172-31-12-18 web[4915]:    return ctx.invoke(self.callback, **ctx.params)
+Oct 12 05:17:43 ip-172-31-12-18 web[4915]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:17:43 ip-172-31-12-18 web[4915]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 814, in invoke
+Oct 12 05:17:43 ip-172-31-12-18 web[4915]:    return callback(*args, **kwargs)
+Oct 12 05:17:43 ip-172-31-12-18 web[4915]:           ^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:17:43 ip-172-31-12-18 web[4915]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/main.py", line 416, in main
+Oct 12 05:17:43 ip-172-31-12-18 web[4915]:    run(
+Oct 12 05:17:43 ip-172-31-12-18 web[4915]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/main.py", line 587, in run
+Oct 12 05:17:43 ip-172-31-12-18 web[4915]:    server.run()
+Oct 12 05:17:43 ip-172-31-12-18 web[4915]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/server.py", line 61, in run
+Oct 12 05:17:43 ip-172-31-12-18 web[4915]:    return asyncio.run(self.serve(sockets=sockets))
+Oct 12 05:17:43 ip-172-31-12-18 web[4915]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:17:43 ip-172-31-12-18 web[4915]:  File "/usr/lib64/python3.11/asyncio/runners.py", line 190, in run
+Oct 12 05:17:43 ip-172-31-12-18 web[4915]:    return runner.run(main)
+Oct 12 05:17:43 ip-172-31-12-18 web[4915]:           ^^^^^^^^^^^^^^^^
+Oct 12 05:17:43 ip-172-31-12-18 web[4915]:  File "/usr/lib64/python3.11/asyncio/runners.py", line 118, in run
+Oct 12 05:17:43 ip-172-31-12-18 web[4915]:    return self._loop.run_until_complete(task)
+Oct 12 05:17:43 ip-172-31-12-18 web[4915]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:17:43 ip-172-31-12-18 web[4915]:  File "/usr/lib64/python3.11/asyncio/base_events.py", line 654, in run_until_complete
+Oct 12 05:17:43 ip-172-31-12-18 web[4915]:    return future.result()
+Oct 12 05:17:43 ip-172-31-12-18 web[4915]:           ^^^^^^^^^^^^^^^
+Oct 12 05:17:43 ip-172-31-12-18 web[4915]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/server.py", line 68, in serve
+Oct 12 05:17:43 ip-172-31-12-18 web[4915]:    config.load()
+Oct 12 05:17:43 ip-172-31-12-18 web[4915]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/config.py", line 467, in load
+Oct 12 05:17:43 ip-172-31-12-18 web[4915]:    self.loaded_app = import_from_string(self.app)
+Oct 12 05:17:43 ip-172-31-12-18 web[4915]:                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:17:43 ip-172-31-12-18 web[4915]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/importer.py", line 24, in import_from_string
+Oct 12 05:17:43 ip-172-31-12-18 web[4915]:    raise exc from None
+Oct 12 05:17:43 ip-172-31-12-18 web[4915]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/importer.py", line 21, in import_from_string
+Oct 12 05:17:43 ip-172-31-12-18 web[4915]:    module = importlib.import_module(module_str)
+Oct 12 05:17:43 ip-172-31-12-18 web[4915]:             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:17:43 ip-172-31-12-18 web[4915]:  File "/usr/lib64/python3.11/importlib/__init__.py", line 126, in import_module
+Oct 12 05:17:43 ip-172-31-12-18 web[4915]:    return _bootstrap._gcd_import(name[level:], package, level)
+Oct 12 05:17:43 ip-172-31-12-18 web[4915]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:17:43 ip-172-31-12-18 web[4915]:  File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
+Oct 12 05:17:43 ip-172-31-12-18 web[4915]:  File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
+Oct 12 05:17:43 ip-172-31-12-18 web[4915]:  File "<frozen importlib._bootstrap>", line 1147, in _find_and_load_unlocked
+Oct 12 05:17:43 ip-172-31-12-18 web[4915]:  File "<frozen importlib._bootstrap>", line 690, in _load_unlocked
+Oct 12 05:17:43 ip-172-31-12-18 web[4915]:  File "<frozen importlib._bootstrap_external>", line 940, in exec_module
+Oct 12 05:17:43 ip-172-31-12-18 web[4915]:  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+Oct 12 05:17:43 ip-172-31-12-18 web[4915]:  File "/var/app/current/app/main.py", line 15, in <module>
+Oct 12 05:17:43 ip-172-31-12-18 web[4915]:    from core.database.connection import get_db_connection, SupabaseConnection
+Oct 12 05:17:43 ip-172-31-12-18 web[4915]:  File "/var/app/current/core/database/connection.py", line 8, in <module>
+Oct 12 05:17:43 ip-172-31-12-18 web[4915]:    from sqlalchemy import create_engine, text
+Oct 12 05:17:43 ip-172-31-12-18 web[4915]: ModuleNotFoundError: No module named 'sqlalchemy'
+Oct 12 05:17:45 ip-172-31-12-18 web[4920]: Traceback (most recent call last):
+Oct 12 05:17:45 ip-172-31-12-18 web[4920]:  File "/var/app/venv/staging-LQM1lest/bin/uvicorn", line 7, in <module>
+Oct 12 05:17:45 ip-172-31-12-18 web[4920]:    sys.exit(main())
+Oct 12 05:17:45 ip-172-31-12-18 web[4920]:             ^^^^^^
+Oct 12 05:17:45 ip-172-31-12-18 web[4920]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1462, in __call__
+Oct 12 05:17:45 ip-172-31-12-18 web[4920]:    return self.main(*args, **kwargs)
+Oct 12 05:17:45 ip-172-31-12-18 web[4920]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:17:45 ip-172-31-12-18 web[4920]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1383, in main
+Oct 12 05:17:45 ip-172-31-12-18 web[4920]:    rv = self.invoke(ctx)
+Oct 12 05:17:45 ip-172-31-12-18 web[4920]:         ^^^^^^^^^^^^^^^^
+Oct 12 05:17:45 ip-172-31-12-18 web[4920]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1246, in invoke
+Oct 12 05:17:45 ip-172-31-12-18 web[4920]:    return ctx.invoke(self.callback, **ctx.params)
+Oct 12 05:17:45 ip-172-31-12-18 web[4920]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:17:45 ip-172-31-12-18 web[4920]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 814, in invoke
+Oct 12 05:17:45 ip-172-31-12-18 web[4920]:    return callback(*args, **kwargs)
+Oct 12 05:17:45 ip-172-31-12-18 web[4920]:           ^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:17:45 ip-172-31-12-18 web[4920]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/main.py", line 416, in main
+Oct 12 05:17:45 ip-172-31-12-18 web[4920]:    run(
+Oct 12 05:17:45 ip-172-31-12-18 web[4920]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/main.py", line 587, in run
+Oct 12 05:17:45 ip-172-31-12-18 web[4920]:    server.run()
+Oct 12 05:17:45 ip-172-31-12-18 web[4920]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/server.py", line 61, in run
+Oct 12 05:17:45 ip-172-31-12-18 web[4920]:    return asyncio.run(self.serve(sockets=sockets))
+Oct 12 05:17:45 ip-172-31-12-18 web[4920]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:17:45 ip-172-31-12-18 web[4920]:  File "/usr/lib64/python3.11/asyncio/runners.py", line 190, in run
+Oct 12 05:17:45 ip-172-31-12-18 web[4920]:    return runner.run(main)
+Oct 12 05:17:45 ip-172-31-12-18 web[4920]:           ^^^^^^^^^^^^^^^^
+Oct 12 05:17:45 ip-172-31-12-18 web[4920]:  File "/usr/lib64/python3.11/asyncio/runners.py", line 118, in run
+Oct 12 05:17:45 ip-172-31-12-18 web[4920]:    return self._loop.run_until_complete(task)
+Oct 12 05:17:45 ip-172-31-12-18 web[4920]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:17:45 ip-172-31-12-18 web[4920]:  File "/usr/lib64/python3.11/asyncio/base_events.py", line 654, in run_until_complete
+Oct 12 05:17:45 ip-172-31-12-18 web[4920]:    return future.result()
+Oct 12 05:17:45 ip-172-31-12-18 web[4920]:           ^^^^^^^^^^^^^^^
+Oct 12 05:17:45 ip-172-31-12-18 web[4920]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/server.py", line 68, in serve
+Oct 12 05:17:45 ip-172-31-12-18 web[4920]:    config.load()
+Oct 12 05:17:45 ip-172-31-12-18 web[4920]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/config.py", line 467, in load
+Oct 12 05:17:45 ip-172-31-12-18 web[4920]:    self.loaded_app = import_from_string(self.app)
+Oct 12 05:17:45 ip-172-31-12-18 web[4920]:                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:17:45 ip-172-31-12-18 web[4920]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/importer.py", line 24, in import_from_string
+Oct 12 05:17:45 ip-172-31-12-18 web[4920]:    raise exc from None
+Oct 12 05:17:45 ip-172-31-12-18 web[4920]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/importer.py", line 21, in import_from_string
+Oct 12 05:17:45 ip-172-31-12-18 web[4920]:    module = importlib.import_module(module_str)
+Oct 12 05:17:45 ip-172-31-12-18 web[4920]:             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:17:45 ip-172-31-12-18 web[4920]:  File "/usr/lib64/python3.11/importlib/__init__.py", line 126, in import_module
+Oct 12 05:17:45 ip-172-31-12-18 web[4920]:    return _bootstrap._gcd_import(name[level:], package, level)
+Oct 12 05:17:45 ip-172-31-12-18 web[4920]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:17:45 ip-172-31-12-18 web[4920]:  File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
+Oct 12 05:17:45 ip-172-31-12-18 web[4920]:  File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
+Oct 12 05:17:45 ip-172-31-12-18 web[4920]:  File "<frozen importlib._bootstrap>", line 1147, in _find_and_load_unlocked
+Oct 12 05:17:45 ip-172-31-12-18 web[4920]:  File "<frozen importlib._bootstrap>", line 690, in _load_unlocked
+Oct 12 05:17:45 ip-172-31-12-18 web[4920]:  File "<frozen importlib._bootstrap_external>", line 940, in exec_module
+Oct 12 05:17:45 ip-172-31-12-18 web[4920]:  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+Oct 12 05:17:45 ip-172-31-12-18 web[4920]:  File "/var/app/current/app/main.py", line 15, in <module>
+Oct 12 05:17:45 ip-172-31-12-18 web[4920]:    from core.database.connection import get_db_connection, SupabaseConnection
+Oct 12 05:17:45 ip-172-31-12-18 web[4920]:  File "/var/app/current/core/database/connection.py", line 8, in <module>
+Oct 12 05:17:45 ip-172-31-12-18 web[4920]:    from sqlalchemy import create_engine, text
+Oct 12 05:17:45 ip-172-31-12-18 web[4920]: ModuleNotFoundError: No module named 'sqlalchemy'
+Oct 12 05:17:46 ip-172-31-12-18 web[4925]: Traceback (most recent call last):
+Oct 12 05:17:46 ip-172-31-12-18 web[4925]:  File "/var/app/venv/staging-LQM1lest/bin/uvicorn", line 7, in <module>
+Oct 12 05:17:46 ip-172-31-12-18 web[4925]:    sys.exit(main())
+Oct 12 05:17:46 ip-172-31-12-18 web[4925]:             ^^^^^^
+Oct 12 05:17:46 ip-172-31-12-18 web[4925]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1462, in __call__
+Oct 12 05:17:46 ip-172-31-12-18 web[4925]:    return self.main(*args, **kwargs)
+Oct 12 05:17:46 ip-172-31-12-18 web[4925]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:17:46 ip-172-31-12-18 web[4925]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1383, in main
+Oct 12 05:17:46 ip-172-31-12-18 web[4925]:    rv = self.invoke(ctx)
+Oct 12 05:17:46 ip-172-31-12-18 web[4925]:         ^^^^^^^^^^^^^^^^
+Oct 12 05:17:46 ip-172-31-12-18 web[4925]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1246, in invoke
+Oct 12 05:17:46 ip-172-31-12-18 web[4925]:    return ctx.invoke(self.callback, **ctx.params)
+Oct 12 05:17:46 ip-172-31-12-18 web[4925]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:17:46 ip-172-31-12-18 web[4925]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 814, in invoke
+Oct 12 05:17:46 ip-172-31-12-18 web[4925]:    return callback(*args, **kwargs)
+Oct 12 05:17:46 ip-172-31-12-18 web[4925]:           ^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:17:46 ip-172-31-12-18 web[4925]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/main.py", line 416, in main
+Oct 12 05:17:46 ip-172-31-12-18 web[4925]:    run(
+Oct 12 05:17:46 ip-172-31-12-18 web[4925]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/main.py", line 587, in run
+Oct 12 05:17:46 ip-172-31-12-18 web[4925]:    server.run()
+Oct 12 05:17:46 ip-172-31-12-18 web[4925]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/server.py", line 61, in run
+Oct 12 05:17:46 ip-172-31-12-18 web[4925]:    return asyncio.run(self.serve(sockets=sockets))
+Oct 12 05:17:46 ip-172-31-12-18 web[4925]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:17:46 ip-172-31-12-18 web[4925]:  File "/usr/lib64/python3.11/asyncio/runners.py", line 190, in run
+Oct 12 05:17:46 ip-172-31-12-18 web[4925]:    return runner.run(main)
+Oct 12 05:17:46 ip-172-31-12-18 web[4925]:           ^^^^^^^^^^^^^^^^
+Oct 12 05:17:46 ip-172-31-12-18 web[4925]:  File "/usr/lib64/python3.11/asyncio/runners.py", line 118, in run
+Oct 12 05:17:46 ip-172-31-12-18 web[4925]:    return self._loop.run_until_complete(task)
+Oct 12 05:17:46 ip-172-31-12-18 web[4925]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:17:46 ip-172-31-12-18 web[4925]:  File "/usr/lib64/python3.11/asyncio/base_events.py", line 654, in run_until_complete
+Oct 12 05:17:46 ip-172-31-12-18 web[4925]:    return future.result()
+Oct 12 05:17:46 ip-172-31-12-18 web[4925]:           ^^^^^^^^^^^^^^^
+Oct 12 05:17:46 ip-172-31-12-18 web[4925]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/server.py", line 68, in serve
+Oct 12 05:17:46 ip-172-31-12-18 web[4925]:    config.load()
+Oct 12 05:17:46 ip-172-31-12-18 web[4925]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/config.py", line 467, in load
+Oct 12 05:17:46 ip-172-31-12-18 web[4925]:    self.loaded_app = import_from_string(self.app)
+Oct 12 05:17:46 ip-172-31-12-18 web[4925]:                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:17:46 ip-172-31-12-18 web[4925]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/importer.py", line 24, in import_from_string
+Oct 12 05:17:46 ip-172-31-12-18 web[4925]:    raise exc from None
+Oct 12 05:17:46 ip-172-31-12-18 web[4925]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/importer.py", line 21, in import_from_string
+Oct 12 05:17:46 ip-172-31-12-18 web[4925]:    module = importlib.import_module(module_str)
+Oct 12 05:17:46 ip-172-31-12-18 web[4925]:             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:17:46 ip-172-31-12-18 web[4925]:  File "/usr/lib64/python3.11/importlib/__init__.py", line 126, in import_module
+Oct 12 05:17:46 ip-172-31-12-18 web[4925]:    return _bootstrap._gcd_import(name[level:], package, level)
+Oct 12 05:17:46 ip-172-31-12-18 web[4925]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:17:46 ip-172-31-12-18 web[4925]:  File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
+Oct 12 05:17:46 ip-172-31-12-18 web[4925]:  File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
+Oct 12 05:17:46 ip-172-31-12-18 web[4925]:  File "<frozen importlib._bootstrap>", line 1147, in _find_and_load_unlocked
+Oct 12 05:17:46 ip-172-31-12-18 web[4925]:  File "<frozen importlib._bootstrap>", line 690, in _load_unlocked
+Oct 12 05:17:46 ip-172-31-12-18 web[4925]:  File "<frozen importlib._bootstrap_external>", line 940, in exec_module
+Oct 12 05:17:46 ip-172-31-12-18 web[4925]:  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+Oct 12 05:17:46 ip-172-31-12-18 web[4925]:  File "/var/app/current/app/main.py", line 15, in <module>
+Oct 12 05:17:46 ip-172-31-12-18 web[4925]:    from core.database.connection import get_db_connection, SupabaseConnection
+Oct 12 05:17:46 ip-172-31-12-18 web[4925]:  File "/var/app/current/core/database/connection.py", line 8, in <module>
+Oct 12 05:17:46 ip-172-31-12-18 web[4925]:    from sqlalchemy import create_engine, text
+Oct 12 05:17:46 ip-172-31-12-18 web[4925]: ModuleNotFoundError: No module named 'sqlalchemy'
+Oct 12 05:17:47 ip-172-31-12-18 web[4930]: Traceback (most recent call last):
+Oct 12 05:17:47 ip-172-31-12-18 web[4930]:  File "/var/app/venv/staging-LQM1lest/bin/uvicorn", line 7, in <module>
+Oct 12 05:17:47 ip-172-31-12-18 web[4930]:    sys.exit(main())
+Oct 12 05:17:47 ip-172-31-12-18 web[4930]:             ^^^^^^
+Oct 12 05:17:47 ip-172-31-12-18 web[4930]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1462, in __call__
+Oct 12 05:17:47 ip-172-31-12-18 web[4930]:    return self.main(*args, **kwargs)
+Oct 12 05:17:47 ip-172-31-12-18 web[4930]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:17:47 ip-172-31-12-18 web[4930]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1383, in main
+Oct 12 05:17:47 ip-172-31-12-18 web[4930]:    rv = self.invoke(ctx)
+Oct 12 05:17:47 ip-172-31-12-18 web[4930]:         ^^^^^^^^^^^^^^^^
+Oct 12 05:17:47 ip-172-31-12-18 web[4930]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1246, in invoke
+Oct 12 05:17:47 ip-172-31-12-18 web[4930]:    return ctx.invoke(self.callback, **ctx.params)
+Oct 12 05:17:47 ip-172-31-12-18 web[4930]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:17:47 ip-172-31-12-18 web[4930]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 814, in invoke
+Oct 12 05:17:47 ip-172-31-12-18 web[4930]:    return callback(*args, **kwargs)
+Oct 12 05:17:47 ip-172-31-12-18 web[4930]:           ^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:17:47 ip-172-31-12-18 web[4930]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/main.py", line 416, in main
+Oct 12 05:17:47 ip-172-31-12-18 web[4930]:    run(
+Oct 12 05:17:47 ip-172-31-12-18 web[4930]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/main.py", line 587, in run
+Oct 12 05:17:47 ip-172-31-12-18 web[4930]:    server.run()
+Oct 12 05:17:47 ip-172-31-12-18 web[4930]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/server.py", line 61, in run
+Oct 12 05:17:47 ip-172-31-12-18 web[4930]:    return asyncio.run(self.serve(sockets=sockets))
+Oct 12 05:17:47 ip-172-31-12-18 web[4930]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:17:47 ip-172-31-12-18 web[4930]:  File "/usr/lib64/python3.11/asyncio/runners.py", line 190, in run
+Oct 12 05:17:47 ip-172-31-12-18 web[4930]:    return runner.run(main)
+Oct 12 05:17:47 ip-172-31-12-18 web[4930]:           ^^^^^^^^^^^^^^^^
+Oct 12 05:17:47 ip-172-31-12-18 web[4930]:  File "/usr/lib64/python3.11/asyncio/runners.py", line 118, in run
+Oct 12 05:17:47 ip-172-31-12-18 web[4930]:    return self._loop.run_until_complete(task)
+Oct 12 05:17:47 ip-172-31-12-18 web[4930]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:17:47 ip-172-31-12-18 web[4930]:  File "/usr/lib64/python3.11/asyncio/base_events.py", line 654, in run_until_complete
+Oct 12 05:17:47 ip-172-31-12-18 web[4930]:    return future.result()
+Oct 12 05:17:47 ip-172-31-12-18 web[4930]:           ^^^^^^^^^^^^^^^
+Oct 12 05:17:47 ip-172-31-12-18 web[4930]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/server.py", line 68, in serve
+Oct 12 05:17:47 ip-172-31-12-18 web[4930]:    config.load()
+Oct 12 05:17:47 ip-172-31-12-18 web[4930]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/config.py", line 467, in load
+Oct 12 05:17:47 ip-172-31-12-18 web[4930]:    self.loaded_app = import_from_string(self.app)
+Oct 12 05:17:47 ip-172-31-12-18 web[4930]:                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:17:47 ip-172-31-12-18 web[4930]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/importer.py", line 24, in import_from_string
+Oct 12 05:17:47 ip-172-31-12-18 web[4930]:    raise exc from None
+Oct 12 05:17:47 ip-172-31-12-18 web[4930]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/importer.py", line 21, in import_from_string
+Oct 12 05:17:47 ip-172-31-12-18 web[4930]:    module = importlib.import_module(module_str)
+Oct 12 05:17:47 ip-172-31-12-18 web[4930]:             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:17:47 ip-172-31-12-18 web[4930]:  File "/usr/lib64/python3.11/importlib/__init__.py", line 126, in import_module
+Oct 12 05:17:47 ip-172-31-12-18 web[4930]:    return _bootstrap._gcd_import(name[level:], package, level)
+Oct 12 05:17:47 ip-172-31-12-18 web[4930]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:17:47 ip-172-31-12-18 web[4930]:  File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
+Oct 12 05:17:47 ip-172-31-12-18 web[4930]:  File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
+Oct 12 05:17:47 ip-172-31-12-18 web[4930]:  File "<frozen importlib._bootstrap>", line 1147, in _find_and_load_unlocked
+Oct 12 05:17:47 ip-172-31-12-18 web[4930]:  File "<frozen importlib._bootstrap>", line 690, in _load_unlocked
+Oct 12 05:17:47 ip-172-31-12-18 web[4930]:  File "<frozen importlib._bootstrap_external>", line 940, in exec_module
+Oct 12 05:17:47 ip-172-31-12-18 web[4930]:  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+Oct 12 05:17:47 ip-172-31-12-18 web[4930]:  File "/var/app/current/app/main.py", line 15, in <module>
+Oct 12 05:17:47 ip-172-31-12-18 web[4930]:    from core.database.connection import get_db_connection, SupabaseConnection
+Oct 12 05:17:47 ip-172-31-12-18 web[4930]:  File "/var/app/current/core/database/connection.py", line 8, in <module>
+Oct 12 05:17:47 ip-172-31-12-18 web[4930]:    from sqlalchemy import create_engine, text
+Oct 12 05:17:47 ip-172-31-12-18 web[4930]: ModuleNotFoundError: No module named 'sqlalchemy'
+Oct 12 05:28:12 ip-172-31-12-18 web[5804]: Traceback (most recent call last):
+Oct 12 05:28:12 ip-172-31-12-18 web[5804]:  File "/var/app/venv/staging-LQM1lest/bin/uvicorn", line 7, in <module>
+Oct 12 05:28:12 ip-172-31-12-18 web[5804]:    sys.exit(main())
+Oct 12 05:28:12 ip-172-31-12-18 web[5804]:             ^^^^^^
+Oct 12 05:28:12 ip-172-31-12-18 web[5804]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1462, in __call__
+Oct 12 05:28:12 ip-172-31-12-18 web[5804]:    return self.main(*args, **kwargs)
+Oct 12 05:28:12 ip-172-31-12-18 web[5804]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:28:12 ip-172-31-12-18 web[5804]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1383, in main
+Oct 12 05:28:12 ip-172-31-12-18 web[5804]:    rv = self.invoke(ctx)
+Oct 12 05:28:12 ip-172-31-12-18 web[5804]:         ^^^^^^^^^^^^^^^^
+Oct 12 05:28:12 ip-172-31-12-18 web[5804]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1246, in invoke
+Oct 12 05:28:12 ip-172-31-12-18 web[5804]:    return ctx.invoke(self.callback, **ctx.params)
+Oct 12 05:28:12 ip-172-31-12-18 web[5804]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:28:12 ip-172-31-12-18 web[5804]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 814, in invoke
+Oct 12 05:28:12 ip-172-31-12-18 web[5804]:    return callback(*args, **kwargs)
+Oct 12 05:28:12 ip-172-31-12-18 web[5804]:           ^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:28:12 ip-172-31-12-18 web[5804]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/main.py", line 416, in main
+Oct 12 05:28:12 ip-172-31-12-18 web[5804]:    run(
+Oct 12 05:28:12 ip-172-31-12-18 web[5804]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/main.py", line 587, in run
+Oct 12 05:28:12 ip-172-31-12-18 web[5804]:    server.run()
+Oct 12 05:28:12 ip-172-31-12-18 web[5804]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/server.py", line 61, in run
+Oct 12 05:28:12 ip-172-31-12-18 web[5804]:    return asyncio.run(self.serve(sockets=sockets))
+Oct 12 05:28:12 ip-172-31-12-18 web[5804]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:28:12 ip-172-31-12-18 web[5804]:  File "/usr/lib64/python3.11/asyncio/runners.py", line 190, in run
+Oct 12 05:28:12 ip-172-31-12-18 web[5804]:    return runner.run(main)
+Oct 12 05:28:12 ip-172-31-12-18 web[5804]:           ^^^^^^^^^^^^^^^^
+Oct 12 05:28:12 ip-172-31-12-18 web[5804]:  File "/usr/lib64/python3.11/asyncio/runners.py", line 118, in run
+Oct 12 05:28:12 ip-172-31-12-18 web[5804]:    return self._loop.run_until_complete(task)
+Oct 12 05:28:12 ip-172-31-12-18 web[5804]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:28:12 ip-172-31-12-18 web[5804]:  File "/usr/lib64/python3.11/asyncio/base_events.py", line 654, in run_until_complete
+Oct 12 05:28:12 ip-172-31-12-18 web[5804]:    return future.result()
+Oct 12 05:28:12 ip-172-31-12-18 web[5804]:           ^^^^^^^^^^^^^^^
+Oct 12 05:28:12 ip-172-31-12-18 web[5804]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/server.py", line 68, in serve
+Oct 12 05:28:12 ip-172-31-12-18 web[5804]:    config.load()
+Oct 12 05:28:12 ip-172-31-12-18 web[5804]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/config.py", line 467, in load
+Oct 12 05:28:12 ip-172-31-12-18 web[5804]:    self.loaded_app = import_from_string(self.app)
+Oct 12 05:28:12 ip-172-31-12-18 web[5804]:                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:28:12 ip-172-31-12-18 web[5804]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/importer.py", line 21, in import_from_string
+Oct 12 05:28:12 ip-172-31-12-18 web[5804]:    module = importlib.import_module(module_str)
+Oct 12 05:28:12 ip-172-31-12-18 web[5804]:             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:28:12 ip-172-31-12-18 web[5804]:  File "/usr/lib64/python3.11/importlib/__init__.py", line 126, in import_module
+Oct 12 05:28:12 ip-172-31-12-18 web[5804]:    return _bootstrap._gcd_import(name[level:], package, level)
+Oct 12 05:28:12 ip-172-31-12-18 web[5804]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:28:12 ip-172-31-12-18 web[5804]:  File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
+Oct 12 05:28:12 ip-172-31-12-18 web[5804]:  File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
+Oct 12 05:28:12 ip-172-31-12-18 web[5804]:  File "<frozen importlib._bootstrap>", line 1147, in _find_and_load_unlocked
+Oct 12 05:28:12 ip-172-31-12-18 web[5804]:  File "<frozen importlib._bootstrap>", line 690, in _load_unlocked
+Oct 12 05:28:12 ip-172-31-12-18 web[5804]:  File "<frozen importlib._bootstrap_external>", line 940, in exec_module
+Oct 12 05:28:12 ip-172-31-12-18 web[5804]:  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+Oct 12 05:28:12 ip-172-31-12-18 web[5804]:  File "/var/app/current/app/main.py", line 8, in <module>
+Oct 12 05:28:12 ip-172-31-12-18 web[5804]:    from core.database.supabase_only import get_supabase_db, SupabaseOnlyConnection
+Oct 12 05:28:12 ip-172-31-12-18 web[5804]:  File "/var/app/current/core/database/supabase_only.py", line 10, in <module>
+Oct 12 05:28:12 ip-172-31-12-18 web[5804]:    from ...app.config import get_settings
+Oct 12 05:28:12 ip-172-31-12-18 web[5804]: ImportError: attempted relative import beyond top-level package
+Oct 12 05:28:13 ip-172-31-12-18 web[5860]: Traceback (most recent call last):
+Oct 12 05:28:13 ip-172-31-12-18 web[5860]:  File "/var/app/venv/staging-LQM1lest/bin/uvicorn", line 7, in <module>
+Oct 12 05:28:13 ip-172-31-12-18 web[5860]:    sys.exit(main())
+Oct 12 05:28:13 ip-172-31-12-18 web[5860]:             ^^^^^^
+Oct 12 05:28:13 ip-172-31-12-18 web[5860]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1462, in __call__
+Oct 12 05:28:13 ip-172-31-12-18 web[5860]:    return self.main(*args, **kwargs)
+Oct 12 05:28:13 ip-172-31-12-18 web[5860]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:28:13 ip-172-31-12-18 web[5860]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1383, in main
+Oct 12 05:28:13 ip-172-31-12-18 web[5860]:    rv = self.invoke(ctx)
+Oct 12 05:28:13 ip-172-31-12-18 web[5860]:         ^^^^^^^^^^^^^^^^
+Oct 12 05:28:13 ip-172-31-12-18 web[5860]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1246, in invoke
+Oct 12 05:28:13 ip-172-31-12-18 web[5860]:    return ctx.invoke(self.callback, **ctx.params)
+Oct 12 05:28:13 ip-172-31-12-18 web[5860]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:28:13 ip-172-31-12-18 web[5860]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 814, in invoke
+Oct 12 05:28:13 ip-172-31-12-18 web[5860]:    return callback(*args, **kwargs)
+Oct 12 05:28:13 ip-172-31-12-18 web[5860]:           ^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:28:13 ip-172-31-12-18 web[5860]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/main.py", line 416, in main
+Oct 12 05:28:13 ip-172-31-12-18 web[5860]:    run(
+Oct 12 05:28:13 ip-172-31-12-18 web[5860]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/main.py", line 587, in run
+Oct 12 05:28:13 ip-172-31-12-18 web[5860]:    server.run()
+Oct 12 05:28:13 ip-172-31-12-18 web[5860]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/server.py", line 61, in run
+Oct 12 05:28:13 ip-172-31-12-18 web[5860]:    return asyncio.run(self.serve(sockets=sockets))
+Oct 12 05:28:13 ip-172-31-12-18 web[5860]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:28:13 ip-172-31-12-18 web[5860]:  File "/usr/lib64/python3.11/asyncio/runners.py", line 190, in run
+Oct 12 05:28:13 ip-172-31-12-18 web[5860]:    return runner.run(main)
+Oct 12 05:28:13 ip-172-31-12-18 web[5860]:           ^^^^^^^^^^^^^^^^
+Oct 12 05:28:13 ip-172-31-12-18 web[5860]:  File "/usr/lib64/python3.11/asyncio/runners.py", line 118, in run
+Oct 12 05:28:13 ip-172-31-12-18 web[5860]:    return self._loop.run_until_complete(task)
+Oct 12 05:28:13 ip-172-31-12-18 web[5860]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:28:13 ip-172-31-12-18 web[5860]:  File "/usr/lib64/python3.11/asyncio/base_events.py", line 654, in run_until_complete
+Oct 12 05:28:13 ip-172-31-12-18 web[5860]:    return future.result()
+Oct 12 05:28:13 ip-172-31-12-18 web[5860]:           ^^^^^^^^^^^^^^^
+Oct 12 05:28:13 ip-172-31-12-18 web[5860]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/server.py", line 68, in serve
+Oct 12 05:28:13 ip-172-31-12-18 web[5860]:    config.load()
+Oct 12 05:28:13 ip-172-31-12-18 web[5860]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/config.py", line 467, in load
+Oct 12 05:28:13 ip-172-31-12-18 web[5860]:    self.loaded_app = import_from_string(self.app)
+Oct 12 05:28:13 ip-172-31-12-18 web[5860]:                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:28:13 ip-172-31-12-18 web[5860]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/importer.py", line 21, in import_from_string
+Oct 12 05:28:13 ip-172-31-12-18 web[5860]:    module = importlib.import_module(module_str)
+Oct 12 05:28:13 ip-172-31-12-18 web[5860]:             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:28:13 ip-172-31-12-18 web[5860]:  File "/usr/lib64/python3.11/importlib/__init__.py", line 126, in import_module
+Oct 12 05:28:13 ip-172-31-12-18 web[5860]:    return _bootstrap._gcd_import(name[level:], package, level)
+Oct 12 05:28:13 ip-172-31-12-18 web[5860]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:28:13 ip-172-31-12-18 web[5860]:  File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
+Oct 12 05:28:13 ip-172-31-12-18 web[5860]:  File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
+Oct 12 05:28:13 ip-172-31-12-18 web[5860]:  File "<frozen importlib._bootstrap>", line 1147, in _find_and_load_unlocked
+Oct 12 05:28:13 ip-172-31-12-18 web[5860]:  File "<frozen importlib._bootstrap>", line 690, in _load_unlocked
+Oct 12 05:28:13 ip-172-31-12-18 web[5860]:  File "<frozen importlib._bootstrap_external>", line 940, in exec_module
+Oct 12 05:28:13 ip-172-31-12-18 web[5860]:  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+Oct 12 05:28:13 ip-172-31-12-18 web[5860]:  File "/var/app/current/app/main.py", line 8, in <module>
+Oct 12 05:28:13 ip-172-31-12-18 web[5860]:    from core.database.supabase_only import get_supabase_db, SupabaseOnlyConnection
+Oct 12 05:28:13 ip-172-31-12-18 web[5860]:  File "/var/app/current/core/database/supabase_only.py", line 10, in <module>
+Oct 12 05:28:13 ip-172-31-12-18 web[5860]:    from ...app.config import get_settings
+Oct 12 05:28:13 ip-172-31-12-18 web[5860]: ImportError: attempted relative import beyond top-level package
+Oct 12 05:28:14 ip-172-31-12-18 web[5865]: Traceback (most recent call last):
+Oct 12 05:28:14 ip-172-31-12-18 web[5865]:  File "/var/app/venv/staging-LQM1lest/bin/uvicorn", line 7, in <module>
+Oct 12 05:28:14 ip-172-31-12-18 web[5865]:    sys.exit(main())
+Oct 12 05:28:14 ip-172-31-12-18 web[5865]:             ^^^^^^
+Oct 12 05:28:14 ip-172-31-12-18 web[5865]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1462, in __call__
+Oct 12 05:28:14 ip-172-31-12-18 web[5865]:    return self.main(*args, **kwargs)
+Oct 12 05:28:14 ip-172-31-12-18 web[5865]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:28:14 ip-172-31-12-18 web[5865]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1383, in main
+Oct 12 05:28:14 ip-172-31-12-18 web[5865]:    rv = self.invoke(ctx)
+Oct 12 05:28:14 ip-172-31-12-18 web[5865]:         ^^^^^^^^^^^^^^^^
+Oct 12 05:28:14 ip-172-31-12-18 web[5865]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1246, in invoke
+Oct 12 05:28:14 ip-172-31-12-18 web[5865]:    return ctx.invoke(self.callback, **ctx.params)
+Oct 12 05:28:14 ip-172-31-12-18 web[5865]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:28:14 ip-172-31-12-18 web[5865]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 814, in invoke
+Oct 12 05:28:14 ip-172-31-12-18 web[5865]:    return callback(*args, **kwargs)
+Oct 12 05:28:14 ip-172-31-12-18 web[5865]:           ^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:28:14 ip-172-31-12-18 web[5865]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/main.py", line 416, in main
+Oct 12 05:28:14 ip-172-31-12-18 web[5865]:    run(
+Oct 12 05:28:14 ip-172-31-12-18 web[5865]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/main.py", line 587, in run
+Oct 12 05:28:14 ip-172-31-12-18 web[5865]:    server.run()
+Oct 12 05:28:14 ip-172-31-12-18 web[5865]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/server.py", line 61, in run
+Oct 12 05:28:14 ip-172-31-12-18 web[5865]:    return asyncio.run(self.serve(sockets=sockets))
+Oct 12 05:28:14 ip-172-31-12-18 web[5865]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:28:14 ip-172-31-12-18 web[5865]:  File "/usr/lib64/python3.11/asyncio/runners.py", line 190, in run
+Oct 12 05:28:14 ip-172-31-12-18 web[5865]:    return runner.run(main)
+Oct 12 05:28:14 ip-172-31-12-18 web[5865]:           ^^^^^^^^^^^^^^^^
+Oct 12 05:28:14 ip-172-31-12-18 web[5865]:  File "/usr/lib64/python3.11/asyncio/runners.py", line 118, in run
+Oct 12 05:28:14 ip-172-31-12-18 web[5865]:    return self._loop.run_until_complete(task)
+Oct 12 05:28:14 ip-172-31-12-18 web[5865]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:28:14 ip-172-31-12-18 web[5865]:  File "/usr/lib64/python3.11/asyncio/base_events.py", line 654, in run_until_complete
+Oct 12 05:28:14 ip-172-31-12-18 web[5865]:    return future.result()
+Oct 12 05:28:14 ip-172-31-12-18 web[5865]:           ^^^^^^^^^^^^^^^
+Oct 12 05:28:14 ip-172-31-12-18 web[5865]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/server.py", line 68, in serve
+Oct 12 05:28:14 ip-172-31-12-18 web[5865]:    config.load()
+Oct 12 05:28:14 ip-172-31-12-18 web[5865]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/config.py", line 467, in load
+Oct 12 05:28:14 ip-172-31-12-18 web[5865]:    self.loaded_app = import_from_string(self.app)
+Oct 12 05:28:14 ip-172-31-12-18 web[5865]:                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:28:14 ip-172-31-12-18 web[5865]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/importer.py", line 21, in import_from_string
+Oct 12 05:28:14 ip-172-31-12-18 web[5865]:    module = importlib.import_module(module_str)
+Oct 12 05:28:14 ip-172-31-12-18 web[5865]:             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:28:14 ip-172-31-12-18 web[5865]:  File "/usr/lib64/python3.11/importlib/__init__.py", line 126, in import_module
+Oct 12 05:28:14 ip-172-31-12-18 web[5865]:    return _bootstrap._gcd_import(name[level:], package, level)
+Oct 12 05:28:14 ip-172-31-12-18 web[5865]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:28:14 ip-172-31-12-18 web[5865]:  File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
+Oct 12 05:28:14 ip-172-31-12-18 web[5865]:  File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
+Oct 12 05:28:14 ip-172-31-12-18 web[5865]:  File "<frozen importlib._bootstrap>", line 1147, in _find_and_load_unlocked
+Oct 12 05:28:14 ip-172-31-12-18 web[5865]:  File "<frozen importlib._bootstrap>", line 690, in _load_unlocked
+Oct 12 05:28:14 ip-172-31-12-18 web[5865]:  File "<frozen importlib._bootstrap_external>", line 940, in exec_module
+Oct 12 05:28:14 ip-172-31-12-18 web[5865]:  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+Oct 12 05:28:14 ip-172-31-12-18 web[5865]:  File "/var/app/current/app/main.py", line 8, in <module>
+Oct 12 05:28:14 ip-172-31-12-18 web[5865]:    from core.database.supabase_only import get_supabase_db, SupabaseOnlyConnection
+Oct 12 05:28:14 ip-172-31-12-18 web[5865]:  File "/var/app/current/core/database/supabase_only.py", line 10, in <module>
+Oct 12 05:28:14 ip-172-31-12-18 web[5865]:    from ...app.config import get_settings
+Oct 12 05:28:14 ip-172-31-12-18 web[5865]: ImportError: attempted relative import beyond top-level package
+Oct 12 05:28:16 ip-172-31-12-18 web[5871]: Traceback (most recent call last):
+Oct 12 05:28:16 ip-172-31-12-18 web[5871]:  File "/var/app/venv/staging-LQM1lest/bin/uvicorn", line 7, in <module>
+Oct 12 05:28:16 ip-172-31-12-18 web[5871]:    sys.exit(main())
+Oct 12 05:28:16 ip-172-31-12-18 web[5871]:             ^^^^^^
+Oct 12 05:28:16 ip-172-31-12-18 web[5871]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1462, in __call__
+Oct 12 05:28:16 ip-172-31-12-18 web[5871]:    return self.main(*args, **kwargs)
+Oct 12 05:28:16 ip-172-31-12-18 web[5871]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:28:16 ip-172-31-12-18 web[5871]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1383, in main
+Oct 12 05:28:16 ip-172-31-12-18 web[5871]:    rv = self.invoke(ctx)
+Oct 12 05:28:16 ip-172-31-12-18 web[5871]:         ^^^^^^^^^^^^^^^^
+Oct 12 05:28:16 ip-172-31-12-18 web[5871]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1246, in invoke
+Oct 12 05:28:16 ip-172-31-12-18 web[5871]:    return ctx.invoke(self.callback, **ctx.params)
+Oct 12 05:28:16 ip-172-31-12-18 web[5871]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:28:16 ip-172-31-12-18 web[5871]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 814, in invoke
+Oct 12 05:28:16 ip-172-31-12-18 web[5871]:    return callback(*args, **kwargs)
+Oct 12 05:28:16 ip-172-31-12-18 web[5871]:           ^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:28:16 ip-172-31-12-18 web[5871]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/main.py", line 416, in main
+Oct 12 05:28:16 ip-172-31-12-18 web[5871]:    run(
+Oct 12 05:28:16 ip-172-31-12-18 web[5871]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/main.py", line 587, in run
+Oct 12 05:28:16 ip-172-31-12-18 web[5871]:    server.run()
+Oct 12 05:28:16 ip-172-31-12-18 web[5871]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/server.py", line 61, in run
+Oct 12 05:28:16 ip-172-31-12-18 web[5871]:    return asyncio.run(self.serve(sockets=sockets))
+Oct 12 05:28:16 ip-172-31-12-18 web[5871]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:28:16 ip-172-31-12-18 web[5871]:  File "/usr/lib64/python3.11/asyncio/runners.py", line 190, in run
+Oct 12 05:28:16 ip-172-31-12-18 web[5871]:    return runner.run(main)
+Oct 12 05:28:16 ip-172-31-12-18 web[5871]:           ^^^^^^^^^^^^^^^^
+Oct 12 05:28:16 ip-172-31-12-18 web[5871]:  File "/usr/lib64/python3.11/asyncio/runners.py", line 118, in run
+Oct 12 05:28:16 ip-172-31-12-18 web[5871]:    return self._loop.run_until_complete(task)
+Oct 12 05:28:16 ip-172-31-12-18 web[5871]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:28:16 ip-172-31-12-18 web[5871]:  File "/usr/lib64/python3.11/asyncio/base_events.py", line 654, in run_until_complete
+Oct 12 05:28:16 ip-172-31-12-18 web[5871]:    return future.result()
+Oct 12 05:28:16 ip-172-31-12-18 web[5871]:           ^^^^^^^^^^^^^^^
+Oct 12 05:28:16 ip-172-31-12-18 web[5871]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/server.py", line 68, in serve
+Oct 12 05:28:16 ip-172-31-12-18 web[5871]:    config.load()
+Oct 12 05:28:16 ip-172-31-12-18 web[5871]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/config.py", line 467, in load
+Oct 12 05:28:16 ip-172-31-12-18 web[5871]:    self.loaded_app = import_from_string(self.app)
+Oct 12 05:28:16 ip-172-31-12-18 web[5871]:                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:28:16 ip-172-31-12-18 web[5871]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/importer.py", line 21, in import_from_string
+Oct 12 05:28:16 ip-172-31-12-18 web[5871]:    module = importlib.import_module(module_str)
+Oct 12 05:28:16 ip-172-31-12-18 web[5871]:             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:28:16 ip-172-31-12-18 web[5871]:  File "/usr/lib64/python3.11/importlib/__init__.py", line 126, in import_module
+Oct 12 05:28:16 ip-172-31-12-18 web[5871]:    return _bootstrap._gcd_import(name[level:], package, level)
+Oct 12 05:28:16 ip-172-31-12-18 web[5871]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:28:16 ip-172-31-12-18 web[5871]:  File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
+Oct 12 05:28:16 ip-172-31-12-18 web[5871]:  File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
+Oct 12 05:28:16 ip-172-31-12-18 web[5871]:  File "<frozen importlib._bootstrap>", line 1147, in _find_and_load_unlocked
+Oct 12 05:28:16 ip-172-31-12-18 web[5871]:  File "<frozen importlib._bootstrap>", line 690, in _load_unlocked
+Oct 12 05:28:16 ip-172-31-12-18 web[5871]:  File "<frozen importlib._bootstrap_external>", line 940, in exec_module
+Oct 12 05:28:16 ip-172-31-12-18 web[5871]:  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+Oct 12 05:28:16 ip-172-31-12-18 web[5871]:  File "/var/app/current/app/main.py", line 8, in <module>
+Oct 12 05:28:16 ip-172-31-12-18 web[5871]:    from core.database.supabase_only import get_supabase_db, SupabaseOnlyConnection
+Oct 12 05:28:16 ip-172-31-12-18 web[5871]:  File "/var/app/current/core/database/supabase_only.py", line 10, in <module>
+Oct 12 05:28:16 ip-172-31-12-18 web[5871]:    from ...app.config import get_settings
+Oct 12 05:28:16 ip-172-31-12-18 web[5871]: ImportError: attempted relative import beyond top-level package
+Oct 12 05:28:17 ip-172-31-12-18 web[5876]: Traceback (most recent call last):
+Oct 12 05:28:17 ip-172-31-12-18 web[5876]:  File "/var/app/venv/staging-LQM1lest/bin/uvicorn", line 7, in <module>
+Oct 12 05:28:17 ip-172-31-12-18 web[5876]:    sys.exit(main())
+Oct 12 05:28:17 ip-172-31-12-18 web[5876]:             ^^^^^^
+Oct 12 05:28:17 ip-172-31-12-18 web[5876]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1462, in __call__
+Oct 12 05:28:17 ip-172-31-12-18 web[5876]:    return self.main(*args, **kwargs)
+Oct 12 05:28:17 ip-172-31-12-18 web[5876]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:28:17 ip-172-31-12-18 web[5876]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1383, in main
+Oct 12 05:28:17 ip-172-31-12-18 web[5876]:    rv = self.invoke(ctx)
+Oct 12 05:28:17 ip-172-31-12-18 web[5876]:         ^^^^^^^^^^^^^^^^
+Oct 12 05:28:17 ip-172-31-12-18 web[5876]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1246, in invoke
+Oct 12 05:28:17 ip-172-31-12-18 web[5876]:    return ctx.invoke(self.callback, **ctx.params)
+Oct 12 05:28:17 ip-172-31-12-18 web[5876]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:28:17 ip-172-31-12-18 web[5876]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 814, in invoke
+Oct 12 05:28:17 ip-172-31-12-18 web[5876]:    return callback(*args, **kwargs)
+Oct 12 05:28:17 ip-172-31-12-18 web[5876]:           ^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:28:17 ip-172-31-12-18 web[5876]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/main.py", line 416, in main
+Oct 12 05:28:17 ip-172-31-12-18 web[5876]:    run(
+Oct 12 05:28:17 ip-172-31-12-18 web[5876]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/main.py", line 587, in run
+Oct 12 05:28:17 ip-172-31-12-18 web[5876]:    server.run()
+Oct 12 05:28:17 ip-172-31-12-18 web[5876]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/server.py", line 61, in run
+Oct 12 05:28:17 ip-172-31-12-18 web[5876]:    return asyncio.run(self.serve(sockets=sockets))
+Oct 12 05:28:17 ip-172-31-12-18 web[5876]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:28:17 ip-172-31-12-18 web[5876]:  File "/usr/lib64/python3.11/asyncio/runners.py", line 190, in run
+Oct 12 05:28:17 ip-172-31-12-18 web[5876]:    return runner.run(main)
+Oct 12 05:28:17 ip-172-31-12-18 web[5876]:           ^^^^^^^^^^^^^^^^
+Oct 12 05:28:17 ip-172-31-12-18 web[5876]:  File "/usr/lib64/python3.11/asyncio/runners.py", line 118, in run
+Oct 12 05:28:17 ip-172-31-12-18 web[5876]:    return self._loop.run_until_complete(task)
+Oct 12 05:28:17 ip-172-31-12-18 web[5876]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:28:17 ip-172-31-12-18 web[5876]:  File "/usr/lib64/python3.11/asyncio/base_events.py", line 654, in run_until_complete
+Oct 12 05:28:17 ip-172-31-12-18 web[5876]:    return future.result()
+Oct 12 05:28:17 ip-172-31-12-18 web[5876]:           ^^^^^^^^^^^^^^^
+Oct 12 05:28:17 ip-172-31-12-18 web[5876]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/server.py", line 68, in serve
+Oct 12 05:28:17 ip-172-31-12-18 web[5876]:    config.load()
+Oct 12 05:28:17 ip-172-31-12-18 web[5876]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/config.py", line 467, in load
+Oct 12 05:28:17 ip-172-31-12-18 web[5876]:    self.loaded_app = import_from_string(self.app)
+Oct 12 05:28:17 ip-172-31-12-18 web[5876]:                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:28:17 ip-172-31-12-18 web[5876]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/importer.py", line 21, in import_from_string
+Oct 12 05:28:17 ip-172-31-12-18 web[5876]:    module = importlib.import_module(module_str)
+Oct 12 05:28:17 ip-172-31-12-18 web[5876]:             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:28:17 ip-172-31-12-18 web[5876]:  File "/usr/lib64/python3.11/importlib/__init__.py", line 126, in import_module
+Oct 12 05:28:17 ip-172-31-12-18 web[5876]:    return _bootstrap._gcd_import(name[level:], package, level)
+Oct 12 05:28:17 ip-172-31-12-18 web[5876]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:28:17 ip-172-31-12-18 web[5876]:  File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
+Oct 12 05:28:17 ip-172-31-12-18 web[5876]:  File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
+Oct 12 05:28:17 ip-172-31-12-18 web[5876]:  File "<frozen importlib._bootstrap>", line 1147, in _find_and_load_unlocked
+Oct 12 05:28:17 ip-172-31-12-18 web[5876]:  File "<frozen importlib._bootstrap>", line 690, in _load_unlocked
+Oct 12 05:28:17 ip-172-31-12-18 web[5876]:  File "<frozen importlib._bootstrap_external>", line 940, in exec_module
+Oct 12 05:28:17 ip-172-31-12-18 web[5876]:  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+Oct 12 05:28:17 ip-172-31-12-18 web[5876]:  File "/var/app/current/app/main.py", line 8, in <module>
+Oct 12 05:28:17 ip-172-31-12-18 web[5876]:    from core.database.supabase_only import get_supabase_db, SupabaseOnlyConnection
+Oct 12 05:28:17 ip-172-31-12-18 web[5876]:  File "/var/app/current/core/database/supabase_only.py", line 10, in <module>
+Oct 12 05:28:17 ip-172-31-12-18 web[5876]:    from ...app.config import get_settings
+Oct 12 05:28:17 ip-172-31-12-18 web[5876]: ImportError: attempted relative import beyond top-level package
+Oct 12 05:28:18 ip-172-31-12-18 web[5881]: Traceback (most recent call last):
+Oct 12 05:28:18 ip-172-31-12-18 web[5881]:  File "/var/app/venv/staging-LQM1lest/bin/uvicorn", line 7, in <module>
+Oct 12 05:28:18 ip-172-31-12-18 web[5881]:    sys.exit(main())
+Oct 12 05:28:18 ip-172-31-12-18 web[5881]:             ^^^^^^
+Oct 12 05:28:18 ip-172-31-12-18 web[5881]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1462, in __call__
+Oct 12 05:28:18 ip-172-31-12-18 web[5881]:    return self.main(*args, **kwargs)
+Oct 12 05:28:18 ip-172-31-12-18 web[5881]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:28:18 ip-172-31-12-18 web[5881]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1383, in main
+Oct 12 05:28:18 ip-172-31-12-18 web[5881]:    rv = self.invoke(ctx)
+Oct 12 05:28:18 ip-172-31-12-18 web[5881]:         ^^^^^^^^^^^^^^^^
+Oct 12 05:28:18 ip-172-31-12-18 web[5881]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1246, in invoke
+Oct 12 05:28:18 ip-172-31-12-18 web[5881]:    return ctx.invoke(self.callback, **ctx.params)
+Oct 12 05:28:18 ip-172-31-12-18 web[5881]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:28:18 ip-172-31-12-18 web[5881]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 814, in invoke
+Oct 12 05:28:18 ip-172-31-12-18 web[5881]:    return callback(*args, **kwargs)
+Oct 12 05:28:18 ip-172-31-12-18 web[5881]:           ^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:28:18 ip-172-31-12-18 web[5881]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/main.py", line 416, in main
+Oct 12 05:28:18 ip-172-31-12-18 web[5881]:    run(
+Oct 12 05:28:18 ip-172-31-12-18 web[5881]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/main.py", line 587, in run
+Oct 12 05:28:18 ip-172-31-12-18 web[5881]:    server.run()
+Oct 12 05:28:18 ip-172-31-12-18 web[5881]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/server.py", line 61, in run
+Oct 12 05:28:18 ip-172-31-12-18 web[5881]:    return asyncio.run(self.serve(sockets=sockets))
+Oct 12 05:28:18 ip-172-31-12-18 web[5881]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:28:18 ip-172-31-12-18 web[5881]:  File "/usr/lib64/python3.11/asyncio/runners.py", line 190, in run
+Oct 12 05:28:18 ip-172-31-12-18 web[5881]:    return runner.run(main)
+Oct 12 05:28:18 ip-172-31-12-18 web[5881]:           ^^^^^^^^^^^^^^^^
+Oct 12 05:28:18 ip-172-31-12-18 web[5881]:  File "/usr/lib64/python3.11/asyncio/runners.py", line 118, in run
+Oct 12 05:28:18 ip-172-31-12-18 web[5881]:    return self._loop.run_until_complete(task)
+Oct 12 05:28:18 ip-172-31-12-18 web[5881]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:28:18 ip-172-31-12-18 web[5881]:  File "/usr/lib64/python3.11/asyncio/base_events.py", line 654, in run_until_complete
+Oct 12 05:28:18 ip-172-31-12-18 web[5881]:    return future.result()
+Oct 12 05:28:18 ip-172-31-12-18 web[5881]:           ^^^^^^^^^^^^^^^
+Oct 12 05:28:18 ip-172-31-12-18 web[5881]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/server.py", line 68, in serve
+Oct 12 05:28:18 ip-172-31-12-18 web[5881]:    config.load()
+Oct 12 05:28:18 ip-172-31-12-18 web[5881]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/config.py", line 467, in load
+Oct 12 05:28:18 ip-172-31-12-18 web[5881]:    self.loaded_app = import_from_string(self.app)
+Oct 12 05:28:18 ip-172-31-12-18 web[5881]:                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:28:18 ip-172-31-12-18 web[5881]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/importer.py", line 21, in import_from_string
+Oct 12 05:28:18 ip-172-31-12-18 web[5881]:    module = importlib.import_module(module_str)
+Oct 12 05:28:18 ip-172-31-12-18 web[5881]:             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:28:18 ip-172-31-12-18 web[5881]:  File "/usr/lib64/python3.11/importlib/__init__.py", line 126, in import_module
+Oct 12 05:28:18 ip-172-31-12-18 web[5881]:    return _bootstrap._gcd_import(name[level:], package, level)
+Oct 12 05:28:18 ip-172-31-12-18 web[5881]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:28:18 ip-172-31-12-18 web[5881]:  File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
+Oct 12 05:28:18 ip-172-31-12-18 web[5881]:  File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
+Oct 12 05:28:18 ip-172-31-12-18 web[5881]:  File "<frozen importlib._bootstrap>", line 1147, in _find_and_load_unlocked
+Oct 12 05:28:18 ip-172-31-12-18 web[5881]:  File "<frozen importlib._bootstrap>", line 690, in _load_unlocked
+Oct 12 05:28:18 ip-172-31-12-18 web[5881]:  File "<frozen importlib._bootstrap_external>", line 940, in exec_module
+Oct 12 05:28:18 ip-172-31-12-18 web[5881]:  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+Oct 12 05:28:18 ip-172-31-12-18 web[5881]:  File "/var/app/current/app/main.py", line 8, in <module>
+Oct 12 05:28:18 ip-172-31-12-18 web[5881]:    from core.database.supabase_only import get_supabase_db, SupabaseOnlyConnection
+Oct 12 05:28:18 ip-172-31-12-18 web[5881]:  File "/var/app/current/core/database/supabase_only.py", line 10, in <module>
+Oct 12 05:28:18 ip-172-31-12-18 web[5881]:    from ...app.config import get_settings
+Oct 12 05:28:18 ip-172-31-12-18 web[5881]: ImportError: attempted relative import beyond top-level package
+Oct 12 05:33:39 ip-172-31-12-18 web[6538]: Traceback (most recent call last):
+Oct 12 05:33:39 ip-172-31-12-18 web[6538]:  File "/var/app/venv/staging-LQM1lest/bin/uvicorn", line 7, in <module>
+Oct 12 05:33:39 ip-172-31-12-18 web[6538]:    sys.exit(main())
+Oct 12 05:33:39 ip-172-31-12-18 web[6538]:             ^^^^^^
+Oct 12 05:33:39 ip-172-31-12-18 web[6538]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1462, in __call__
+Oct 12 05:33:39 ip-172-31-12-18 web[6538]:    return self.main(*args, **kwargs)
+Oct 12 05:33:39 ip-172-31-12-18 web[6538]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:33:39 ip-172-31-12-18 web[6538]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1383, in main
+Oct 12 05:33:39 ip-172-31-12-18 web[6538]:    rv = self.invoke(ctx)
+Oct 12 05:33:39 ip-172-31-12-18 web[6538]:         ^^^^^^^^^^^^^^^^
+Oct 12 05:33:39 ip-172-31-12-18 web[6538]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1246, in invoke
+Oct 12 05:33:39 ip-172-31-12-18 web[6538]:    return ctx.invoke(self.callback, **ctx.params)
+Oct 12 05:33:39 ip-172-31-12-18 web[6538]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:33:39 ip-172-31-12-18 web[6538]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 814, in invoke
+Oct 12 05:33:39 ip-172-31-12-18 web[6538]:    return callback(*args, **kwargs)
+Oct 12 05:33:39 ip-172-31-12-18 web[6538]:           ^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:33:39 ip-172-31-12-18 web[6538]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/main.py", line 416, in main
+Oct 12 05:33:39 ip-172-31-12-18 web[6538]:    run(
+Oct 12 05:33:39 ip-172-31-12-18 web[6538]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/main.py", line 587, in run
+Oct 12 05:33:39 ip-172-31-12-18 web[6538]:    server.run()
+Oct 12 05:33:39 ip-172-31-12-18 web[6538]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/server.py", line 61, in run
+Oct 12 05:33:39 ip-172-31-12-18 web[6538]:    return asyncio.run(self.serve(sockets=sockets))
+Oct 12 05:33:39 ip-172-31-12-18 web[6538]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:33:39 ip-172-31-12-18 web[6538]:  File "/usr/lib64/python3.11/asyncio/runners.py", line 190, in run
+Oct 12 05:33:39 ip-172-31-12-18 web[6538]:    return runner.run(main)
+Oct 12 05:33:39 ip-172-31-12-18 web[6538]:           ^^^^^^^^^^^^^^^^
+Oct 12 05:33:39 ip-172-31-12-18 web[6538]:  File "/usr/lib64/python3.11/asyncio/runners.py", line 118, in run
+Oct 12 05:33:39 ip-172-31-12-18 web[6538]:    return self._loop.run_until_complete(task)
+Oct 12 05:33:39 ip-172-31-12-18 web[6538]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:33:39 ip-172-31-12-18 web[6538]:  File "/usr/lib64/python3.11/asyncio/base_events.py", line 654, in run_until_complete
+Oct 12 05:33:39 ip-172-31-12-18 web[6538]:    return future.result()
+Oct 12 05:33:39 ip-172-31-12-18 web[6538]:           ^^^^^^^^^^^^^^^
+Oct 12 05:33:39 ip-172-31-12-18 web[6538]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/server.py", line 68, in serve
+Oct 12 05:33:39 ip-172-31-12-18 web[6538]:    config.load()
+Oct 12 05:33:39 ip-172-31-12-18 web[6538]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/config.py", line 467, in load
+Oct 12 05:33:39 ip-172-31-12-18 web[6538]:    self.loaded_app = import_from_string(self.app)
+Oct 12 05:33:39 ip-172-31-12-18 web[6538]:                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:33:39 ip-172-31-12-18 web[6538]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/importer.py", line 21, in import_from_string
+Oct 12 05:33:39 ip-172-31-12-18 web[6538]:    module = importlib.import_module(module_str)
+Oct 12 05:33:39 ip-172-31-12-18 web[6538]:             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:33:39 ip-172-31-12-18 web[6538]:  File "/usr/lib64/python3.11/importlib/__init__.py", line 126, in import_module
+Oct 12 05:33:39 ip-172-31-12-18 web[6538]:    return _bootstrap._gcd_import(name[level:], package, level)
+Oct 12 05:33:39 ip-172-31-12-18 web[6538]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:33:39 ip-172-31-12-18 web[6538]:  File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
+Oct 12 05:33:39 ip-172-31-12-18 web[6538]:  File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
+Oct 12 05:33:39 ip-172-31-12-18 web[6538]:  File "<frozen importlib._bootstrap>", line 1147, in _find_and_load_unlocked
+Oct 12 05:33:39 ip-172-31-12-18 web[6538]:  File "<frozen importlib._bootstrap>", line 690, in _load_unlocked
+Oct 12 05:33:39 ip-172-31-12-18 web[6538]:  File "<frozen importlib._bootstrap_external>", line 940, in exec_module
+Oct 12 05:33:39 ip-172-31-12-18 web[6538]:  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+Oct 12 05:33:39 ip-172-31-12-18 web[6538]:  File "/var/app/current/app/main.py", line 71, in <module>
+Oct 12 05:33:39 ip-172-31-12-18 web[6538]:    from services.chat_service import get_chat_service
+Oct 12 05:33:39 ip-172-31-12-18 web[6538]:  File "/var/app/current/services/chat_service.py", line 12, in <module>
+Oct 12 05:33:39 ip-172-31-12-18 web[6538]:    from core.langchain.simple_test_agent import get_simple_agent
+Oct 12 05:33:39 ip-172-31-12-18 web[6538]:  File "/var/app/current/core/langchain/simple_test_agent.py", line 7, in <module>
+Oct 12 05:33:39 ip-172-31-12-18 web[6538]:    from core.llm.openai_client import get_chat_llm
+Oct 12 05:33:39 ip-172-31-12-18 web[6538]:  File "/var/app/current/core/llm/openai_client.py", line 1, in <module>
+Oct 12 05:33:39 ip-172-31-12-18 web[6538]:    cat > core/llm/openai_client.py << 'EOF'
+Oct 12 05:33:39 ip-172-31-12-18 web[6538]:    ^^^
+Oct 12 05:33:39 ip-172-31-12-18 web[6538]: NameError: name 'cat' is not defined
+Oct 12 05:33:41 ip-172-31-12-18 web[6594]: Traceback (most recent call last):
+Oct 12 05:33:41 ip-172-31-12-18 web[6594]:  File "/var/app/venv/staging-LQM1lest/bin/uvicorn", line 7, in <module>
+Oct 12 05:33:41 ip-172-31-12-18 web[6594]:    sys.exit(main())
+Oct 12 05:33:41 ip-172-31-12-18 web[6594]:             ^^^^^^
+Oct 12 05:33:41 ip-172-31-12-18 web[6594]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1462, in __call__
+Oct 12 05:33:41 ip-172-31-12-18 web[6594]:    return self.main(*args, **kwargs)
+Oct 12 05:33:41 ip-172-31-12-18 web[6594]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:33:41 ip-172-31-12-18 web[6594]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1383, in main
+Oct 12 05:33:41 ip-172-31-12-18 web[6594]:    rv = self.invoke(ctx)
+Oct 12 05:33:41 ip-172-31-12-18 web[6594]:         ^^^^^^^^^^^^^^^^
+Oct 12 05:33:41 ip-172-31-12-18 web[6594]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1246, in invoke
+Oct 12 05:33:41 ip-172-31-12-18 web[6594]:    return ctx.invoke(self.callback, **ctx.params)
+Oct 12 05:33:41 ip-172-31-12-18 web[6594]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:33:41 ip-172-31-12-18 web[6594]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 814, in invoke
+Oct 12 05:33:41 ip-172-31-12-18 web[6594]:    return callback(*args, **kwargs)
+Oct 12 05:33:41 ip-172-31-12-18 web[6594]:           ^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:33:41 ip-172-31-12-18 web[6594]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/main.py", line 416, in main
+Oct 12 05:33:41 ip-172-31-12-18 web[6594]:    run(
+Oct 12 05:33:41 ip-172-31-12-18 web[6594]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/main.py", line 587, in run
+Oct 12 05:33:41 ip-172-31-12-18 web[6594]:    server.run()
+Oct 12 05:33:41 ip-172-31-12-18 web[6594]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/server.py", line 61, in run
+Oct 12 05:33:41 ip-172-31-12-18 web[6594]:    return asyncio.run(self.serve(sockets=sockets))
+Oct 12 05:33:41 ip-172-31-12-18 web[6594]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:33:41 ip-172-31-12-18 web[6594]:  File "/usr/lib64/python3.11/asyncio/runners.py", line 190, in run
+Oct 12 05:33:41 ip-172-31-12-18 web[6594]:    return runner.run(main)
+Oct 12 05:33:41 ip-172-31-12-18 web[6594]:           ^^^^^^^^^^^^^^^^
+Oct 12 05:33:41 ip-172-31-12-18 web[6594]:  File "/usr/lib64/python3.11/asyncio/runners.py", line 118, in run
+Oct 12 05:33:41 ip-172-31-12-18 web[6594]:    return self._loop.run_until_complete(task)
+Oct 12 05:33:41 ip-172-31-12-18 web[6594]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:33:41 ip-172-31-12-18 web[6594]:  File "/usr/lib64/python3.11/asyncio/base_events.py", line 654, in run_until_complete
+Oct 12 05:33:41 ip-172-31-12-18 web[6594]:    return future.result()
+Oct 12 05:33:41 ip-172-31-12-18 web[6594]:           ^^^^^^^^^^^^^^^
+Oct 12 05:33:41 ip-172-31-12-18 web[6594]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/server.py", line 68, in serve
+Oct 12 05:33:41 ip-172-31-12-18 web[6594]:    config.load()
+Oct 12 05:33:41 ip-172-31-12-18 web[6594]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/config.py", line 467, in load
+Oct 12 05:33:41 ip-172-31-12-18 web[6594]:    self.loaded_app = import_from_string(self.app)
+Oct 12 05:33:41 ip-172-31-12-18 web[6594]:                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:33:41 ip-172-31-12-18 web[6594]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/importer.py", line 21, in import_from_string
+Oct 12 05:33:41 ip-172-31-12-18 web[6594]:    module = importlib.import_module(module_str)
+Oct 12 05:33:41 ip-172-31-12-18 web[6594]:             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:33:41 ip-172-31-12-18 web[6594]:  File "/usr/lib64/python3.11/importlib/__init__.py", line 126, in import_module
+Oct 12 05:33:41 ip-172-31-12-18 web[6594]:    return _bootstrap._gcd_import(name[level:], package, level)
+Oct 12 05:33:41 ip-172-31-12-18 web[6594]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:33:41 ip-172-31-12-18 web[6594]:  File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
+Oct 12 05:33:41 ip-172-31-12-18 web[6594]:  File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
+Oct 12 05:33:41 ip-172-31-12-18 web[6594]:  File "<frozen importlib._bootstrap>", line 1147, in _find_and_load_unlocked
+Oct 12 05:33:41 ip-172-31-12-18 web[6594]:  File "<frozen importlib._bootstrap>", line 690, in _load_unlocked
+Oct 12 05:33:41 ip-172-31-12-18 web[6594]:  File "<frozen importlib._bootstrap_external>", line 940, in exec_module
+Oct 12 05:33:41 ip-172-31-12-18 web[6594]:  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+Oct 12 05:33:41 ip-172-31-12-18 web[6594]:  File "/var/app/current/app/main.py", line 71, in <module>
+Oct 12 05:33:41 ip-172-31-12-18 web[6594]:    from services.chat_service import get_chat_service
+Oct 12 05:33:41 ip-172-31-12-18 web[6594]:  File "/var/app/current/services/chat_service.py", line 12, in <module>
+Oct 12 05:33:41 ip-172-31-12-18 web[6594]:    from core.langchain.simple_test_agent import get_simple_agent
+Oct 12 05:33:41 ip-172-31-12-18 web[6594]:  File "/var/app/current/core/langchain/simple_test_agent.py", line 7, in <module>
+Oct 12 05:33:41 ip-172-31-12-18 web[6594]:    from core.llm.openai_client import get_chat_llm
+Oct 12 05:33:41 ip-172-31-12-18 web[6594]:  File "/var/app/current/core/llm/openai_client.py", line 1, in <module>
+Oct 12 05:33:41 ip-172-31-12-18 web[6594]:    cat > core/llm/openai_client.py << 'EOF'
+Oct 12 05:33:41 ip-172-31-12-18 web[6594]:    ^^^
+Oct 12 05:33:41 ip-172-31-12-18 web[6594]: NameError: name 'cat' is not defined
+Oct 12 05:33:42 ip-172-31-12-18 web[6599]: Traceback (most recent call last):
+Oct 12 05:33:42 ip-172-31-12-18 web[6599]:  File "/var/app/venv/staging-LQM1lest/bin/uvicorn", line 7, in <module>
+Oct 12 05:33:42 ip-172-31-12-18 web[6599]:    sys.exit(main())
+Oct 12 05:33:42 ip-172-31-12-18 web[6599]:             ^^^^^^
+Oct 12 05:33:42 ip-172-31-12-18 web[6599]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1462, in __call__
+Oct 12 05:33:42 ip-172-31-12-18 web[6599]:    return self.main(*args, **kwargs)
+Oct 12 05:33:42 ip-172-31-12-18 web[6599]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:33:42 ip-172-31-12-18 web[6599]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1383, in main
+Oct 12 05:33:42 ip-172-31-12-18 web[6599]:    rv = self.invoke(ctx)
+Oct 12 05:33:42 ip-172-31-12-18 web[6599]:         ^^^^^^^^^^^^^^^^
+Oct 12 05:33:42 ip-172-31-12-18 web[6599]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1246, in invoke
+Oct 12 05:33:42 ip-172-31-12-18 web[6599]:    return ctx.invoke(self.callback, **ctx.params)
+Oct 12 05:33:42 ip-172-31-12-18 web[6599]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:33:42 ip-172-31-12-18 web[6599]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 814, in invoke
+Oct 12 05:33:42 ip-172-31-12-18 web[6599]:    return callback(*args, **kwargs)
+Oct 12 05:33:42 ip-172-31-12-18 web[6599]:           ^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:33:42 ip-172-31-12-18 web[6599]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/main.py", line 416, in main
+Oct 12 05:33:42 ip-172-31-12-18 web[6599]:    run(
+Oct 12 05:33:42 ip-172-31-12-18 web[6599]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/main.py", line 587, in run
+Oct 12 05:33:42 ip-172-31-12-18 web[6599]:    server.run()
+Oct 12 05:33:42 ip-172-31-12-18 web[6599]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/server.py", line 61, in run
+Oct 12 05:33:42 ip-172-31-12-18 web[6599]:    return asyncio.run(self.serve(sockets=sockets))
+Oct 12 05:33:42 ip-172-31-12-18 web[6599]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:33:42 ip-172-31-12-18 web[6599]:  File "/usr/lib64/python3.11/asyncio/runners.py", line 190, in run
+Oct 12 05:33:42 ip-172-31-12-18 web[6599]:    return runner.run(main)
+Oct 12 05:33:42 ip-172-31-12-18 web[6599]:           ^^^^^^^^^^^^^^^^
+Oct 12 05:33:42 ip-172-31-12-18 web[6599]:  File "/usr/lib64/python3.11/asyncio/runners.py", line 118, in run
+Oct 12 05:33:42 ip-172-31-12-18 web[6599]:    return self._loop.run_until_complete(task)
+Oct 12 05:33:42 ip-172-31-12-18 web[6599]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:33:42 ip-172-31-12-18 web[6599]:  File "/usr/lib64/python3.11/asyncio/base_events.py", line 654, in run_until_complete
+Oct 12 05:33:42 ip-172-31-12-18 web[6599]:    return future.result()
+Oct 12 05:33:42 ip-172-31-12-18 web[6599]:           ^^^^^^^^^^^^^^^
+Oct 12 05:33:42 ip-172-31-12-18 web[6599]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/server.py", line 68, in serve
+Oct 12 05:33:42 ip-172-31-12-18 web[6599]:    config.load()
+Oct 12 05:33:42 ip-172-31-12-18 web[6599]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/config.py", line 467, in load
+Oct 12 05:33:42 ip-172-31-12-18 web[6599]:    self.loaded_app = import_from_string(self.app)
+Oct 12 05:33:42 ip-172-31-12-18 web[6599]:                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:33:42 ip-172-31-12-18 web[6599]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/importer.py", line 21, in import_from_string
+Oct 12 05:33:42 ip-172-31-12-18 web[6599]:    module = importlib.import_module(module_str)
+Oct 12 05:33:42 ip-172-31-12-18 web[6599]:             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:33:42 ip-172-31-12-18 web[6599]:  File "/usr/lib64/python3.11/importlib/__init__.py", line 126, in import_module
+Oct 12 05:33:42 ip-172-31-12-18 web[6599]:    return _bootstrap._gcd_import(name[level:], package, level)
+Oct 12 05:33:42 ip-172-31-12-18 web[6599]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:33:42 ip-172-31-12-18 web[6599]:  File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
+Oct 12 05:33:42 ip-172-31-12-18 web[6599]:  File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
+Oct 12 05:33:42 ip-172-31-12-18 web[6599]:  File "<frozen importlib._bootstrap>", line 1147, in _find_and_load_unlocked
+Oct 12 05:33:42 ip-172-31-12-18 web[6599]:  File "<frozen importlib._bootstrap>", line 690, in _load_unlocked
+Oct 12 05:33:42 ip-172-31-12-18 web[6599]:  File "<frozen importlib._bootstrap_external>", line 940, in exec_module
+Oct 12 05:33:42 ip-172-31-12-18 web[6599]:  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+Oct 12 05:33:42 ip-172-31-12-18 web[6599]:  File "/var/app/current/app/main.py", line 71, in <module>
+Oct 12 05:33:42 ip-172-31-12-18 web[6599]:    from services.chat_service import get_chat_service
+Oct 12 05:33:42 ip-172-31-12-18 web[6599]:  File "/var/app/current/services/chat_service.py", line 12, in <module>
+Oct 12 05:33:42 ip-172-31-12-18 web[6599]:    from core.langchain.simple_test_agent import get_simple_agent
+Oct 12 05:33:42 ip-172-31-12-18 web[6599]:  File "/var/app/current/core/langchain/simple_test_agent.py", line 7, in <module>
+Oct 12 05:33:42 ip-172-31-12-18 web[6599]:    from core.llm.openai_client import get_chat_llm
+Oct 12 05:33:42 ip-172-31-12-18 web[6599]:  File "/var/app/current/core/llm/openai_client.py", line 1, in <module>
+Oct 12 05:33:42 ip-172-31-12-18 web[6599]:    cat > core/llm/openai_client.py << 'EOF'
+Oct 12 05:33:42 ip-172-31-12-18 web[6599]:    ^^^
+Oct 12 05:33:42 ip-172-31-12-18 web[6599]: NameError: name 'cat' is not defined
+Oct 12 05:33:43 ip-172-31-12-18 web[6604]: Traceback (most recent call last):
+Oct 12 05:33:43 ip-172-31-12-18 web[6604]:  File "/var/app/venv/staging-LQM1lest/bin/uvicorn", line 7, in <module>
+Oct 12 05:33:43 ip-172-31-12-18 web[6604]:    sys.exit(main())
+Oct 12 05:33:43 ip-172-31-12-18 web[6604]:             ^^^^^^
+Oct 12 05:33:43 ip-172-31-12-18 web[6604]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1462, in __call__
+Oct 12 05:33:43 ip-172-31-12-18 web[6604]:    return self.main(*args, **kwargs)
+Oct 12 05:33:43 ip-172-31-12-18 web[6604]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:33:43 ip-172-31-12-18 web[6604]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1383, in main
+Oct 12 05:33:43 ip-172-31-12-18 web[6604]:    rv = self.invoke(ctx)
+Oct 12 05:33:43 ip-172-31-12-18 web[6604]:         ^^^^^^^^^^^^^^^^
+Oct 12 05:33:43 ip-172-31-12-18 web[6604]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1246, in invoke
+Oct 12 05:33:43 ip-172-31-12-18 web[6604]:    return ctx.invoke(self.callback, **ctx.params)
+Oct 12 05:33:43 ip-172-31-12-18 web[6604]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:33:43 ip-172-31-12-18 web[6604]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 814, in invoke
+Oct 12 05:33:43 ip-172-31-12-18 web[6604]:    return callback(*args, **kwargs)
+Oct 12 05:33:43 ip-172-31-12-18 web[6604]:           ^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:33:43 ip-172-31-12-18 web[6604]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/main.py", line 416, in main
+Oct 12 05:33:43 ip-172-31-12-18 web[6604]:    run(
+Oct 12 05:33:43 ip-172-31-12-18 web[6604]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/main.py", line 587, in run
+Oct 12 05:33:43 ip-172-31-12-18 web[6604]:    server.run()
+Oct 12 05:33:43 ip-172-31-12-18 web[6604]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/server.py", line 61, in run
+Oct 12 05:33:43 ip-172-31-12-18 web[6604]:    return asyncio.run(self.serve(sockets=sockets))
+Oct 12 05:33:43 ip-172-31-12-18 web[6604]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:33:43 ip-172-31-12-18 web[6604]:  File "/usr/lib64/python3.11/asyncio/runners.py", line 190, in run
+Oct 12 05:33:43 ip-172-31-12-18 web[6604]:    return runner.run(main)
+Oct 12 05:33:43 ip-172-31-12-18 web[6604]:           ^^^^^^^^^^^^^^^^
+Oct 12 05:33:43 ip-172-31-12-18 web[6604]:  File "/usr/lib64/python3.11/asyncio/runners.py", line 118, in run
+Oct 12 05:33:43 ip-172-31-12-18 web[6604]:    return self._loop.run_until_complete(task)
+Oct 12 05:33:43 ip-172-31-12-18 web[6604]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:33:43 ip-172-31-12-18 web[6604]:  File "/usr/lib64/python3.11/asyncio/base_events.py", line 654, in run_until_complete
+Oct 12 05:33:43 ip-172-31-12-18 web[6604]:    return future.result()
+Oct 12 05:33:43 ip-172-31-12-18 web[6604]:           ^^^^^^^^^^^^^^^
+Oct 12 05:33:43 ip-172-31-12-18 web[6604]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/server.py", line 68, in serve
+Oct 12 05:33:43 ip-172-31-12-18 web[6604]:    config.load()
+Oct 12 05:33:43 ip-172-31-12-18 web[6604]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/config.py", line 467, in load
+Oct 12 05:33:43 ip-172-31-12-18 web[6604]:    self.loaded_app = import_from_string(self.app)
+Oct 12 05:33:43 ip-172-31-12-18 web[6604]:                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:33:43 ip-172-31-12-18 web[6604]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/importer.py", line 21, in import_from_string
+Oct 12 05:33:43 ip-172-31-12-18 web[6604]:    module = importlib.import_module(module_str)
+Oct 12 05:33:43 ip-172-31-12-18 web[6604]:             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:33:43 ip-172-31-12-18 web[6604]:  File "/usr/lib64/python3.11/importlib/__init__.py", line 126, in import_module
+Oct 12 05:33:43 ip-172-31-12-18 web[6604]:    return _bootstrap._gcd_import(name[level:], package, level)
+Oct 12 05:33:43 ip-172-31-12-18 web[6604]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:33:43 ip-172-31-12-18 web[6604]:  File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
+Oct 12 05:33:43 ip-172-31-12-18 web[6604]:  File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
+Oct 12 05:33:43 ip-172-31-12-18 web[6604]:  File "<frozen importlib._bootstrap>", line 1147, in _find_and_load_unlocked
+Oct 12 05:33:43 ip-172-31-12-18 web[6604]:  File "<frozen importlib._bootstrap>", line 690, in _load_unlocked
+Oct 12 05:33:43 ip-172-31-12-18 web[6604]:  File "<frozen importlib._bootstrap_external>", line 940, in exec_module
+Oct 12 05:33:43 ip-172-31-12-18 web[6604]:  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+Oct 12 05:33:43 ip-172-31-12-18 web[6604]:  File "/var/app/current/app/main.py", line 71, in <module>
+Oct 12 05:33:43 ip-172-31-12-18 web[6604]:    from services.chat_service import get_chat_service
+Oct 12 05:33:43 ip-172-31-12-18 web[6604]:  File "/var/app/current/services/chat_service.py", line 12, in <module>
+Oct 12 05:33:43 ip-172-31-12-18 web[6604]:    from core.langchain.simple_test_agent import get_simple_agent
+Oct 12 05:33:43 ip-172-31-12-18 web[6604]:  File "/var/app/current/core/langchain/simple_test_agent.py", line 7, in <module>
+Oct 12 05:33:43 ip-172-31-12-18 web[6604]:    from core.llm.openai_client import get_chat_llm
+Oct 12 05:33:43 ip-172-31-12-18 web[6604]:  File "/var/app/current/core/llm/openai_client.py", line 1, in <module>
+Oct 12 05:33:43 ip-172-31-12-18 web[6604]:    cat > core/llm/openai_client.py << 'EOF'
+Oct 12 05:33:43 ip-172-31-12-18 web[6604]:    ^^^
+Oct 12 05:33:43 ip-172-31-12-18 web[6604]: NameError: name 'cat' is not defined
+Oct 12 05:33:44 ip-172-31-12-18 web[6609]: Traceback (most recent call last):
+Oct 12 05:33:44 ip-172-31-12-18 web[6609]:  File "/var/app/venv/staging-LQM1lest/bin/uvicorn", line 7, in <module>
+Oct 12 05:33:44 ip-172-31-12-18 web[6609]:    sys.exit(main())
+Oct 12 05:33:44 ip-172-31-12-18 web[6609]:             ^^^^^^
+Oct 12 05:33:44 ip-172-31-12-18 web[6609]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1462, in __call__
+Oct 12 05:33:44 ip-172-31-12-18 web[6609]:    return self.main(*args, **kwargs)
+Oct 12 05:33:44 ip-172-31-12-18 web[6609]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:33:44 ip-172-31-12-18 web[6609]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1383, in main
+Oct 12 05:33:44 ip-172-31-12-18 web[6609]:    rv = self.invoke(ctx)
+Oct 12 05:33:44 ip-172-31-12-18 web[6609]:         ^^^^^^^^^^^^^^^^
+Oct 12 05:33:44 ip-172-31-12-18 web[6609]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1246, in invoke
+Oct 12 05:33:44 ip-172-31-12-18 web[6609]:    return ctx.invoke(self.callback, **ctx.params)
+Oct 12 05:33:44 ip-172-31-12-18 web[6609]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:33:44 ip-172-31-12-18 web[6609]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 814, in invoke
+Oct 12 05:33:44 ip-172-31-12-18 web[6609]:    return callback(*args, **kwargs)
+Oct 12 05:33:44 ip-172-31-12-18 web[6609]:           ^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:33:44 ip-172-31-12-18 web[6609]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/main.py", line 416, in main
+Oct 12 05:33:44 ip-172-31-12-18 web[6609]:    run(
+Oct 12 05:33:44 ip-172-31-12-18 web[6609]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/main.py", line 587, in run
+Oct 12 05:33:44 ip-172-31-12-18 web[6609]:    server.run()
+Oct 12 05:33:44 ip-172-31-12-18 web[6609]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/server.py", line 61, in run
+Oct 12 05:33:44 ip-172-31-12-18 web[6609]:    return asyncio.run(self.serve(sockets=sockets))
+Oct 12 05:33:44 ip-172-31-12-18 web[6609]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:33:44 ip-172-31-12-18 web[6609]:  File "/usr/lib64/python3.11/asyncio/runners.py", line 190, in run
+Oct 12 05:33:44 ip-172-31-12-18 web[6609]:    return runner.run(main)
+Oct 12 05:33:44 ip-172-31-12-18 web[6609]:           ^^^^^^^^^^^^^^^^
+Oct 12 05:33:44 ip-172-31-12-18 web[6609]:  File "/usr/lib64/python3.11/asyncio/runners.py", line 118, in run
+Oct 12 05:33:44 ip-172-31-12-18 web[6609]:    return self._loop.run_until_complete(task)
+Oct 12 05:33:44 ip-172-31-12-18 web[6609]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:33:44 ip-172-31-12-18 web[6609]:  File "/usr/lib64/python3.11/asyncio/base_events.py", line 654, in run_until_complete
+Oct 12 05:33:44 ip-172-31-12-18 web[6609]:    return future.result()
+Oct 12 05:33:44 ip-172-31-12-18 web[6609]:           ^^^^^^^^^^^^^^^
+Oct 12 05:33:44 ip-172-31-12-18 web[6609]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/server.py", line 68, in serve
+Oct 12 05:33:44 ip-172-31-12-18 web[6609]:    config.load()
+Oct 12 05:33:44 ip-172-31-12-18 web[6609]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/config.py", line 467, in load
+Oct 12 05:33:44 ip-172-31-12-18 web[6609]:    self.loaded_app = import_from_string(self.app)
+Oct 12 05:33:44 ip-172-31-12-18 web[6609]:                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:33:44 ip-172-31-12-18 web[6609]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/importer.py", line 21, in import_from_string
+Oct 12 05:33:44 ip-172-31-12-18 web[6609]:    module = importlib.import_module(module_str)
+Oct 12 05:33:44 ip-172-31-12-18 web[6609]:             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:33:44 ip-172-31-12-18 web[6609]:  File "/usr/lib64/python3.11/importlib/__init__.py", line 126, in import_module
+Oct 12 05:33:44 ip-172-31-12-18 web[6609]:    return _bootstrap._gcd_import(name[level:], package, level)
+Oct 12 05:33:44 ip-172-31-12-18 web[6609]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:33:44 ip-172-31-12-18 web[6609]:  File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
+Oct 12 05:33:44 ip-172-31-12-18 web[6609]:  File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
+Oct 12 05:33:44 ip-172-31-12-18 web[6609]:  File "<frozen importlib._bootstrap>", line 1147, in _find_and_load_unlocked
+Oct 12 05:33:44 ip-172-31-12-18 web[6609]:  File "<frozen importlib._bootstrap>", line 690, in _load_unlocked
+Oct 12 05:33:44 ip-172-31-12-18 web[6609]:  File "<frozen importlib._bootstrap_external>", line 940, in exec_module
+Oct 12 05:33:44 ip-172-31-12-18 web[6609]:  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+Oct 12 05:33:44 ip-172-31-12-18 web[6609]:  File "/var/app/current/app/main.py", line 71, in <module>
+Oct 12 05:33:44 ip-172-31-12-18 web[6609]:    from services.chat_service import get_chat_service
+Oct 12 05:33:44 ip-172-31-12-18 web[6609]:  File "/var/app/current/services/chat_service.py", line 12, in <module>
+Oct 12 05:33:44 ip-172-31-12-18 web[6609]:    from core.langchain.simple_test_agent import get_simple_agent
+Oct 12 05:33:44 ip-172-31-12-18 web[6609]:  File "/var/app/current/core/langchain/simple_test_agent.py", line 7, in <module>
+Oct 12 05:33:44 ip-172-31-12-18 web[6609]:    from core.llm.openai_client import get_chat_llm
+Oct 12 05:33:44 ip-172-31-12-18 web[6609]:  File "/var/app/current/core/llm/openai_client.py", line 1, in <module>
+Oct 12 05:33:44 ip-172-31-12-18 web[6609]:    cat > core/llm/openai_client.py << 'EOF'
+Oct 12 05:33:44 ip-172-31-12-18 web[6609]:    ^^^
+Oct 12 05:33:44 ip-172-31-12-18 web[6609]: NameError: name 'cat' is not defined
+Oct 12 05:33:46 ip-172-31-12-18 web[6614]: Traceback (most recent call last):
+Oct 12 05:33:46 ip-172-31-12-18 web[6614]:  File "/var/app/venv/staging-LQM1lest/bin/uvicorn", line 7, in <module>
+Oct 12 05:33:46 ip-172-31-12-18 web[6614]:    sys.exit(main())
+Oct 12 05:33:46 ip-172-31-12-18 web[6614]:             ^^^^^^
+Oct 12 05:33:46 ip-172-31-12-18 web[6614]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1462, in __call__
+Oct 12 05:33:46 ip-172-31-12-18 web[6614]:    return self.main(*args, **kwargs)
+Oct 12 05:33:46 ip-172-31-12-18 web[6614]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:33:46 ip-172-31-12-18 web[6614]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1383, in main
+Oct 12 05:33:46 ip-172-31-12-18 web[6614]:    rv = self.invoke(ctx)
+Oct 12 05:33:46 ip-172-31-12-18 web[6614]:         ^^^^^^^^^^^^^^^^
+Oct 12 05:33:46 ip-172-31-12-18 web[6614]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 1246, in invoke
+Oct 12 05:33:46 ip-172-31-12-18 web[6614]:    return ctx.invoke(self.callback, **ctx.params)
+Oct 12 05:33:46 ip-172-31-12-18 web[6614]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:33:46 ip-172-31-12-18 web[6614]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/click/core.py", line 814, in invoke
+Oct 12 05:33:46 ip-172-31-12-18 web[6614]:    return callback(*args, **kwargs)
+Oct 12 05:33:46 ip-172-31-12-18 web[6614]:           ^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:33:46 ip-172-31-12-18 web[6614]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/main.py", line 416, in main
+Oct 12 05:33:46 ip-172-31-12-18 web[6614]:    run(
+Oct 12 05:33:46 ip-172-31-12-18 web[6614]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/main.py", line 587, in run
+Oct 12 05:33:46 ip-172-31-12-18 web[6614]:    server.run()
+Oct 12 05:33:46 ip-172-31-12-18 web[6614]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/server.py", line 61, in run
+Oct 12 05:33:46 ip-172-31-12-18 web[6614]:    return asyncio.run(self.serve(sockets=sockets))
+Oct 12 05:33:46 ip-172-31-12-18 web[6614]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:33:46 ip-172-31-12-18 web[6614]:  File "/usr/lib64/python3.11/asyncio/runners.py", line 190, in run
+Oct 12 05:33:46 ip-172-31-12-18 web[6614]:    return runner.run(main)
+Oct 12 05:33:46 ip-172-31-12-18 web[6614]:           ^^^^^^^^^^^^^^^^
+Oct 12 05:33:46 ip-172-31-12-18 web[6614]:  File "/usr/lib64/python3.11/asyncio/runners.py", line 118, in run
+Oct 12 05:33:46 ip-172-31-12-18 web[6614]:    return self._loop.run_until_complete(task)
+Oct 12 05:33:46 ip-172-31-12-18 web[6614]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:33:46 ip-172-31-12-18 web[6614]:  File "/usr/lib64/python3.11/asyncio/base_events.py", line 654, in run_until_complete
+Oct 12 05:33:46 ip-172-31-12-18 web[6614]:    return future.result()
+Oct 12 05:33:46 ip-172-31-12-18 web[6614]:           ^^^^^^^^^^^^^^^
+Oct 12 05:33:46 ip-172-31-12-18 web[6614]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/server.py", line 68, in serve
+Oct 12 05:33:46 ip-172-31-12-18 web[6614]:    config.load()
+Oct 12 05:33:46 ip-172-31-12-18 web[6614]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/config.py", line 467, in load
+Oct 12 05:33:46 ip-172-31-12-18 web[6614]:    self.loaded_app = import_from_string(self.app)
+Oct 12 05:33:46 ip-172-31-12-18 web[6614]:                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:33:46 ip-172-31-12-18 web[6614]:  File "/var/app/venv/staging-LQM1lest/lib64/python3.11/site-packages/uvicorn/importer.py", line 21, in import_from_string
+Oct 12 05:33:46 ip-172-31-12-18 web[6614]:    module = importlib.import_module(module_str)
+Oct 12 05:33:46 ip-172-31-12-18 web[6614]:             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:33:46 ip-172-31-12-18 web[6614]:  File "/usr/lib64/python3.11/importlib/__init__.py", line 126, in import_module
+Oct 12 05:33:46 ip-172-31-12-18 web[6614]:    return _bootstrap._gcd_import(name[level:], package, level)
+Oct 12 05:33:46 ip-172-31-12-18 web[6614]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Oct 12 05:33:46 ip-172-31-12-18 web[6614]:  File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
+Oct 12 05:33:46 ip-172-31-12-18 web[6614]:  File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
+Oct 12 05:33:46 ip-172-31-12-18 web[6614]:  File "<frozen importlib._bootstrap>", line 1147, in _find_and_load_unlocked
+Oct 12 05:33:46 ip-172-31-12-18 web[6614]:  File "<frozen importlib._bootstrap>", line 690, in _load_unlocked
+Oct 12 05:33:46 ip-172-31-12-18 web[6614]:  File "<frozen importlib._bootstrap_external>", line 940, in exec_module
+Oct 12 05:33:46 ip-172-31-12-18 web[6614]:  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+Oct 12 05:33:46 ip-172-31-12-18 web[6614]:  File "/var/app/current/app/main.py", line 71, in <module>
+Oct 12 05:33:46 ip-172-31-12-18 web[6614]:    from services.chat_service import get_chat_service
+Oct 12 05:33:46 ip-172-31-12-18 web[6614]:  File "/var/app/current/services/chat_service.py", line 12, in <module>
+Oct 12 05:33:46 ip-172-31-12-18 web[6614]:    from core.langchain.simple_test_agent import get_simple_agent
+Oct 12 05:33:46 ip-172-31-12-18 web[6614]:  File "/var/app/current/core/langchain/simple_test_agent.py", line 7, in <module>
+Oct 12 05:33:46 ip-172-31-12-18 web[6614]:    from core.llm.openai_client import get_chat_llm
+Oct 12 05:33:46 ip-172-31-12-18 web[6614]:  File "/var/app/current/core/llm/openai_client.py", line 1, in <module>
+Oct 12 05:33:46 ip-172-31-12-18 web[6614]:    cat > core/llm/openai_client.py << 'EOF'
+Oct 12 05:33:46 ip-172-31-12-18 web[6614]:    ^^^
+Oct 12 05:33:46 ip-172-31-12-18 web[6614]: NameError: name 'cat' is not defined
+Oct 12 20:25:23 ip-172-31-12-18 web[39438]: INFO:     Started server process [39438]
+Oct 12 20:25:23 ip-172-31-12-18 web[39438]: INFO:     Waiting for application startup.
+Oct 12 20:25:23 ip-172-31-12-18 web[39438]: INFO:     Application startup complete.
+Oct 12 20:25:23 ip-172-31-12-18 web[39438]: INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+Oct 12 20:25:38 ip-172-31-12-18 web[39438]: INFO:     101.186.146.66:0 - "GET / HTTP/1.1" 200 OK
+Oct 12 20:26:03 ip-172-31-12-18 web[39438]: INFO:     101.186.146.66:0 - "GET / HTTP/1.1" 200 OK
+Oct 12 20:26:04 ip-172-31-12-18 web[39438]: INFO:     101.186.146.66:0 - "GET /apple-touch-icon-precomposed.png HTTP/1.1" 404 Not Found
+Oct 12 20:26:04 ip-172-31-12-18 web[39438]: INFO:     101.186.146.66:0 - "GET /apple-touch-icon.png HTTP/1.1" 404 Not Found
+Oct 12 20:31:03 ip-172-31-12-18 web[39438]: INFO:     Shutting down
+Oct 12 20:31:03 ip-172-31-12-18 web[39438]: INFO:     Waiting for application shutdown.
+Oct 12 20:31:03 ip-172-31-12-18 web[39438]: INFO:     Application shutdown complete.
+Oct 12 20:31:03 ip-172-31-12-18 web[39438]: INFO:     Finished server process [39438]
+Oct 12 20:31:05 ip-172-31-12-18 web[40106]: INFO:     Started server process [40106]
+Oct 12 20:31:05 ip-172-31-12-18 web[40106]: INFO:     Waiting for application startup.
+Oct 12 20:31:05 ip-172-31-12-18 web[40106]: INFO:     Application startup complete.
+Oct 12 20:31:05 ip-172-31-12-18 web[40106]: INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+Oct 12 20:31:39 ip-172-31-12-18 web[40106]: INFO:     87.120.191.84:0 - "GET / HTTP/1.1" 200 OK
+Oct 12 20:31:45 ip-172-31-12-18 web[40106]: INFO:     101.186.146.66:0 - "GET / HTTP/1.1" 200 OK
+Oct 12 20:33:52 ip-172-31-12-18 web[40106]: INFO:     Shutting down
+Oct 12 20:33:52 ip-172-31-12-18 web[40106]: INFO:     Waiting for application shutdown.
+Oct 12 20:33:52 ip-172-31-12-18 web[40106]: INFO:     Application shutdown complete.
+Oct 12 20:33:52 ip-172-31-12-18 web[40106]: INFO:     Finished server process [40106]
+Oct 12 20:33:55 ip-172-31-12-18 web[40690]: INFO:     Started server process [40690]
+Oct 12 20:33:55 ip-172-31-12-18 web[40690]: INFO:     Waiting for application startup.
+Oct 12 20:33:55 ip-172-31-12-18 web[40690]: INFO:     Application startup complete.
+Oct 12 20:33:55 ip-172-31-12-18 web[40690]: INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+Oct 12 20:34:10 ip-172-31-12-18 web[40690]: 2025-10-12 20:34:10 [info     ] Processing message             message=Find mental health services in Melbourne session_id=e214a555-acd0-4249-856b-9a58c087263b
+Oct 12 20:34:10 ip-172-31-12-18 web[40690]: 2025-10-12 20:34:10 [error    ] Service text search failed     error=Client.__init__() got an unexpected keyword argument 'proxy' search_term=Find mental health services in Melbourne
+Oct 12 20:34:12 ip-172-31-12-18 web[40690]: INFO:     101.186.146.66:0 - "POST /api/v1/chat/chat HTTP/1.1" 200 OK
+Oct 12 20:34:24 ip-172-31-12-18 web[40690]: INFO:     101.186.146.66:0 - "GET / HTTP/1.1" 200 OK
+Oct 12 20:36:18 ip-172-31-12-18 web[40690]: 2025-10-12 20:36:18 [info     ] Processing message             message=Find mental health services in Carlton session_id=e4748d90-112c-4693-ad70-9ae82e061d58
+Oct 12 20:36:18 ip-172-31-12-18 web[40690]: 2025-10-12 20:36:18 [error    ] Service text search failed     error=Client.__init__() got an unexpected keyword argument 'proxy' search_term=Find mental health services in Carlton
+Oct 12 20:36:20 ip-172-31-12-18 web[40690]: INFO:     101.186.146.66:0 - "POST /api/v1/chat/chat HTTP/1.1" 200 OK
+Oct 12 20:36:41 ip-172-31-12-18 web[40690]: INFO:     101.186.146.66:0 - "GET /database/search?q=Melbourne&limit=5 HTTP/1.1" 404 Not Found
+Oct 12 20:37:28 ip-172-31-12-18 web[40690]: INFO:     Shutting down
+Oct 12 20:37:28 ip-172-31-12-18 web[40690]: INFO:     Waiting for application shutdown.
+Oct 12 20:37:28 ip-172-31-12-18 web[40690]: INFO:     Application shutdown complete.
+Oct 12 20:37:28 ip-172-31-12-18 web[40690]: INFO:     Finished server process [40690]
+Oct 12 20:37:31 ip-172-31-12-18 web[41278]: INFO:     Started server process [41278]
+Oct 12 20:37:31 ip-172-31-12-18 web[41278]: INFO:     Waiting for application startup.
+Oct 12 20:37:31 ip-172-31-12-18 web[41278]: INFO:     Application startup complete.
+Oct 12 20:37:31 ip-172-31-12-18 web[41278]: INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+Oct 12 20:37:46 ip-172-31-12-18 web[41278]: 2025-10-12 20:37:46 [info     ] Processing message             message=Find mental health services in Melbourne session_id=2bd6a365-9dce-47e6-8aa4-004e1965c956
+Oct 12 20:37:46 ip-172-31-12-18 web[41278]: 2025-10-12 20:37:46 [info     ] Searching for services         search_term=Find mental health services in Melbourne
+Oct 12 20:37:46 ip-172-31-12-18 web[41278]: 2025-10-12 20:37:46 [error    ] Service text search failed     error=Client.__init__() got an unexpected keyword argument 'proxy' search_term=Find mental health services in Melbourne
+Oct 12 20:37:47 ip-172-31-12-18 web[41278]: INFO:     101.186.146.66:0 - "POST /api/v1/chat/chat HTTP/1.1" 200 OK
+Oct 12 20:38:10 ip-172-31-12-18 web[41278]: INFO:     101.186.146.66:0 - "GET / HTTP/1.1" 200 OK
+Oct 12 21:28:20 ip-172-31-12-18 web[41278]: INFO:     176.65.141.87:0 - "GET / HTTP/1.1" 200 OK
+Oct 12 22:08:32 ip-172-31-12-18 web[41278]: INFO:     87.121.84.17:0 - "GET / HTTP/1.1" 200 OK
+Oct 12 22:09:48 ip-172-31-12-18 web[41278]: WARNING:  Invalid HTTP request received.
+Oct 12 22:14:11 ip-172-31-12-18 web[41278]: INFO:     87.120.191.84:0 - "GET / HTTP/1.1" 200 OK
+Oct 12 22:18:53 ip-172-31-12-18 web[41278]: INFO:     204.76.203.219:0 - "GET / HTTP/1.1" 200 OK
+Oct 12 22:27:36 ip-172-31-12-18 web[41278]: 2025-10-12 22:27:36 [info     ] Processing message             message=hello session_id=866ef8a3-6312-4ca4-960a-73c1a6f728a3
+Oct 12 22:27:36 ip-172-31-12-18 web[41278]: 2025-10-12 22:27:36 [info     ] Searching for services         search_term=hello
+Oct 12 22:27:36 ip-172-31-12-18 web[41278]: 2025-10-12 22:27:36 [error    ] Service text search failed     error=Client.__init__() got an unexpected keyword argument 'proxy' search_term=hello
+Oct 12 22:27:38 ip-172-31-12-18 web[41278]: INFO:     128.250.0.173:0 - "POST /api/v1/chat/chat HTTP/1.1" 200 OK
+Oct 12 22:30:49 ip-172-31-12-18 web[41278]: INFO:     Shutting down
+Oct 12 22:30:49 ip-172-31-12-18 web[41278]: INFO:     Waiting for application shutdown.
+Oct 12 22:30:49 ip-172-31-12-18 web[41278]: INFO:     Application shutdown complete.
+Oct 12 22:30:49 ip-172-31-12-18 web[41278]: INFO:     Finished server process [41278]
+Oct 12 22:30:52 ip-172-31-12-18 web[45871]: INFO:     Started server process [45871]
+Oct 12 22:30:52 ip-172-31-12-18 web[45871]: INFO:     Waiting for application startup.
+Oct 12 22:30:52 ip-172-31-12-18 web[45871]: INFO:     Application startup complete.
+Oct 12 22:30:52 ip-172-31-12-18 web[45871]: INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+Oct 12 22:31:13 ip-172-31-12-18 web[45871]: INFO:     128.250.0.173:0 - "GET / HTTP/1.1" 200 OK
+Oct 12 22:31:20 ip-172-31-12-18 web[45871]: 2025-10-12 22:31:20 [info     ] Processing message             message=hello session_id=581655ea-c405-4d8b-9567-62a47b27373c
+Oct 12 22:31:20 ip-172-31-12-18 web[45871]: 2025-10-12 22:31:20 [info     ] Searching for services         search_term=hello
+Oct 12 22:31:20 ip-172-31-12-18 web[45871]: 2025-10-12 22:31:20 [error    ] Service text search failed     error=Client.__init__() got an unexpected keyword argument 'proxy' search_term=hello
+Oct 12 22:31:22 ip-172-31-12-18 web[45871]: INFO:     128.250.0.173:0 - "POST /api/v1/chat/chat HTTP/1.1" 200 OK
+Oct 12 22:31:40 ip-172-31-12-18 web[45871]: 2025-10-12 22:31:40 [info     ] Processing message             message=I need services near Carlton session_id=ef29a5ed-1ac6-4093-babb-7b5045cfe2bd
+Oct 12 22:31:40 ip-172-31-12-18 web[45871]: 2025-10-12 22:31:40 [info     ] Searching for services         search_term=I need services near Carlton
+Oct 12 22:31:40 ip-172-31-12-18 web[45871]: 2025-10-12 22:31:40 [error    ] Service text search failed     error=Client.__init__() got an unexpected keyword argument 'proxy' search_term=I need services near Carlton
+Oct 12 22:31:42 ip-172-31-12-18 web[45871]: INFO:     128.250.0.173:0 - "POST /api/v1/chat/chat HTTP/1.1" 200 OK
+Oct 12 22:31:51 ip-172-31-12-18 web[45871]: INFO:     128.250.0.173:0 - "GET / HTTP/1.1" 200 OK
+Oct 12 22:36:32 ip-172-31-12-18 web[45871]: INFO:     128.250.0.173:0 - "GET /apple-touch-icon-precomposed.png HTTP/1.1" 404 Not Found
+Oct 12 22:36:33 ip-172-31-12-18 web[45871]: INFO:     128.250.0.173:0 - "GET /apple-touch-icon.png HTTP/1.1" 404 Not Found
+Oct 12 22:36:33 ip-172-31-12-18 web[45871]: INFO:     128.250.0.173:0 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+Oct 12 22:36:45 ip-172-31-12-18 web[45871]: INFO:     205.169.39.49:0 - "GET /apple-touch-icon.png HTTP/1.1" 404 Not Found
+Oct 12 22:36:58 ip-172-31-12-18 web[45871]: 2025-10-12 22:36:58 [error    ] Supabase connection test failed error=Client.__init__() got an unexpected keyword argument 'proxy'
+Oct 12 22:36:58 ip-172-31-12-18 web[45871]: INFO:     128.250.0.173:0 - "GET /health HTTP/1.1" 200 OK
+Oct 12 22:37:25 ip-172-31-12-18 web[45871]: INFO:     128.250.0.173:0 - "GET / HTTP/1.1" 200 OK
+Oct 12 22:38:55 ip-172-31-12-18 web[45871]: INFO:     Shutting down
+Oct 12 22:38:56 ip-172-31-12-18 web[45871]: INFO:     Waiting for application shutdown.
+Oct 12 22:38:56 ip-172-31-12-18 web[45871]: INFO:     Application shutdown complete.
+Oct 12 22:38:56 ip-172-31-12-18 web[45871]: INFO:     Finished server process [45871]
+Oct 12 22:38:58 ip-172-31-12-18 web[46604]: INFO:     Started server process [46604]
+Oct 12 22:38:58 ip-172-31-12-18 web[46604]: INFO:     Waiting for application startup.
+Oct 12 22:38:58 ip-172-31-12-18 web[46604]: INFO:     Application startup complete.
+Oct 12 22:38:58 ip-172-31-12-18 web[46604]: INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+Oct 12 22:39:24 ip-172-31-12-18 web[46604]: 2025-10-12 22:39:24 [info     ] Processing message             message=I need services near Carlton session_id=128d4115-9fb0-437b-87d2-35d47bb7ba7e
+Oct 12 22:39:24 ip-172-31-12-18 web[46604]: 2025-10-12 22:39:24 [info     ] Searching for services         search_term=I need services near Carlton
+Oct 12 22:39:24 ip-172-31-12-18 web[46604]: 2025-10-12 22:39:24 [error    ] Service text search failed     error=Client.__init__() got an unexpected keyword argument 'proxy' search_term=I need services near Carlton
+Oct 12 22:39:25 ip-172-31-12-18 web[46604]: INFO:     128.250.0.173:0 - "POST /api/v1/chat/chat HTTP/1.1" 200 OK
+Oct 12 22:39:36 ip-172-31-12-18 web[46604]: 2025-10-12 22:39:36 [error    ] Supabase connection test failed error=Client.__init__() got an unexpected keyword argument 'proxy'
+Oct 12 22:39:36 ip-172-31-12-18 web[46604]: INFO:     128.250.0.173:0 - "GET /health HTTP/1.1" 200 OK
+Oct 12 22:48:16 ip-172-31-12-18 web[46604]: INFO:     Shutting down
+Oct 12 22:48:16 ip-172-31-12-18 web[46604]: INFO:     Waiting for application shutdown.
+Oct 12 22:48:16 ip-172-31-12-18 web[46604]: INFO:     Application shutdown complete.
+Oct 12 22:48:16 ip-172-31-12-18 web[46604]: INFO:     Finished server process [46604]
+Oct 12 22:48:19 ip-172-31-12-18 web[47402]: INFO:     Started server process [47402]
+Oct 12 22:48:19 ip-172-31-12-18 web[47402]: INFO:     Waiting for application startup.
+Oct 12 22:48:19 ip-172-31-12-18 web[47402]: INFO:     Application startup complete.
+Oct 12 22:48:19 ip-172-31-12-18 web[47402]: INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+Oct 12 22:50:15 ip-172-31-12-18 web[47402]: INFO:     128.250.0.173:0 - "GET /debug/versions HTTP/1.1" 200 OK
+Oct 12 22:50:21 ip-172-31-12-18 web[47402]: INFO:     205.169.39.24:0 - "GET /debug/versions HTTP/1.1" 200 OK
+Oct 12 22:50:46 ip-172-31-12-18 web[47402]: INFO:     128.250.0.173:0 - "GET /debug/versions HTTP/1.1" 200 OK
+Oct 12 22:54:41 ip-172-31-12-18 web[47402]: INFO:     Shutting down
+Oct 12 22:54:41 ip-172-31-12-18 web[47402]: INFO:     Waiting for application shutdown.
+Oct 12 22:54:41 ip-172-31-12-18 web[47402]: INFO:     Application shutdown complete.
+Oct 12 22:54:41 ip-172-31-12-18 web[47402]: INFO:     Finished server process [47402]
+Oct 12 22:54:43 ip-172-31-12-18 web[48156]: INFO:     Started server process [48156]
+Oct 12 22:54:43 ip-172-31-12-18 web[48156]: INFO:     Waiting for application startup.
+Oct 12 22:54:43 ip-172-31-12-18 web[48156]: INFO:     Application startup complete.
+Oct 12 22:54:43 ip-172-31-12-18 web[48156]: INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+Oct 12 22:55:11 ip-172-31-12-18 web[48156]: INFO:     128.250.0.173:0 - "GET /debug/versions HTTP/1.1" 200 OK
+Oct 12 22:55:21 ip-172-31-12-18 web[48156]: 2025-10-12 22:55:21 [error    ] Supabase connection test failed error=Client.__init__() got an unexpected keyword argument 'proxy'
+Oct 12 22:55:21 ip-172-31-12-18 web[48156]: INFO:     128.250.0.173:0 - "GET /health HTTP/1.1" 200 OK
+Oct 12 22:55:35 ip-172-31-12-18 web[48156]: 2025-10-12 22:55:35 [info     ] Processing message             message=Find mental health services in Melbourne session_id=bf6b87eb-f496-46d4-ab3d-872d02a53d92
+Oct 12 22:55:35 ip-172-31-12-18 web[48156]: 2025-10-12 22:55:35 [info     ] Searching for services         search_term=Find mental health services in Melbourne
+Oct 12 22:55:35 ip-172-31-12-18 web[48156]: 2025-10-12 22:55:35 [error    ] Service text search failed     error=Client.__init__() got an unexpected keyword argument 'proxy' search_term=Find mental health services in Melbourne
+Oct 12 22:55:36 ip-172-31-12-18 web[48156]: INFO:     128.250.0.173:0 - "POST /api/v1/chat/chat HTTP/1.1" 200 OK
+Oct 12 23:01:52 ip-172-31-12-18 web[48156]: INFO:     Shutting down
+Oct 12 23:01:53 ip-172-31-12-18 web[48156]: INFO:     Waiting for application shutdown.
+Oct 12 23:01:53 ip-172-31-12-18 web[48156]: INFO:     Application shutdown complete.
+Oct 12 23:01:53 ip-172-31-12-18 web[48156]: INFO:     Finished server process [48156]
+Oct 12 23:01:55 ip-172-31-12-18 web[48953]: INFO:     Started server process [48953]
+Oct 12 23:01:55 ip-172-31-12-18 web[48953]: INFO:     Waiting for application startup.
+Oct 12 23:01:55 ip-172-31-12-18 web[48953]: INFO:     Application startup complete.
+Oct 12 23:01:55 ip-172-31-12-18 web[48953]: INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+Oct 12 23:02:05 ip-172-31-12-18 web[48953]: INFO:     128.250.0.173:0 - "GET /debug/supabase-test HTTP/1.1" 200 OK
+Oct 12 23:04:33 ip-172-31-12-18 web[48953]: INFO:     Shutting down
+Oct 12 23:04:33 ip-172-31-12-18 web[48953]: INFO:     Waiting for application shutdown.
+Oct 12 23:04:33 ip-172-31-12-18 web[48953]: INFO:     Application shutdown complete.
+Oct 12 23:04:33 ip-172-31-12-18 web[48953]: INFO:     Finished server process [48953]
+Oct 12 23:04:36 ip-172-31-12-18 web[49534]: INFO:     Started server process [49534]
+Oct 12 23:04:36 ip-172-31-12-18 web[49534]: INFO:     Waiting for application startup.
+Oct 12 23:04:36 ip-172-31-12-18 web[49534]: INFO:     Application startup complete.
+Oct 12 23:04:36 ip-172-31-12-18 web[49534]: INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+Oct 12 23:05:02 ip-172-31-12-18 web[49534]: INFO:     128.250.0.173:0 - "GET / HTTP/1.1" 200 OK
+Oct 12 23:05:17 ip-172-31-12-18 web[49534]: 2025-10-12 23:05:17 [info     ] Processing message             message=Find mental health services in Melbourne session_id=afd91490-d2a4-4585-831b-939312c173d9
+Oct 12 23:05:17 ip-172-31-12-18 web[49534]: 2025-10-12 23:05:17 [info     ] Searching for services         limit=10 search_term=Find mental health services in Melbourne
+Oct 12 23:05:19 ip-172-31-12-18 web[49534]: 2025-10-12 23:05:19 [info     ] Search completed               results=0 search_term=Find mental health services in Melbourne
+Oct 12 23:05:19 ip-172-31-12-18 web[49534]: 2025-10-12 23:05:19 [warning  ] No results found for search    search_term=Find mental health services in Melbourne
+Oct 12 23:05:20 ip-172-31-12-18 web[49534]: INFO:     128.250.0.173:0 - "POST /api/v1/chat/chat HTTP/1.1" 200 OK
+Oct 12 23:05:35 ip-172-31-12-18 web[49534]: INFO:     128.250.0.173:0 - "GET /debug/versions HTTP/1.1" 200 OK
+Oct 12 23:05:43 ip-172-31-12-18 web[49534]: INFO:     128.250.0.173:0 - "GET /debug/supabase-test HTTP/1.1" 200 OK
+Oct 12 23:05:53 ip-172-31-12-18 web[49534]: INFO:     128.250.0.173:0 - "GET /health HTTP/1.1" 200 OK
+Oct 12 23:08:09 ip-172-31-12-18 web[49534]: INFO:     Shutting down
+Oct 12 23:08:09 ip-172-31-12-18 web[49534]: INFO:     Waiting for application shutdown.
+Oct 12 23:08:09 ip-172-31-12-18 web[49534]: INFO:     Application shutdown complete.
+Oct 12 23:08:09 ip-172-31-12-18 web[49534]: INFO:     Finished server process [49534]
+Oct 12 23:08:11 ip-172-31-12-18 web[50123]: INFO:     Started server process [50123]
+Oct 12 23:08:11 ip-172-31-12-18 web[50123]: INFO:     Waiting for application startup.
+Oct 12 23:08:11 ip-172-31-12-18 web[50123]: INFO:     Application startup complete.
+Oct 12 23:08:11 ip-172-31-12-18 web[50123]: INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+Oct 12 23:08:21 ip-172-31-12-18 web[50123]: 2025-10-12 23:08:21 [info     ] Searching for services         limit=5 search_term=Melbourne
+Oct 12 23:08:22 ip-172-31-12-18 web[50123]: 2025-10-12 23:08:22 [info     ] Search completed               results=5 search_term=Melbourne
+Oct 12 23:08:22 ip-172-31-12-18 web[50123]: INFO:     128.250.0.173:0 - "GET /debug/test-search?query=Melbourne HTTP/1.1" 200 OK
+Oct 12 23:10:46 ip-172-31-12-18 web[50123]: 2025-10-12 23:10:46 [info     ] Searching for services         limit=5 search_term=health
+Oct 12 23:10:47 ip-172-31-12-18 web[50123]: 2025-10-12 23:10:47 [info     ] Search completed               results=5 search_term=health
+Oct 12 23:10:47 ip-172-31-12-18 web[50123]: INFO:     128.250.0.173:0 - "GET /debug/test-search?query=health HTTP/1.1" 200 OK
+Oct 12 23:11:20 ip-172-31-12-18 web[50123]: 2025-10-12 23:11:20 [info     ] Searching for services         limit=5 search_term=Melbourne
+Oct 12 23:11:21 ip-172-31-12-18 web[50123]: 2025-10-12 23:11:21 [info     ] Search completed               results=5 search_term=Melbourne
+Oct 12 23:11:21 ip-172-31-12-18 web[50123]: INFO:     205.169.39.20:0 - "GET /debug/test-search?query=Melbourne HTTP/1.1" 200 OK
+Oct 12 23:13:09 ip-172-31-12-18 web[50123]: INFO:     87.120.191.84:0 - "GET / HTTP/1.1" 200 OK
+Oct 12 23:14:42 ip-172-31-12-18 web[50123]: INFO:     74.249.129.4:0 - "GET / HTTP/1.1" 200 OK
+Oct 12 23:19:47 ip-172-31-12-18 web[50123]: INFO:     Shutting down
+Oct 12 23:19:47 ip-172-31-12-18 web[50123]: INFO:     Waiting for application shutdown.
+Oct 12 23:19:47 ip-172-31-12-18 web[50123]: INFO:     Application shutdown complete.
+Oct 12 23:19:47 ip-172-31-12-18 web[50123]: INFO:     Finished server process [50123]
+Oct 12 23:19:50 ip-172-31-12-18 web[50999]: INFO:     Started server process [50999]
+Oct 12 23:19:50 ip-172-31-12-18 web[50999]: INFO:     Waiting for application startup.
+Oct 12 23:19:50 ip-172-31-12-18 web[50999]: INFO:     Application startup complete.
+Oct 12 23:19:50 ip-172-31-12-18 web[50999]: INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+Oct 12 23:20:18 ip-172-31-12-18 web[50999]: 2025-10-12 23:20:18 [info     ] === CHAT SERVICE START ===     message=Find mental health services in Melbourne session_id=6ae11597-e787-47c4-862c-7fef1d94269f
+Oct 12 23:20:18 ip-172-31-12-18 web[50999]: 2025-10-12 23:20:18 [info     ] Initializing clients...
+Oct 12 23:20:18 ip-172-31-12-18 web[50999]: 2025-10-12 23:20:18 [info     ] ✓ Clients initialized successfully
+Oct 12 23:20:18 ip-172-31-12-18 web[50999]: 2025-10-12 23:20:18 [info     ] Starting database search       limit=10 search_term=Find mental health services in Melbourne
+Oct 12 23:20:18 ip-172-31-12-18 web[50999]: 2025-10-12 23:20:18 [info     ] Searching for services         limit=10 search_term=Find mental health services in Melbourne
+Oct 12 23:20:18 ip-172-31-12-18 web[50999]: 2025-10-12 23:20:18 [info     ] Search completed               results=0 search_term=Find mental health services in Melbourne
+Oct 12 23:20:18 ip-172-31-12-18 web[50999]: 2025-10-12 23:20:18 [warning  ] No results found for search    search_term=Find mental health services in Melbourne
+Oct 12 23:20:18 ip-172-31-12-18 web[50999]: 2025-10-12 23:20:18 [info     ] ✓ Database search completed    results_count=0 search_term=Find mental health services in Melbourne
+Oct 12 23:20:18 ip-172-31-12-18 web[50999]: 2025-10-12 23:20:18 [warning  ] ⚠ Search returned zero results search_term=Find mental health services in Melbourne
+Oct 12 23:20:18 ip-172-31-12-18 web[50999]: 2025-10-12 23:20:18 [info     ] No results found, generating fallback response
+Oct 12 23:20:20 ip-172-31-12-18 web[50999]: INFO:     128.250.0.173:0 - "POST /api/v1/chat/chat HTTP/1.1" 200 OK
