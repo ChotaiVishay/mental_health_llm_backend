@@ -4,6 +4,7 @@ Enhanced search with better keyword extraction and context understanding.
 """
 
 import httpx
+import re
 from typing import Any, Dict, List, Optional
 import structlog
 
@@ -37,40 +38,66 @@ class SupabaseOnlyConnection:
         }
 
     def _extract_location_keywords(self, text: str) -> List[str]:
-        """Extract location-specific keywords (suburbs, states, postcodes)."""
+        """Extract location-specific keywords (suburbs, states, postcodes) conservatively.
+
+        - Match state abbreviations only as standalone tokens (avoid 'vic' in 'services').
+        - Prefer full state names and common phrases.
+        - Postcodes: AU are 4 digits; ignore 1300/1800 (phone prefixes).
+        """
         text_lower = text.lower()
-        
-        # Australian states and territories
-        states = ['victoria', 'nsw', 'queensland', 'wa', 'sa', 'tas', 'act', 'nt',
-                 'vic', 'qld', 'western australia', 'south australia', 'tasmania',
-                 'northern territory', 'australian capital territory']
-        
-        # Common Victorian suburbs (expand this list)
-        melbourne_suburbs = ['carlton', 'fitzroy', 'richmond', 'collingwood', 'brunswick',
-                            'footscray', 'preston', 'thornbury', 'northcote', 'hawthorn',
-                            'south yarra', 'st kilda', 'elwood', 'caulfield', 'glen waverley',
-                            'box hill', 'dandenong', 'frankston', 'geelong', 'ballarat',
-                            'bendigo', 'shepparton', 'wangaratta', 'wodonga', 'melbourne']
-        
-        locations = []
-        
-        # Check for states
-        for state in states:
-            if state in text_lower:
-                locations.append(state)
-        
-        # Check for suburbs
+
+        # Tokenize to words and 4-digit numbers only
+        tokens = re.findall(r"[a-z]+|\d{4}", text_lower)
+        token_set = set(tokens)
+
+        # Full state names/phrases
+        state_full = [
+            'victoria', 'new south wales', 'queensland', 'western australia',
+            'south australia', 'tasmania', 'northern territory', 'australian capital territory'
+        ]
+
+        # Safer abbreviations only (avoid ambiguous: sa/wa/nt/act/tas)
+        state_abbrev_safe = ['vic', 'nsw', 'qld']
+
+        # Common Victorian suburbs (expand as needed)
+        melbourne_suburbs = [
+            'carlton', 'fitzroy', 'richmond', 'collingwood', 'brunswick',
+            'footscray', 'preston', 'thornbury', 'northcote', 'hawthorn',
+            'south yarra', 'st kilda', 'elwood', 'caulfield', 'glen waverley',
+            'box hill', 'dandenong', 'frankston', 'geelong', 'ballarat',
+            'bendigo', 'shepparton', 'wangaratta', 'wodonga', 'melbourne'
+        ]
+
+        found: List[str] = []
+
+        # Full state phrases as substrings
+        for name in state_full:
+            if name in text_lower:
+                found.append(name)
+
+        # Abbreviations as standalone tokens only
+        for abbr in state_abbrev_safe:
+            if abbr in token_set:
+                found.append(abbr)
+
+        # Suburbs as phrases
         for suburb in melbourne_suburbs:
             if suburb in text_lower:
-                locations.append(suburb)
-        
-        # Check for postcodes (3-4 digits)
-        words = text.split()
-        for word in words:
-            if word.isdigit() and 3 <= len(word) <= 4:
-                locations.append(word)
-        
-        return locations
+                found.append(suburb)
+
+        # Postcodes: exactly 4 digits, skip common phone prefixes
+        for tok in tokens:
+            if tok.isdigit() and len(tok) == 4 and tok not in {"1300", "1800"}:
+                found.append(tok)
+
+        # Deduplicate while preserving order
+        seen = set()
+        result: List[str] = []
+        for item in found:
+            if item not in seen:
+                seen.add(item)
+                result.append(item)
+        return result
 
     def _extract_service_keywords(self, text: str) -> List[str]:
         """Extract service-type keywords."""
@@ -127,61 +154,65 @@ class SupabaseOnlyConnection:
                        services=services,
                        cost_filter=cost_filter)
             
-            # Build search filters based on what we found
-            filters = []
-            
-            # Location filters (highest priority)
+            # Build PostgREST boolean logic: OR within groups, AND across groups
+            url = f"{self.settings.supabase_url}/rest/v1/staging_services"
+            params: Dict[str, str] = {"select": "*", "limit": str(limit)}
+
+            location_exprs: List[str] = []
             if locations:
-                location_filters = []
                 for loc in locations:
                     pattern = f"*{loc}*"
-                    location_filters.extend([
+                    location_exprs.extend([
                         f"suburb.ilike.{pattern}",
                         f"state.ilike.{pattern}",
+                        f"address.ilike.{pattern}",
                         f"postcode.eq.{loc}" if loc.isdigit() else None,
-                        f"address.ilike.{pattern}"
                     ])
-                location_filters = [f for f in location_filters if f]  # Remove None
-                if location_filters:
-                    filters.append(f"({','.join(location_filters)})")
-            
-            # Service type filters
+                location_exprs = [f for f in location_exprs if f]
+
+            service_exprs: List[str] = []
             if services:
-                service_filters = []
                 for service in services:
                     pattern = f"*{service}*"
-                    service_filters.extend([
+                    service_exprs.extend([
                         f"service_name.ilike.{pattern}",
                         f"service_type.ilike.{pattern}",
-                        f"notes.ilike.{pattern}"
+                        f"notes.ilike.{pattern}",
                     ])
-                if service_filters:
-                    filters.append(f"({','.join(service_filters)})")
-            
-            # If no specific keywords found, do a general search
-            if not filters:
+
+            cost_expr: Optional[str] = None
+            if cost_filter:
+                cost_expr = f"cost.ilike.*{cost_filter}*"
+
+            # If no specific keywords found, do a general OR search across common fields
+            if not location_exprs and not service_exprs and not cost_expr:
                 pattern = f"*{search_term.strip()}*"
-                filters.append(
+                params["or"] = (
                     f"(service_name.ilike.{pattern},"
                     f"organisation_name.ilike.{pattern},"
                     f"suburb.ilike.{pattern},"
                     f"service_type.ilike.{pattern},"
                     f"notes.ilike.{pattern})"
                 )
-            
-            # Combine all filters with AND logic
-            combined_filter = ",".join(filters)
-            
-            url = f"{self.settings.supabase_url}/rest/v1/staging_services"
-            params = {
-                "select": "*",
-                "or": combined_filter,
-                "limit": str(limit)
-            }
-            
-            # Add cost filter if specified
-            if cost_filter:
-                params["cost"] = f"ilike.*{cost_filter}*"
+            else:
+                and_parts: List[str] = []
+                if location_exprs:
+                    and_parts.append(f"or=({','.join(location_exprs)})")
+                if service_exprs:
+                    and_parts.append(f"or=({','.join(service_exprs)})")
+                if cost_expr:
+                    and_parts.append(cost_expr)
+
+                if len(and_parts) == 1:
+                    only = and_parts[0]
+                    if only.startswith("or="):
+                        params["or"] = only[len("or="):]
+                    else:
+                        # field.op.value as top-level param: field=op.value
+                        field, rest = only.split(".", 1)
+                        params[field] = rest
+                else:
+                    params["and"] = f"({','.join(and_parts)})"
             
             logger.info("Executing search", url=url, params=params)
             
