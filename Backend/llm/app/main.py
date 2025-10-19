@@ -15,7 +15,7 @@ app = FastAPI(
     version="1.0.0",
 )
 
-# Fixed CORS - allow all Vercel domains
+# CORS - allow all Vercel domains for predeployment testing
 app.add_middleware(
     CORSMiddleware,
     allow_origin_regex=r"https://.*\.vercel\.app",
