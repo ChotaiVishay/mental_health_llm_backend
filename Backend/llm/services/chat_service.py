@@ -1,18 +1,17 @@
 """
 Main chat service orchestrating mental health chatbot functionality.
-Enhanced with comprehensive debug logging.
 """
 
 from typing import Dict, Any, List, Optional
-from datetime import datetime
 import uuid
 import structlog
 
 from core.database.supabase_only import get_supabase_db
 from core.llm.openai_client import get_openai_client
 from app.config import get_settings
-from services.intent_router import detect_intent
-from services.flows.service_creation import prepare_payload
+# TEMPORARILY DISABLED - service creation feature
+# from services.intent_router import detect_intent
+# from services.flows.service_creation import prepare_payload
 
 logger = structlog.get_logger(__name__)
 
@@ -30,29 +29,25 @@ class MentalHealthChatService:
 
             logger.info("=== CHAT SERVICE START ===", message=message, session_id=session_id)
 
-            # Step 0: Detect intent early. If it's an add-service intent, signal frontend to open the form.
-            try:
-                intent = detect_intent(message)
-            except Exception:
-                intent = "query_services"
-
-            if intent == "add_service":
-                logger.info("Detected add_service intent; prompting for form")
-                return {
-                    "message": (
-                        "I can help add a new service. Please provide the service details via the form."
-                    ),
-                    "session_id": session_id,
-                    "services_found": 0,
-                    "query_successful": True,
-                    "action": "request_service_form",
-                }
+            # TEMPORARILY DISABLED - service creation intent detection
+            # try:
+            #     intent = detect_intent(message)
+            # except Exception:
+            #     intent = "query_services"
+            # 
+            # if intent == "add_service":
+            #     return {
+            #         "message": "Service creation feature temporarily disabled.",
+            #         "session_id": session_id,
+            #         "services_found": 0,
+            #         "query_successful": True,
+            #     }
 
             # Validate configuration
             if not self.settings.openai_api_key:
                 logger.error("OpenAI API key not configured")
                 return {
-                    "message": "Configuration error: OpenAI API key is missing. Please set OPENAI_API_KEY environment variable.",
+                    "message": "Configuration error: OpenAI API key is missing.",
                     "session_id": session_id,
                     "services_found": 0,
                     "query_successful": False,
@@ -62,7 +57,7 @@ class MentalHealthChatService:
             if not self.settings.supabase_url or not self.settings.supabase_key:
                 logger.error("Supabase not configured")
                 return {
-                    "message": "Configuration error: Supabase is not configured. Please set SUPABASE_URL and SUPABASE_KEY.",
+                    "message": "Configuration error: Supabase is not configured.",
                     "session_id": session_id,
                     "services_found": 0,
                     "query_successful": False,
@@ -78,14 +73,14 @@ class MentalHealthChatService:
             except Exception as e:
                 logger.error("Failed to initialize clients", error=str(e), exc_info=True)
                 return {
-                    "message": "Failed to initialize services. Please check configuration.",
+                    "message": "Failed to initialize services.",
                     "session_id": session_id,
                     "services_found": 0,
                     "query_successful": False,
                     "error": f"Client initialization failed: {str(e)}"
                 }
 
-            # Search for services with comprehensive logging
+            # Search for services
             try:
                 logger.info("Starting database search", search_term=message, limit=10)
                 
@@ -95,7 +90,6 @@ class MentalHealthChatService:
                            results_count=len(search_results),
                            search_term=message)
                 
-                # Log details of first result for verification
                 if search_results:
                     first = search_results[0]
                     logger.info("First result details:", 
@@ -112,7 +106,7 @@ class MentalHealthChatService:
                             search_term=message,
                             exc_info=True)
                 return {
-                    "message": "I apologise, but I'm having trouble accessing the service database right now. Please try again later or contact support.",
+                    "message": "I'm having trouble accessing the service database right now.",
                     "session_id": session_id,
                     "services_found": 0,
                     "query_successful": False,
@@ -124,9 +118,8 @@ class MentalHealthChatService:
                 if search_results:
                     logger.info("Generating AI response for results", count=len(search_results))
                     
-                    # Format search results for better readability
                     formatted_services = []
-                    for service in search_results[:5]:  # Top 5 results
+                    for service in search_results[:5]:
                         service_info = f"""
 - Service: {service.get('service_name', 'N/A')}
   Organization: {service.get('organisation_name', 'N/A')}
@@ -144,11 +137,10 @@ I found these mental health services:
 
 Please provide a helpful response that:
 1. Directly answers their question
-2. Lists the relevant services with key details (name, location, cost, contact)
+2. Lists the relevant services with key details
 3. Is empathetic and supportive
 4. Keeps response under 250 words
-5. Encourages them to contact the services for more information
-6. Return plain text only. Do not use Markdown.
+5. Return plain text only, no Markdown
 
 Respond as a helpful mental health services assistant."""
 
@@ -175,14 +167,13 @@ Respond as a helpful mental health services assistant."""
                     
                     prompt = f"""The user asked: "{message}"
 
-I couldn't find specific mental health services matching their request in the database.
+I couldn't find specific mental health services matching their request.
 
 Please provide a supportive response that:
 1. Acknowledges we couldn't find specific matches
-2. Suggests they try different search terms (be specific about what to try)
-3. Recommends contacting their GP or calling mental health helplines (Lifeline 13 11 14, Beyond Blue 1300 22 4636)
-4. Is empathetic and helpful
-5. Keeps response under 150 words"""
+2. Suggests trying different search terms
+3. Recommends contacting their GP or mental health helplines
+4. Keeps response under 150 words"""
 
                     response = openai_client.client.chat.completions.create(
                         model=self.settings.openai_model,
@@ -196,20 +187,17 @@ Please provide a supportive response that:
                         "session_id": session_id,
                         "services_found": 0,
                         "query_successful": True,
-                        "suggestion": "Try different search terms like 'counseling', 'therapy', or specify a location",
+                        "suggestion": "Try different search terms or specify a location",
                     }
                     
             except Exception as e:
-                logger.error("✗ OpenAI API call failed", error=str(e), exc_info=True)
+                logger.error("OpenAI API call failed", error=str(e), exc_info=True)
                 
-                # Fallback response if OpenAI fails
                 if search_results:
-                    fallback_msg = f"I found {len(search_results)} mental health services, but I'm having trouble generating a detailed response. Here are the first few results:\n\n"
+                    fallback_msg = f"I found {len(search_results)} mental health services:\n\n"
                     for i, service in enumerate(search_results[:3], 1):
-                        fallback_msg += f"{i}. {service.get('service_name', 'N/A')} - {service.get('suburb', 'N/A')}, {service.get('state', 'N/A')}\n"
-                        fallback_msg += f"   Organization: {service.get('organisation_name', 'N/A')}\n"
-                        fallback_msg += f"   Phone: {service.get('phone', 'N/A')}\n"
-                        fallback_msg += f"   Cost: {service.get('cost', 'N/A')}\n\n"
+                        fallback_msg += f"{i}. {service.get('service_name', 'N/A')} - {service.get('suburb', 'N/A')}\n"
+                        fallback_msg += f"   Phone: {service.get('phone', 'N/A')}\n\n"
                     
                     return {
                         "message": fallback_msg,
@@ -217,11 +205,10 @@ Please provide a supportive response that:
                         "services_found": len(search_results),
                         "raw_data": search_results[:3],
                         "query_successful": True,
-                        "warning": "Using fallback response due to AI service issue"
                     }
                 else:
                     return {
-                        "message": "I apologize, but I'm experiencing technical difficulties with the AI service. Please try again later.",
+                        "message": "I'm experiencing technical difficulties.",
                         "session_id": session_id,
                         "services_found": 0,
                         "query_successful": False,
@@ -229,50 +216,13 @@ Please provide a supportive response that:
                     }
 
         except Exception as e:
-            logger.error("✗ CHAT PROCESSING COMPLETELY FAILED", 
+            logger.error("CHAT PROCESSING FAILED", 
                         message=message, 
                         error=str(e), 
                         exc_info=True)
             return {
-                "message": "I apologize, but I'm experiencing technical difficulties. Please try again later or contact support.",
+                "message": "I'm experiencing technical difficulties.",
                 "session_id": session_id or str(uuid.uuid4()),
-                "services_found": 0,
-                "query_successful": False,
-                "error": str(e),
-            }
-
-    async def process_service_form(self, form_data: Dict[str, Any], session_id: Optional[str] = None) -> Dict[str, Any]:
-        """Validate form data and insert a new service into Supabase."""
-        if not session_id:
-            session_id = str(uuid.uuid4())
-
-        try:
-            logger.info("=== SERVICE CREATION START ===", session_id=session_id)
-
-            # Validate/normalize via flow helper
-            payload = prepare_payload(form_data)
-            logger.info("Service form validated", keys=list(payload.keys()))
-
-            # Insert into Supabase
-            supabase_db = await get_supabase_db()
-            created = supabase_db.insert_service(payload)
-
-            name = created.get("service_name") or payload.get("service_name")
-            sid = created.get("id")
-
-            return {
-                "message": f"Thanks! The service '{name}' has been submitted successfully.",
-                "session_id": session_id,
-                "services_found": 0,
-                "query_successful": True,
-                "action": "service_created",
-                "raw_data": [created],
-            }
-        except Exception as e:
-            logger.error("Service creation failed", error=str(e), exc_info=True)
-            return {
-                "message": "I couldn't submit that service due to a validation or database error.",
-                "session_id": session_id,
                 "services_found": 0,
                 "query_successful": False,
                 "error": str(e),
@@ -293,38 +243,32 @@ Please provide a supportive response that:
             return []
 
     async def get_suggested_questions(self) -> List[str]:
-        """Get suggested questions to help users get started."""
+        """Get suggested questions."""
         return [
             "Find mental health services in Melbourne",
             "What free counseling services are available?",
-            "I need help with anxiety - what services can help?",
+            "I need help with anxiety",
             "Show me telehealth therapy options",
-            "Are there services for young people with depression?",
         ]
 
     async def health_check(self) -> Dict[str, Any]:
-        """Check the health of chat service components."""
+        """Check service health."""
         try:
-            # Check configuration
             config_status = {
                 "openai_api_key_set": bool(self.settings.openai_api_key),
                 "supabase_url_set": bool(self.settings.supabase_url),
                 "supabase_key_set": bool(self.settings.supabase_key),
-                "openai_model": self.settings.openai_model,
             }
             
-            # Check database
             supabase_db = await get_supabase_db()
             db_status = await supabase_db.test_connection()
             
-            # Check OpenAI
             openai_client = get_openai_client()
             openai_status = await openai_client.test_connection()
 
             all_healthy = (
                 config_status["openai_api_key_set"] and
                 config_status["supabase_url_set"] and
-                config_status["supabase_key_set"] and
                 db_status.get("status") == "connected" and
                 openai_status.get("status") == "connected"
             )
@@ -337,7 +281,7 @@ Please provide a supportive response that:
                 "ready_for_chat": all_healthy,
             }
         except Exception as e:
-            logger.error("Chat service health check failed", error=str(e), exc_info=True)
+            logger.error("Health check failed", error=str(e), exc_info=True)
             return {
                 "status": "error",
                 "error": str(e),

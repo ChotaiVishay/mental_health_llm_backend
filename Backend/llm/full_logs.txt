@@ -1,4 +1,4 @@
 Retrieving logs...
-Logs were saved to /Users/vishaychotai/Documents/University/Third Year - Bachelor of Science/SEM 2/IT Project - COMP30022/LLM Insertion/COMP30022-Group-30-Mental-Health-Services-with-LLM/Backend/llm/.elasticbeanstalk/logs/251019_165516
-Logs were saved to /Users/vishaychotai/Documents/University/Third Year - Bachelor of Science/SEM 2/IT Project - COMP30022/LLM Insertion/COMP30022-Group-30-Mental-Health-Services-with-LLM/Backend/llm/.elasticbeanstalk/logs/251019_165516
+Logs were saved to /Users/vishaychotai/Documents/University/Third Year - Bachelor of Science/SEM 2/IT Project - COMP30022/LLM Insertion/COMP30022-Group-30-Mental-Health-Services-with-LLM/Backend/llm/.elasticbeanstalk/logs/251019_211440
+Logs were saved to /Users/vishaychotai/Documents/University/Third Year - Bachelor of Science/SEM 2/IT Project - COMP30022/LLM Insertion/COMP30022-Group-30-Mental-Health-Services-with-LLM/Backend/llm/.elasticbeanstalk/logs/251019_211440
 Updated symlink at /Users/vishaychotai/Documents/University/Third Year - Bachelor of Science/SEM 2/IT Project - COMP30022/LLM Insertion/COMP30022-Group-30-Mental-Health-Services-with-LLM/Backend/llm/.elasticbeanstalk/logs/latest

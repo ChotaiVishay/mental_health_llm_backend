@@ -1,0 +1,11 @@
+ Environment Variables:
+ eb setenv \    
+     ALLOWED_ORIGINS="https://comp-30022-group-30-mental-health-s.vercel.app,https://*.vercel.app" \
+     ENVIRONMENT="production" \
+     MAX_RESPONSE_TOKENS="1000" \
+     OPENAI_API_KEY="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" \
+     OPENAI_MODEL="gpt-4o-mini" \
+     OPENAI_TEMPERATURE="0.7" \
+     SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpsZHRqZWNuZG12dGR2ZGxzemdkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUxMzk5MzcsImV4cCI6MjA3MDcxNTkzN30.utUxFKtpx1f-OyJsneE6DgsC_OvuxD0zfwqTgUi0O5Y" \
+     SUPABASE_SERVICE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpsZHRqZWNuZG12dGR2ZGxzemdkIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NTEzOTkzNywiZXhwIjoyMDcwNzE1OTM3fQ.qwEPw97_aNlLsNYyYtAlGsnLk-J0EUQcXpZrhG0tMcg" \
+     SUPABASE_URL="https://zldtjecndmvtdvdlszgd.supabase.co"

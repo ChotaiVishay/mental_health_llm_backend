@@ -25,7 +25,7 @@ class ServiceDraft(BaseModel):
     postcode: str
 
     phone: Optional[str] = None
-    email: Optional[EmailStr] = None
+    email: Optional[str] = None
     website: Optional[str] = None
     notes: Optional[str] = None
     wait_time: Optional[str] = None
