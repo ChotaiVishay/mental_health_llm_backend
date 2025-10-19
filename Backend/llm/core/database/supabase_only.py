@@ -1,5 +1,5 @@
 """
-Supabase-only connection using direct REST API calls.
+Supabase-only connection using direct RESTapi calls.
 Enhanced search with better keyword extraction and context understanding.
 """
 
