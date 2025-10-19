@@ -1,5 +1,6 @@
 """
 OpenAI client configuration for the mental health LLM backend.
+Key updated on: 15/09/25, 17/10/25, 22/10/25
 """
 
 from typing import Optional, Dict, Any
