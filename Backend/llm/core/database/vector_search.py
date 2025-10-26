@@ -187,9 +187,9 @@ class VectorSearchService:
         Determine how many results to return based on top similarity score.
         
         Quality-gated approach:
-        - High confidence (>70%): 3 results
-        - Medium confidence (50-70%): 5 results
-        - Low confidence (<50%): 7 results
+        - High confidence (>75%): 3 results
+        - Medium confidence (55-75%): 5 results
+        - Low confidence (<55%): 7 results
         """
         if top_similarity > 0.75:
             count = 3
