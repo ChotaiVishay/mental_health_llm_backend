@@ -89,8 +89,30 @@ class VectorSearchService:
             'bendigo', 'melbourne', 'coburg', 'essendon', 'moonee ponds',
             'newport', 'williamstown', 'yarraville', 'seddon', 'altona',
             'north melbourne', 'west melbourne', 'kensington', 'flemington',
-            'parkville', 'princes hill', 'east melbourne', 'docklands'
+            'parkville', 'princes hill', 'east melbourne', 'docklands', 'toorak',
+            'malvern', 'armadale', 'brighton', 'hampton', 'sandringham',
+            'mordialloc', 'mentone', 'cheltenham', 'clayton', 'oakleigh',
+            'ashburton', 'burwood', 'camberwell', 'surrey hills', 'balwyn',
+            'doncaster', 'templestowe', 'bulleen', 'heidelberg', 'rosanna',
+            'greensborough', 'montmorency', 'eltham', 'warrandyte', 'ringwood',
+            'croydon', 'mitcham', 'nunawading', 'blackburn', 'vermont',
+            'forest hill', 'wheelers hill', 'mulgrave', 'springvale', 'noble park',
+            'keysborough', 'cranbourne', 'berwick', 'narre warren', 'pakenham',
+            'rowville', 'knoxfield', 'boronia', 'ferntree gully', 'wantirna',
+            'scoresby', 'bayswater', 'croydon south', 'donvale', 'glen iris',
+            'chadstone', 'mount waverley', 'ashwood', 'huntingdale', 'hughesdale',
+            'murrumbeena', 'carnegie', 'ormond', 'bentleigh', 'mckinnon',
+            'hampton east', 'highett', 'beaumaris', 'black rock', 'edithvale',
+            'chelsea', 'bonbeach', 'seaford', 'langwarrin', 'mornington',
+            'mount martha', 'rosebud', 'rye', 'sorrento', 'port melbourne',
+            'south melbourne', 'albert park', 'middle park', 'kensington',
+            'ascot vale', 'avondale heights', 'sunshine', 'albion', 'ar.deer park',
+            'st albans', 'keilor', 'taylors lakes', 'sydenham', 'caroline springs',
+            'burnside', 'hillside', 'melton', 'rockbank', 'tarneit',
+            'werribee', 'hoppers crossing', 'point cook', 'laverton',
+            'seabrook', 'truganina', 'williams landing', 'manor lakes'
         ]
+
         
         # Check for suburbs
         for suburb in melbourne_suburbs:
@@ -169,10 +191,10 @@ class VectorSearchService:
         - Medium confidence (50-70%): 5 results
         - Low confidence (<50%): 7 results
         """
-        if top_similarity > 0.70:
+        if top_similarity > 0.75:
             count = 3
             confidence = "high"
-        elif top_similarity > 0.50:
+        elif top_similarity > 0.55:
             count = 5
             confidence = "medium"
         else:
@@ -262,7 +284,7 @@ class VectorSearchService:
                 similarity_threshold = 0.2  # Lower threshold for crisis
                 candidate_count = 40  # Get more options
             else:
-                similarity_threshold = 0.25
+                similarity_threshold = 0.40
                 candidate_count = 30
             
             # Step 1: Get candidate results (cast wide net)
