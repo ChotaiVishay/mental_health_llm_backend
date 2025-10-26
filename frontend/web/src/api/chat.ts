@@ -8,44 +8,51 @@ export interface ChatSession {
   updated_at: string;
 }
 
-const envBase = VITE.VITE_CHAT_API_BASE?.trim();
-const backendOrigin = VITE.VITE_BACKEND_ORIGIN?.trim();
+// Get API base URL from environment variable, fallback to CloudFront
+const API_BASE_URL = 
+  VITE.VITE_API_BASE_URL?.trim() || 
+  'https://d1hfq1dvtow5bt.cloudfront.net';
 
-// Always use FastAPI base path `/api/v1/chat`
-const DEFAULT_BASE =
-  'https://mental-health-prod-v2.eba-cxhtfs2h.us-east-1.elasticbeanstalk.com/api/v1/chat';
-const RAW_BASE = envBase || (backendOrigin ? join(backendOrigin, 'api/v1/chat') : DEFAULT_BASE);
-const BASE = RAW_BASE.replace(/\/+$/, '');
+// FastAPI endpoints
+const CHAT_ENDPOINT = `${API_BASE_URL}/api/v1/chat/chat`;
+const SESSIONS_ENDPOINT = `${API_BASE_URL}/api/v1/chat/sessions`;
 
-function join(base: string, path: string) {
-  return `${base}/${path.replace(/^\/+/, '')}`;
-}
-
-// FastAPI-only endpoints
-const CHAT_SESSIONS_URL = join(BASE, 'sessions/');
-const CHAT_MESSAGE_URL = join(BASE, 'chat');
 // Chat sessions are not implemented on FastAPI yet
 const CHAT_SESSIONS_SUPPORTED = false;
 
-
+/**
+ * Fetch all chat sessions (not currently supported by backend)
+ */
 export async function fetchChatSessions(): Promise<ChatSession[]> {
-  if (!CHAT_SESSIONS_SUPPORTED) return [];
-
-  const response = await fetch(CHAT_SESSIONS_URL, {
-    headers: { Accept: 'application/json' },
-  });
-
-  if (response.status === 404) return [];
-
-  if (!response.ok) {
-    const text = await response.text();
-    throw new Error(`HTTP ${response.status} on ${CHAT_SESSIONS_URL}: ${text.slice(0, 120)}`);
+  if (!CHAT_SESSIONS_SUPPORTED) {
+    return [];
   }
-
-  const data = await response.json();
-  return data as ChatSession[];
+  
+  try {
+    const response = await fetch(SESSIONS_ENDPOINT, {
+      headers: { Accept: 'application/json' },
+    });
+    
+    if (response.status === 404) {
+      return [];
+    }
+    
+    if (!response.ok) {
+      const text = await response.text();
+      throw new Error(`HTTP ${response.status} on ${SESSIONS_ENDPOINT}: ${text.slice(0, 120)}`);
+    }
+    
+    const data = await response.json();
+    return data as ChatSession[];
+  } catch (error) {
+    console.error('Error fetching chat sessions:', error);
+    return [];
+  }
 }
 
+/**
+ * Service form data structure
+ */
 export interface ServiceFormPayload {
   service_name: string;
   organisation_name: string;
@@ -74,54 +81,75 @@ export interface ServiceFormPayload {
   op_hours_extended_details?: string;
 }
 
+/**
+ * Chat request can be either a message or a service form submission
+ */
 export type ChatRequestPayload =
   | { message: string; session_id?: string | null }
   | { type: 'service_form'; data: ServiceFormPayload; session_id?: string | null };
 
+/**
+ * Chat response from backend
+ */
 export interface ChatReply {
   response: string;
   session_id: string | null;
   action?: string | null;
+  services_found?: number;
+  raw_data?: Array<Record<string, unknown>>;
+  query_successful?: boolean;
+  suggestion?: string;
 }
 
-// Simple: Just one environment variable
-const API_BASE_URL = VITE.VITE_API_BASE_URL || 'https://d1hfq1dvtow5bt.cloudfront.net';
-
-const CHAT_ENDPOINT = `${API_BASE_URL}/api/v1/chat/chat`;
-
-// export async function fetchChatSessions(): Promise<ChatSession[]> {
-  // Not supported in FastAPI version
-//   return [];
-// }
-
+/**
+ * Send a message or form to the chat API
+ */
 export async function sendMessageToAPI(payload: ChatRequestPayload): Promise<ChatReply> {
-  const body =
-    'type' in payload
-      ? { ...payload, session_id: payload.session_id ?? null }
-      : { message: payload.message, session_id: payload.session_id ?? null };
+  try {
+    // Construct request body
+    const body =
+      'type' in payload
+        ? { ...payload, session_id: payload.session_id ?? null }
+        : { message: payload.message, session_id: payload.session_id ?? null };
 
-  const response = await fetch(CHAT_ENDPOINT, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-    },
-    body: JSON.stringify(body),
-  });
+    console.log('Sending request to:', CHAT_ENDPOINT);
+    console.log('Request payload:', JSON.stringify(body, null, 2));
 
-  if (!response.ok) {
-    const text = await response.text();
-    throw new Error(`HTTP ${response.status}: ${text}`);
+    const response = await fetch(CHAT_ENDPOINT, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+      body: JSON.stringify(body),
+    });
+
+    if (!response.ok) {
+      const text = await response.text();
+      console.error('API error response:', text);
+      throw new Error(`HTTP ${response.status}: ${text}`);
+    }
+
+    const raw = (await response.json()) as Record<string, unknown>;
+    console.log('API response:', raw);
+
+    // Backend returns "message", frontend expects "response"
+    const text = (raw.message ?? raw.response ?? '') as string;
+
+    return {
+      response: text,
+      session_id: (raw.session_id ?? null) as string | null,
+      action: (raw.action ?? null) as string | null,
+      services_found: (raw.services_found ?? 0) as number,
+      raw_data: (raw.raw_data ?? []) as Array<Record<string, unknown>>,
+      query_successful: (raw.query_successful ?? false) as boolean,
+      suggestion: (raw.suggestion ?? null) as string | null,
+    };
+  } catch (error) {
+    console.error('Error sending message to API:', error);
+    throw error;
   }
-
-  const raw = (await response.json()) as Record<string, unknown>;
-  
-  // Backend returns "message", frontend expects "response"
-  const text = (raw.message ?? raw.response ?? '') as string;
-  
-  return {
-    response: text,
-    session_id: (raw.session_id ?? null) as string | null,
-    action: (raw.action ?? null) as string | null,
-  };
 }
+
+// Export API base URL for debugging
+export { API_BASE_URL };
