@@ -1,4 +1,4 @@
-const SERVICE_DRAFT_URL = 'http://localhost:8000/chat/service-draft/';
+const SERVICE_DRAFT_URL = 'https://mental-health-prod-v2.eba-cxhtfs2h.us-east-1.elasticbeanstalk.com/api/v1/chat/service-draft';
 
 export interface ServiceDraftResponse {
   message: string;
