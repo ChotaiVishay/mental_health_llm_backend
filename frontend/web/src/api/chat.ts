@@ -99,6 +99,10 @@ export interface ChatReply {
   raw_data?: Array<Record<string, unknown>>;
   query_successful?: boolean;
   suggestion?: string;
+  /** Original message field for backwards compatibility */
+  message?: string;
+  /** Optional resources payload provided with crisis_halt responses */
+  resources?: unknown;
 }
 
 /**
@@ -159,6 +163,8 @@ export async function sendMessageToAPI(
       raw_data: (raw.raw_data ?? []) as Array<Record<string, unknown>>,
       query_successful: (raw.query_successful ?? false) as boolean,
       suggestion: raw.suggestion as string | undefined,
+      message: typeof raw.message === 'string' ? raw.message : undefined,
+      resources: raw.resources,
     };
   } catch (error) {
     console.error('Error sending message to API:', error);
