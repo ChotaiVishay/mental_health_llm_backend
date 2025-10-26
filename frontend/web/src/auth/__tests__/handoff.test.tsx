@@ -34,10 +34,14 @@ vi.mock('@/auth/AuthContext', () => {
 
 import { AuthProvider, useAuth } from '@/auth/AuthContext';
 
-vi.mock('@/api/agreements', () => ({
-  fetchAgreementStatus: vi.fn(),
-  acceptAgreements: vi.fn(),
-}));
+vi.mock('@/api/agreements', async () => {
+  const actual = await vi.importActual<typeof import('@/api/agreements')>('@/api/agreements');
+  return {
+    ...actual,
+    fetchAgreementStatus: vi.fn(),
+    acceptAgreements: vi.fn(),
+  };
+});
 
 vi.mocked(fetchAgreementStatus).mockResolvedValue({
   termsVersion: 'test',

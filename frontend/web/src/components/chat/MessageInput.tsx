@@ -1,4 +1,12 @@
-import { useState, FormEvent, useEffect } from 'react';
+import {
+  useState,
+  FormEvent,
+  useEffect,
+  useRef,
+  useCallback,
+  KeyboardEvent,
+} from 'react';
+import { Mic, MicOff, Send } from 'lucide-react';
 import { useSpeechToText } from '@/hooks/useSpeechToText';
 import { useMicRecorder } from '@/hooks/useMicRecorder';
 import { useLanguage } from '@/i18n/LanguageProvider';
@@ -8,11 +16,28 @@ type Props = {
   disabled?: boolean;
 };
 
+const MAX_VISIBLE_LINES = 5;
+
 export default function MessageInput({ onSend, disabled }: Props) {
   const [value, setValue] = useState('');
   const stt = useSpeechToText();           // Chrome path
   const rec = useMicRecorder();            // Fallback path
   const { t, locale, language, keyboard } = useLanguage();
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+
+  const resizeTextarea = useCallback(() => {
+    const el = textareaRef.current;
+    if (!el || typeof window === 'undefined') return;
+    const styles = window.getComputedStyle(el);
+    const lineHeight = parseFloat(styles.lineHeight || '20');
+    const padding = parseFloat(styles.paddingTop || '0') + parseFloat(styles.paddingBottom || '0');
+    const border = parseFloat(styles.borderTopWidth || '0') + parseFloat(styles.borderBottomWidth || '0');
+    el.style.height = 'auto';
+    const maxHeight = lineHeight * MAX_VISIBLE_LINES + padding + border;
+    const minHeight = lineHeight + padding + border;
+    const next = Math.min(el.scrollHeight, maxHeight);
+    el.style.height = `${Math.max(next, minHeight)}px`;
+  }, []);
 
   // Keep dictated text after the mic stops: append final transcript, or last interim if no final arrives.
   useEffect(() => {
@@ -27,6 +52,10 @@ export default function MessageInput({ onSend, disabled }: Props) {
       setValue((prev) => (prev ? `${prev} ${stt.interim}`.trim() : stt.interim));
     }
   }, [stt.isListening, stt.error, stt.interim, stt.finalText]);
+
+  useEffect(() => {
+    resizeTextarea();
+  }, [resizeTextarea, value, stt.interim, stt.isListening]);
 
   async function uploadAndInsert(blob: Blob) {
     const fd = new FormData();
@@ -54,14 +83,30 @@ export default function MessageInput({ onSend, disabled }: Props) {
       if (blob) await uploadAndInsert(blob);
     }
   }
+  const currentText = value.trim();
+  const canSend = currentText.length > 0 && !disabled;
 
-  function submit(e: FormEvent) {
-    e.preventDefault();
+  const submit = useCallback(() => {
     const text = value.trim();
     if (!text || disabled) return;
     onSend(text);
     setValue('');
-  }
+    if (textareaRef.current) {
+      textareaRef.current.focus();
+    }
+  }, [disabled, onSend, value]);
+
+  const handleSubmit = (event: FormEvent) => {
+    event.preventDefault();
+    submit();
+  };
+
+  const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (event.key === 'Enter' && !event.shiftKey && !event.altKey && !event.ctrlKey && !event.metaKey) {
+      event.preventDefault();
+      submit();
+    }
+  };
 
   const basePlaceholder = t('chat.composer.placeholder.default');
   let placeholder = basePlaceholder;
@@ -79,37 +124,47 @@ export default function MessageInput({ onSend, disabled }: Props) {
 
   const appendCharacter = (char: string) => {
     setValue((prev) => `${prev}${char}`);
+    textareaRef.current?.focus();
   };
 
+  const displayValue = stt.isSupported && stt.isListening && stt.interim ? stt.interim : value;
+  const listening = stt.isListening || rec.recording;
+
   return (
-    <form className="chat-input" onSubmit={submit} aria-label={t('chat.composer.aria')}>
+    <form className="chat-input" onSubmit={handleSubmit} aria-label={t('chat.composer.aria')}>
       <label htmlFor="chat-input" className="sr-only">{t('chat.composer.label')}</label>
+      <button
+        type="button"
+        className={listening ? 'composer-icon-btn listening' : 'composer-icon-btn'}
+        aria-pressed={listening}
+        aria-label={listening ? t('chat.composer.mic.stop') : t('chat.composer.mic.start')}
+        onClick={handleMicClick}
+        title={t('chat.composer.mic.tooltip')}
+        disabled={disabled}
+        data-easy-mode="hide"
+      >
+        {listening ? <MicOff aria-hidden /> : <Mic aria-hidden />}
+      </button>
       <textarea
         id="chat-input"
-        rows={2}
+        ref={textareaRef}
+        rows={1}
         placeholder={placeholder}
-        value={stt.isSupported && stt.isListening && stt.interim ? stt.interim : value}
+        value={displayValue}
         onChange={(e) => setValue(e.target.value)}
         disabled={disabled}
         lang={language}
         aria-label={t('chat.composer.label')}
+        onKeyDown={handleKeyDown}
       />
-      <div className="composer-actions" role="group" aria-label="Composer actions">
-        <button
-          type="button"
-          className={`btn ${stt.isListening || rec.recording ? 'listening' : ''}`}
-          aria-pressed={stt.isListening || rec.recording}
-          aria-label={stt.isListening || rec.recording ? t('chat.composer.mic.stop') : t('chat.composer.mic.start')}
-          onClick={handleMicClick}
-          title={t('chat.composer.mic.tooltip')}
-          data-easy-mode="hide"
-        >
-          🎤
-        </button>
-        <button className="btn primary" type="submit" disabled={disabled || !value.trim()}>
-          {t('chat.composer.send')}
-        </button>
-      </div>
+      <button
+        className="composer-icon-btn send"
+        type="submit"
+        disabled={!canSend}
+        aria-label={t('chat.composer.send')}
+      >
+        <Send aria-hidden />
+      </button>
       {showKeyboard && (
         <div className="virtual-keyboard" aria-label={t('chat.keyboard.title')}>
           <p className="virtual-keyboard-hint">{t('chat.keyboard.hint')}</p>

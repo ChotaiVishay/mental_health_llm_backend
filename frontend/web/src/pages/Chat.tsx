@@ -1,5 +1,11 @@
 // Chat page
-import { useEffect, useMemo, useRef, useState } from 'react';
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useCallback,
+} from 'react';
 import { useNavigate } from 'react-router-dom';
 import Title from '@/components/misc/Title';
 import MessageList, { Message } from '@/components/chat/MessageList';
@@ -28,6 +34,8 @@ import {
 } from '@/api/agreements';
 import '@/styles/pages/chat.css';
 import { useLanguage } from '@/i18n/LanguageProvider';
+import { CONSENT_STORAGE_KEY } from '@/constants/consent';
+import { ArrowLeft } from 'lucide-react';
 
 type ChatMessageStore = { id: string; role: 'user' | 'assistant'; text: string; at: number };
 type CrisisResource = { label: string; href: string };
@@ -89,6 +97,14 @@ export default function Chat() {
   const navigate = useNavigate();
   const { language, locale, t } = useLanguage();
 
+  const handleBack = useCallback(() => {
+    if (typeof window !== 'undefined' && window.history.length > 1) {
+      navigate(-1);
+      return;
+    }
+    navigate('/');
+  }, [navigate]);
+
   const getIsNarrow = () => (typeof window !== 'undefined' ? window.matchMedia('(max-width: 900px)').matches : false);
 
   const [isNarrow, setIsNarrow] = useState<boolean>(getIsNarrow);
@@ -97,7 +113,6 @@ export default function Chat() {
   const isAuthenticated = Boolean(user);
 
   // Refs
-  const pageRef = useRef<HTMLDivElement>(null);     // whole [sidebar|main] + composer grid
   const scrollerRef = useRef<HTMLDivElement>(null!) as React.RefObject<HTMLDivElement>; // transcript scroller
 
   const { atBottom, scrollToBottom } = useAtBottom(scrollerRef);
@@ -117,6 +132,7 @@ export default function Chat() {
   const [showAgreementsModal, setShowAgreementsModal] = useState(true);
   const [savingAgreement, setSavingAgreement] = useState(false);
   const [crisisAlert, setCrisisAlert] = useState<CrisisAlert | null>(null);
+  const [showAnonNotice, setShowAnonNotice] = useState(true);
 
   useEffect(() => {
     let active = true;
@@ -124,6 +140,31 @@ export default function Chat() {
     const loadStatus = async () => {
       setAgreementsLoading(true);
       setAgreementsError(null);
+
+      const storedConsent = (() => {
+        try {
+          return typeof window !== 'undefined'
+            && window.localStorage.getItem(CONSENT_STORAGE_KEY) === 'true';
+        } catch {
+          return false;
+        }
+      })();
+
+      if (!userId && storedConsent) {
+        if (!active) return;
+        const acceptedStatus: AgreementStatus = {
+          termsVersion: AGREEMENT_TERMS_VERSION,
+          privacyVersion: AGREEMENT_PRIVACY_VERSION,
+          termsAccepted: true,
+          privacyAccepted: true,
+          requiresAcceptance: false,
+        };
+        setAgreementStatus(acceptedStatus);
+        setShowAgreementsModal(false);
+        setAgreementsLoading(false);
+        return;
+      }
+
       try {
         const status = await fetchAgreementStatus(userId);
         if (!active) return;
@@ -146,6 +187,13 @@ export default function Chat() {
 
   const handleAcceptAgreements = async () => {
     if (!userId) {
+      try {
+        if (typeof window !== 'undefined') {
+          window.localStorage.setItem(CONSENT_STORAGE_KEY, 'true');
+        }
+      } catch {
+        // Ignore storage failures; rely on state fallback.
+      }
       setAgreementStatus((prev) => prev
         ? { ...prev, termsAccepted: true, privacyAccepted: true, requiresAcceptance: false }
         : {
@@ -225,6 +273,12 @@ export default function Chat() {
     mq.addListener(legacyHandler);
     return () => mq.removeListener(legacyHandler);
   }, []);
+
+  useEffect(() => {
+    if (user) {
+      setShowAnonNotice(false);
+    }
+  }, [user]);
 
   // persist
   useEffect(() => {
@@ -344,81 +398,12 @@ export default function Chat() {
 
   const lastActivityLabel = useMemo(() => formatRelativeTime(lastActivity, locale), [lastActivity, locale]);
 
-  // === Fit the page grid to the viewport from its actual top (so composer is visible at 100% zoom)
-  useEffect(() => {
-    const el = pageRef.current;
-    if (!el) return;
-    if (isNarrow) {
-      el.style.height = '';
-      return;
-    }
-
-    let raf = 0;
-
-    const recalc = () => {
-      const top = el.getBoundingClientRect().top;
-      const h = Math.max(520, Math.round(window.innerHeight - top)); // never collapse
-      el.style.height = `${h}px`;
-    };
-
-    const schedule = () => {
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(recalc);
-    };
-
-    schedule();
-
-    // fonts.ready isn't in JSDOM — guard it without using `any`
-    type DocWithFonts = Document & { fonts?: { ready?: Promise<unknown> } };
-    const fontsReady = (document as DocWithFonts).fonts?.ready;
-    fontsReady?.then(() => schedule());
-
-    // Viewport changes
-    window.addEventListener('resize', schedule);
-    window.addEventListener('orientationchange', schedule);
-
-    // Guard ResizeObserver (missing in JSDOM)
-    let ro: ResizeObserver | null = null;
-    if (typeof window !== 'undefined' && 'ResizeObserver' in window) {
-      ro = new ResizeObserver(schedule);
-      ro.observe(document.body);
-    }
-
-    return () => {
-      cancelAnimationFrame(raf);
-      window.removeEventListener('resize', schedule);
-      window.removeEventListener('orientationchange', schedule);
-      ro?.disconnect();
-    };
-  }, [isNarrow]);
-
-  // Recalculate when these toggle height above the grid
-  useEffect(() => {
-    if (isNarrow) {
-      const el = pageRef.current;
-      if (el) el.style.height = '';
-      return;
-    }
-    const el = pageRef.current;
-    if (!el) return;
-    const top = el.getBoundingClientRect().top;
-    el.style.height = `${Math.max(520, Math.round(window.innerHeight - top))}px`;
-  }, [netErr, sidebarOpen, userId, crisisAlert, isNarrow]);
-
   return (
     <>
       <Title value={t('chat.metaTitle')} />
 
-      {/* Signed-out banner */}
-      {!user && (
-        <div className="anon-banner" role="note" aria-live="polite" aria-label={t('chat.banner.aria')} data-easy-mode="hide">
-          <span>{t('chat.anonBanner')}</span>
-          <a className="btn btn-secondary" href="/login">{t('chat.banner.button')}</a>
-        </div>
-      )}
-
       {/* Page grid: [sidebar | main] above, [sidebar | composer] below */}
-      <div ref={pageRef} className={`chat-page ${sidebarOpen ? '' : '-collapsed'}`}>
+      <div className={`chat-page ${sidebarOpen ? '' : '-collapsed'}`}>
         {/* Sidebar */}
         {sidebarOpen ? (
           <aside className="chat-sidebar">
@@ -431,13 +416,25 @@ export default function Chat() {
             </div>
           </aside>
         ) : (
-          <button className="hambtn" aria-label={t('chat.sidebar.open')} onClick={() => setSidebarOpen(true)}>☰</button>
+          !isNarrow && (
+            <button className="hambtn" aria-label={t('chat.sidebar.open')} onClick={() => setSidebarOpen(true)}>☰</button>
+          )
         )}
 
         {/* Main chat panel (no composer here) */}
         <section className="chat-main">
           <header className="chat-head">
-            <h2 className="h2" style={{ margin: 0 }}>{t('chat.heading')}</h2>
+            <div className="chat-head-left">
+              <button
+                type="button"
+                className="chat-back"
+                onClick={handleBack}
+              >
+                <ArrowLeft aria-hidden />
+                <span>{t('chat.back')}</span>
+              </button>
+              <h2 className="h2" style={{ margin: 0 }}>{t('chat.heading')}</h2>
+            </div>
             <span className="muted small">{t('chat.lastActivity')} {lastActivityLabel}</span>
           </header>
 
@@ -496,6 +493,20 @@ export default function Chat() {
 
         {/* Composer dock — separate row pinned at grid bottom */}
         <div className="composer-dock">
+          {!user && showAnonNotice && (
+            <div className="anon-banner" role="note" aria-live="polite" aria-label={t('chat.banner.aria')} data-easy-mode="hide">
+              <span>{t('chat.anonBanner')}</span>
+              <a className="anon-banner-link" href="/login">{t('chat.banner.button')}</a>
+              <button
+                type="button"
+                className="anon-banner-close"
+                aria-label={t('chat.alert.dismiss')}
+                onClick={() => setShowAnonNotice(false)}
+              >
+                ×
+              </button>
+            </div>
+          )}
           <MessageInput onSend={onSend} disabled={busy || agreementsLoading || showAgreementsModal || Boolean(crisisAlert)} />
         </div>
       </div>

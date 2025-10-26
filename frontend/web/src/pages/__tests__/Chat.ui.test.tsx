@@ -8,10 +8,14 @@ import Chat from '@/pages/Chat';
 import { Providers } from '@/test-utils';
 import { fetchAgreementStatus, acceptAgreements } from '@/api/agreements';
 
-vi.mock('@/api/agreements', () => ({
-  fetchAgreementStatus: vi.fn(),
-  acceptAgreements: vi.fn(),
-}));
+vi.mock('@/api/agreements', async () => {
+  const actual = await vi.importActual<typeof import('@/api/agreements')>('@/api/agreements');
+  return {
+    ...actual,
+    fetchAgreementStatus: vi.fn(),
+    acceptAgreements: vi.fn(),
+  };
+});
 
 beforeEach(() => {
   vi.mocked(fetchAgreementStatus).mockResolvedValue({
@@ -32,6 +36,7 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.clearAllMocks();
+  window.localStorage.clear();
 });
 
 it('shows anonymous banner and toggles the conversation sidebar', async () => {
@@ -49,6 +54,7 @@ it('shows anonymous banner and toggles the conversation sidebar', async () => {
 
   // The banner uses curly apostrophes, so assert loosely on its role + contents
   expect(screen.getByRole('note')).toHaveTextContent(/chatting.*anonymous/i);
+  expect(screen.getByRole('button', { name: /back/i })).toBeInTheDocument();
 
   // Hide the sidebar, then open it again with the hamburger
   fireEvent.click(screen.getByLabelText(/hide conversations/i));
@@ -58,7 +64,7 @@ it('shows anonymous banner and toggles the conversation sidebar', async () => {
   expect(await screen.findByText(/sign in to view/i)).toBeInTheDocument();
 });
 
-it('defaults to a collapsed sidebar with floating toggle on narrow screens', async () => {
+it('defaults to a collapsed sidebar without a floating toggle on narrow screens', async () => {
   const originalMatchMedia = window.matchMedia;
   const listeners = new Set<(event: MediaQueryListEvent) => void>();
 
@@ -100,11 +106,9 @@ it('defaults to a collapsed sidebar with floating toggle on narrow screens', asy
     fireEvent.click(screen.getByRole('button', { name: /accept and continue/i }));
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
 
-    expect(screen.getByRole('button', { name: /open chat history/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /back/i })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /open chat history/i })).not.toBeInTheDocument();
     expect(screen.queryByRole('heading', { name: /Conversations/i })).not.toBeInTheDocument();
-
-    fireEvent.click(screen.getByRole('button', { name: /open chat history/i }));
-    expect(await screen.findByRole('heading', { name: /Conversations/i })).toBeInTheDocument();
   } finally {
     window.matchMedia = originalMatchMedia;
     listeners.clear();

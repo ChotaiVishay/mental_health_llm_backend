@@ -1,5 +1,6 @@
 * { box-sizing: border-box; }
 html, body, #root { height: 100%; }
+html { scroll-behavior: smooth; }
 body {
   margin: 0;
   font-family: var(--font-ui);
@@ -44,5 +45,8 @@ img { max-width: 100%; display: block; }
 @media (max-width: 768px) {
   body {
     padding-bottom: calc(120px + env(safe-area-inset-bottom, 0));
+  }
+  body.chat-route-active {
+    padding-bottom: 0;
   }
 }

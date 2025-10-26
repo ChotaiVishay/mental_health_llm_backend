@@ -11,6 +11,11 @@
   --shadow:0 12px 36px rgba(0,0,0,.10);
 }
 
+#help-crisis,
+#faq{
+  scroll-margin-top: clamp(80px, 12vh, 120px);
+}
+
 /* Remove white gutters */
 .home{ position:relative; color:var(--text); }
 .home::before{
@@ -39,8 +44,10 @@
 
 /* Start Chat banner */
 .cta-banner{
-  display:block; width:100%; border:0; border-radius:22px; color:#fff; cursor:pointer;
-  padding:20px 26px; font-weight:700; font-size:clamp(1rem, .9rem + .6vw, 1.25rem);
+  display:block; width:100%; border:0; border-radius:20px; color:#fff; cursor:pointer;
+  padding:16px 22px; min-height:52px;
+  font-weight:700; font-size:clamp(1rem, .95rem + .4vw, 1.15rem);
+  line-height:1.2;
   background:linear-gradient(90deg, var(--green-700), var(--green-600), var(--green-500));
   box-shadow:var(--shadow);
   transition:transform .08s ease, filter .25s ease;
@@ -55,6 +62,14 @@
 .cta-banner:hover::after{ transform:translateX(120%); }
 .cta-banner:active{ transform:scale(.998); }
 .cta-banner:focus-visible{ outline:3px solid var(--green-300); outline-offset:3px; }
+
+@media (max-width: 600px){
+  .cta-banner{
+    padding:14px 18px;
+    min-height:48px;
+    font-size:1rem;
+  }
+}
 
 .hero-note{ margin:16px 0 10px; color:var(--grey-700); max-width:72ch; }
 .hero-links{ display:flex; gap:18px; flex-wrap:wrap; margin-top:14px; }

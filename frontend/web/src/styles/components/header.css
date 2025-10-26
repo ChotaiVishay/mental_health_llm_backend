@@ -3,6 +3,17 @@
   background: var(--bg);
   border-bottom: 1px solid var(--grey-300);
   backdrop-filter: blur(6px);
+  transition: transform 0.24s var(--ease), opacity 0.24s var(--ease), box-shadow 0.24s var(--ease), border-color 0.24s var(--ease);
+}
+.header--scrolled{
+  background: color-mix(in srgb, var(--surface) 96%, rgba(255, 255, 255, 0.9));
+  border-color: color-mix(in srgb, var(--grey-200) 75%, transparent);
+  box-shadow: 0 18px 32px rgba(15, 23, 42, 0.12);
+}
+.header--collapsed{
+  transform: translateY(-110%);
+  opacity: 0;
+  pointer-events: none;
 }
 .header-inner{
   display:flex;

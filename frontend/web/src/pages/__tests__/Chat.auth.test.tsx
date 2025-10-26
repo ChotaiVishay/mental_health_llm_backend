@@ -14,10 +14,14 @@ import RequireAuth from '@/auth/RequireAuth';
 import Chat from '@/pages/Chat';
 import { fetchAgreementStatus, acceptAgreements } from '@/api/agreements';
 
-vi.mock('@/api/agreements', () => ({
-  fetchAgreementStatus: vi.fn(),
-  acceptAgreements: vi.fn(),
-}));
+vi.mock('@/api/agreements', async () => {
+  const actual = await vi.importActual<typeof import('@/api/agreements')>('@/api/agreements');
+  return {
+    ...actual,
+    fetchAgreementStatus: vi.fn(),
+    acceptAgreements: vi.fn(),
+  };
+});
 
 beforeEach(() => {
   vi.mocked(fetchAgreementStatus).mockResolvedValue({

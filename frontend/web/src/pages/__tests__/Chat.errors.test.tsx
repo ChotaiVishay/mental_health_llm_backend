@@ -14,10 +14,14 @@ vi.mock('@/api/chat', () => ({
   fetchChatSessions: vi.fn(async () => []),
 }));
 
-vi.mock('@/api/agreements', () => ({
-  fetchAgreementStatus: vi.fn(),
-  acceptAgreements: vi.fn(),
-}));
+vi.mock('@/api/agreements', async () => {
+  const actual = await vi.importActual<typeof import('@/api/agreements')>('@/api/agreements');
+  return {
+    ...actual,
+    fetchAgreementStatus: vi.fn(),
+    acceptAgreements: vi.fn(),
+  };
+});
 
 beforeEach(() => {
   vi.mocked(fetchAgreementStatus).mockResolvedValue({

@@ -29,11 +29,6 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                         <App />
                       </LanguageProvider>
                     </AdminAuthProvider>
-                    <AdminAuthProvider>
-                    <LanguageProvider>
-                      <App />
-                    </LanguageProvider>
-                     </AdminAuthProvider>
                   </AuthProvider>
                 </DyslexicModeProvider>
               </EasyModeProvider>

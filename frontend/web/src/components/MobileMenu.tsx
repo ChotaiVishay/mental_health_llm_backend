@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom';
 import { X } from 'lucide-react';
 import { useAuth } from '@/auth/AuthContext';
 import { useLanguage } from '@/i18n/LanguageProvider';
+import { useHashNavigation } from '@/hooks/useHashNavigation';
 
 type MobileMenuProps = {
   open: boolean;
@@ -38,11 +39,16 @@ export default function MobileMenu({ open, onClose }: MobileMenuProps) {
   const {
     user, loading, signOut,
   } = useAuth();
+  const handleHashNavigation = useHashNavigation();
 
-  const currentLanguageLabel = useMemo(() => {
-    const match = options.find((option) => option.code === language);
-    return match ? match.label : language.toUpperCase();
-  }, [language, options]);
+  const navLinks = useMemo(() => ([
+    { key: 'home', to: '/', label: t('header.nav.home') },
+    { key: 'chat', to: '/chat', label: t('header.nav.chat') },
+    { key: 'services', to: '/services', label: t('header.nav.services') },
+    { key: 'help', to: '/#help-crisis', label: t('header.nav.helpCrisis') },
+    { key: 'faq', to: '/#faq', label: t('header.nav.faq') },
+    { key: 'accessibility', to: '/accessibility', label: t('header.nav.accessibility') },
+  ]), [t]);
 
   const closeMenu = useCallback(() => {
     onClose();
@@ -147,29 +153,44 @@ export default function MobileMenu({ open, onClose }: MobileMenuProps) {
         <section className="mobile-menu-section" aria-label={t('header.language.label')}>
           <header className="mobile-menu-section-head">
             <h2>{t('header.language.label')}</h2>
-            <span className="mobile-menu-section-helper">
-              {t('header.language.select')}: {currentLanguageLabel}
-            </span>
           </header>
-          <div
-            role="radiogroup"
-            aria-label={t('header.language.select')}
-            className="mobile-menu-language-list"
-          >
-            {options.map((option) => {
-              const isActive = option.code === language;
+          <label className="mobile-menu-select-label" htmlFor="mobile-language-select">
+            {t('header.language.select')}
+          </label>
+          <div className="mobile-menu-select-wrapper">
+            <select
+              id="mobile-language-select"
+              value={language}
+              onChange={(event) => handleLanguageSelect(event.target.value as typeof language)}
+            >
+              {options.map((option) => (
+                <option key={option.code} value={option.code}>
+                  {option.label} — {option.nativeLabel}
+                </option>
+              ))}
+            </select>
+          </div>
+        </section>
+
+        <section className="mobile-menu-section" aria-label={t('header.menu.explore')}>
+          <header className="mobile-menu-section-head">
+            <h2>{t('header.menu.explore')}</h2>
+          </header>
+          <div className="mobile-menu-actions">
+            {navLinks.map((link) => {
+              const hash = link.to.includes('#') ? link.to.slice(link.to.indexOf('#')) : '';
               return (
-                <button
-                  key={option.code}
-                  type="button"
-                  role="radio"
-                  aria-checked={isActive}
-                  className={isActive ? 'mobile-menu-language active' : 'mobile-menu-language'}
-                  onClick={() => handleLanguageSelect(option.code)}
+                <Link
+                  key={link.key}
+                  to={link.to}
+                  className="mobile-menu-link"
+                  onClick={(event) => {
+                    if (hash) handleHashNavigation(event, hash);
+                    closeMenu();
+                  }}
                 >
-                  <span className="mobile-menu-language-label">{option.label}</span>
-                  <span className="mobile-menu-language-native">{option.nativeLabel}</span>
-                </button>
+                  {link.label}
+                </Link>
               );
             })}
           </div>
@@ -208,28 +229,6 @@ export default function MobileMenu({ open, onClose }: MobileMenuProps) {
                 {t('header.nav.signIn')}
               </Link>
             )}
-          </div>
-        </section>
-
-        <section className="mobile-menu-section" aria-label="More information">
-          <header className="mobile-menu-section-head">
-            <h2>More</h2>
-          </header>
-          <div className="mobile-menu-actions">
-            <Link
-              to="/accessibility"
-              className="mobile-menu-link"
-              onClick={closeMenu}
-            >
-              Accessibility
-            </Link>
-            <Link
-              to="/contact"
-              className="mobile-menu-link"
-              onClick={closeMenu}
-            >
-              Contact
-            </Link>
           </div>
         </section>
       </aside>

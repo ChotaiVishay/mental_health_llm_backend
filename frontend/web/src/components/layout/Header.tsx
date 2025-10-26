@@ -1,15 +1,32 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import Container from './Container';
 import { useAuth } from '@/auth/AuthContext';
 import { useScreenReaderMode } from '@/accessibility/ScreenReaderModeContext';
 import { useLanguage } from '@/i18n/LanguageProvider';
 import LanguageSwitcher from '@/i18n/LanguageSwitcher';
+import { useHashNavigation } from '@/hooks/useHashNavigation';
 
 export default function Header() {
   const { user, loading, signOut } = useAuth();
   const { screenReaderAssist } = useScreenReaderMode();
   const { t } = useLanguage();
+  const handleHashNavigation = useHashNavigation();
+  const [headerScrolled, setHeaderScrolled] = useState(false);
+  const [headerCollapsed, setHeaderCollapsed] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (typeof window === 'undefined') return;
+      const y = window.scrollY || window.pageYOffset || 0;
+      setHeaderScrolled(y > 4);
+      setHeaderCollapsed(y > 260);
+    };
+
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const navItems = [
     {
@@ -75,19 +92,31 @@ export default function Header() {
       );
     }
 
+    const hash = item.href.includes('#') ? item.href.slice(item.href.indexOf('#')) : '';
+
     return (
-      <a
+      <NavLink
         key={item.key}
-        href={item.href}
+        to={item.href}
         data-easy-mode={item.dataEasyMode}
+        className={({ isActive }) => (isActive ? 'active' : undefined)}
+        onClick={(event) => {
+          if (hash) handleHashNavigation(event, hash);
+        }}
       >
         {item.label}
-      </a>
+      </NavLink>
     );
   });
 
+  const headerClassName = [
+    'header',
+    headerScrolled ? 'header--scrolled' : '',
+    headerCollapsed ? 'header--collapsed' : '',
+  ].filter(Boolean).join(' ');
+
   return (
-    <header className="header">
+    <header className={headerClassName}>
       <Container>
         <a href="#main" className="skip-link">{t('header.skipLink')}</a>
         <div className="header-inner">

@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { useLanguage } from '@/i18n/LanguageProvider';
 import { useScreenReaderMode } from '@/accessibility/ScreenReaderModeContext';
+import { useHashNavigation } from '@/hooks/useHashNavigation';
 
 type TabItem = {
   id: 'home' | 'chat' | 'help' | 'faq';
@@ -35,6 +36,7 @@ export default function BottomTabBar() {
   const location = useLocation();
   const { t } = useLanguage();
   const { screenReaderAssist } = useScreenReaderMode();
+  const handleHashNavigation = useHashNavigation();
 
   const items = useMemo<TabItem[]>(() => ([
     { id: 'home', icon: Home, to: '/' },
@@ -79,12 +81,16 @@ export default function BottomTabBar() {
           {items.map((item) => {
             const Icon = item.icon;
             const active = isActive(item.id);
+            const hash = item.to.includes('#') ? item.to.slice(item.to.indexOf('#')) : '';
             return (
               <Link
                 key={item.id}
                 to={item.to}
                 className={active ? 'bottom-tab-item active' : 'bottom-tab-item'}
                 aria-current={active ? 'page' : undefined}
+                onClick={(event) => {
+                  if (hash) handleHashNavigation(event, hash);
+                }}
               >
                 <span className={active ? 'bottom-tab-pill active' : 'bottom-tab-pill'}>
                   <Icon className="bottom-tab-icon" aria-hidden />

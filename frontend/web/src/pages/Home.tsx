@@ -1,13 +1,15 @@
 import { useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Title from '@/components/misc/Title';
 import Container from '@/components/layout/Container';
 import { savePreloginChat } from '@/features/chat/sessionStore';
 import { useTranslation } from '@/i18n/LanguageProvider';
+import { scrollToHash } from '@/utils/scroll';
 import '@/styles/pages/home.css';
 
 export default function Home() {
   const nav = useNavigate();
+  const location = useLocation();
   const t = useTranslation();
 
   const start = (seed?: string) => {
@@ -32,6 +34,12 @@ export default function Home() {
     document.querySelectorAll<HTMLElement>('.reveal').forEach(el => io.observe(el));
     return () => io.disconnect();
   }, []);
+
+  useEffect(() => {
+    if (location.hash) {
+      scrollToHash(location.hash);
+    }
+  }, [location.hash]);
 
   const prompts = useMemo(
     () => [
