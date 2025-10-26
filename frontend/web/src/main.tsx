@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from '@/auth/AuthContext';
+import { AdminAuthProvider } from '@/admin/AdminAuthContext';
 import { DyslexicModeProvider } from '@/accessibility/DyslexicModeContext';
 import { EasyModeProvider } from '@/accessibility/EasyModeContext';
 import { HighContrastModeProvider } from '@/accessibility/HighContrastModeContext';
@@ -23,12 +24,11 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
               <EasyModeProvider>
                 <DyslexicModeProvider>
                   <AuthProvider>
-                    {/* Admin auth temporarily disabled until setup */}
-                    {/* <AdminAuthProvider> */}
+                    <AdminAuthProvider>
                     <LanguageProvider>
                       <App />
                     </LanguageProvider>
-                    {/* </AdminAuthProvider> */}
+                     </AdminAuthProvider>
                   </AuthProvider>
                 </DyslexicModeProvider>
               </EasyModeProvider>

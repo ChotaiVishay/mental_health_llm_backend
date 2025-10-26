@@ -182,6 +182,122 @@ html[data-high-contrast="on"] *:focus-visible {
   outline-offset: 4px;
 }
 
+/* High contrast refinements for the marketing homepage */
+html[data-high-contrast="on"] .home {
+  color: var(--text);
+}
+
+html[data-high-contrast="on"] .home::before {
+  background: var(--bg);
+  filter: none;
+  opacity: 1;
+}
+
+html[data-high-contrast="on"] .home .hero,
+html[data-high-contrast="on"] .home .section,
+html[data-high-contrast="on"] .home .pattern-a,
+html[data-high-contrast="on"] .home .pattern-crisis,
+html[data-high-contrast="on"] .home .pattern-faq {
+  background: var(--bg);
+}
+
+html[data-high-contrast="on"] .home .hero-sub,
+html[data-high-contrast="on"] .home .hero-note,
+html[data-high-contrast="on"] .home .section .muted {
+  color: var(--muted);
+}
+
+html[data-high-contrast="on"] .home .hero-links a,
+html[data-high-contrast="on"] .home .faq-min > summary {
+  color: var(--link);
+}
+
+html[data-high-contrast="on"] .home .faq-min {
+  border: 2px solid var(--focus);
+  border-radius: 12px;
+  padding: 10px 14px;
+  background: var(--surface);
+  color: var(--text);
+}
+
+html[data-high-contrast="on"] .home .faq-min + .faq-min {
+  margin-top: 12px;
+}
+
+html[data-high-contrast="on"] .home .faq-min > summary {
+  font-weight: 700;
+}
+
+html[data-high-contrast="on"] .home .faq-min > summary::-webkit-details-marker {
+  filter: invert(1);
+}
+
+html[data-high-contrast="on"] .home .faq-min > div {
+  margin-top: 10px;
+  color: var(--text);
+}
+
+html[data-high-contrast="on"] .home .cta-banner {
+  background: linear-gradient(
+    90deg,
+    var(--brand),
+    color-mix(in srgb, var(--brand) 75%, var(--brand-contrast))
+  );
+  color: var(--brand-contrast);
+  border: 2px solid var(--focus);
+  box-shadow: none;
+}
+
+html[data-high-contrast="on"] .home .cta-banner::after {
+  display: none;
+}
+
+html[data-high-contrast="on"] .home .chips .chip,
+html[data-high-contrast="on"] .home .cta-row .btn,
+html[data-high-contrast="on"] .home .cta-row .btn-secondary {
+  background: var(--surface-alt);
+  border: 2px solid var(--focus);
+  color: var(--text);
+}
+
+html[data-high-contrast="on"] .home .cta-row .btn-primary {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: var(--brand-contrast);
+}
+
+html[data-high-contrast="on"] .home .crisis-banner {
+  background: var(--danger);
+  color: var(--brand-contrast);
+  border: 2px solid var(--focus);
+  box-shadow: none;
+}
+
+html[data-high-contrast="on"] .home .hotline,
+html[data-high-contrast="on"] .home .card,
+html[data-high-contrast="on"] .home .p-card {
+  background: var(--surface);
+  border: 2px solid var(--focus);
+  box-shadow: none;
+  color: var(--text);
+}
+
+html[data-high-contrast="on"] .home .hotline:hover,
+html[data-high-contrast="on"] .home .card:hover,
+html[data-high-contrast="on"] .home .p-card:hover {
+  transform: none;
+}
+
+html[data-high-contrast="on"] .home .hotline .tag {
+  background: var(--brand);
+  border-color: transparent;
+  color: var(--brand-contrast);
+}
+
+html[data-high-contrast="on"] .home .p-dot {
+  background: var(--brand);
+}
+
 html[data-large-text="on"] {
   --fs-base: clamp(1.125rem, 1rem + 0.7vw, 1.35rem);
   --lh-base: 1.95;

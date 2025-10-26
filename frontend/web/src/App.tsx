@@ -10,15 +10,15 @@ import Contact from '@/pages/Contact';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import Container from '@/components/layout/Container';
-// import AdminSignIn from '@/pages/admin/AdminSignIn';
-// import AdminLayout from '@/pages/admin/AdminLayout';
-// import AdminDashboard from '@/pages/admin/AdminDashboard';
-// import AdminUsersPage from '@/pages/admin/AdminUsersPage';
-// import AdminProvidersPage from '@/pages/admin/AdminProvidersPage';
-// import AdminServicesPage from '@/pages/admin/AdminServicesPage';
-// import AdminAdminsPage from '@/pages/admin/AdminAdminsPage';
-// import AdminProfilePage from '@/pages/admin/AdminProfilePage';
-// import RequireAdmin from '@/auth/RequireAdmin';
+import AdminSignIn from '@/pages/admin/AdminSignIn';
+import AdminLayout from '@/pages/admin/AdminLayout';
+import AdminDashboard from '@/pages/admin/AdminDashboard';
+import AdminUsersPage from '@/pages/admin/AdminUsersPage';
+import AdminProvidersPage from '@/pages/admin/AdminProvidersPage';
+import AdminServicesPage from '@/pages/admin/AdminServicesPage';
+import AdminAdminsPage from '@/pages/admin/AdminAdminsPage';
+import AdminProfilePage from '@/pages/admin/AdminProfilePage';
+import RequireAdmin from '@/auth/RequireAdmin';
 import RequireAuth from '@/auth/RequireAuth';
 import Styleguide from '@/pages/Styleguide';
 import '@/styles/index.css';
@@ -51,8 +51,7 @@ export default function App() {
             )}
           />
 
-          {/* Admin routes temporarily disabled until admin setup is configured. */}
-          {/*
+          
           <Route path="/admin/signin" element={<AdminSignIn />} />
           <Route
             path="/admin"
@@ -69,7 +68,7 @@ export default function App() {
             <Route path="admins" element={<AdminAdminsPage />} />
             <Route path="profile" element={<AdminProfilePage />} />
           </Route>
-          */}
+          
 
           <Route path="/accessibility" element={<Accessibility />} />
           <Route path="/contact" element={<Contact />} />
