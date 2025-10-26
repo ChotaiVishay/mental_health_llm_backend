@@ -10,8 +10,12 @@ it('renders core navigation links in the header only', () => {
     </Providers>
   );
 
-  // Only look in the header’s Primary navigation (avoids footer duplicates)
-  const nav = screen.getByRole('navigation', { name: /primary/i });
+  const navs = screen.getAllByRole('navigation', { name: /primary/i });
+  const nav = navs.find((element) => element.getAttribute('data-variant') === 'desktop');
+
+  if (!nav) {
+    throw new Error('Expected to find the desktop header navigation');
+  }
 
   ['Home', 'Chat', 'Help & Crisis', 'FAQ'].forEach((label) => {
     expect(within(nav).getByRole('link', { name: label })).toBeInTheDocument();
