@@ -1,14 +1,14 @@
-// cypress/e2e/i18n.language.cy.ts
 describe('Language switcher', () => {
-  it('changes language and persists', () => {
+  it('changes language and persists after reload', () => {
     cy.visit('/');
-    cy.findByRole('button', { name: /language/i }).click();
-    cy.findByRole('menuitem', { name: /español|hindi|简体中文|العربية|français/i }).click();
 
-    // Assert a known string is translated
-    cy.contains(/iniciar sesión|connexion|登录|تسجيل|se connecter/i);
+    cy.contains('Find mental-health support, fast.').should('be.visible');
+
+    cy.get('select[aria-label="Language"]').select('es');
+
+    cy.contains('Encuentra apoyo en salud mental').should('be.visible');
 
     cy.reload();
-    cy.contains(/iniciar sesión|connexion|登录|تسجيل|se connecter/i);
+    cy.contains('Encuentra apoyo en salud mental').should('be.visible');
   });
 });

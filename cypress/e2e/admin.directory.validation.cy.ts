@@ -20,7 +20,7 @@ describe('Admin: directory field validation', () => {
     cy.findByLabelText(/hours/i).type('Mon–Fri 9–5');
     cy.findByLabelText(/availability/i).select('Open');
 
-    cy.intercept('POST', '/api/listings', { statusCode: 201, body: { id: 123 } }).as('create');
+    cy.intercept({ method: 'POST', url: '**/api/v1/chat/service-draft' }, { statusCode: 201, body: { id: 123 } }).as('create');
     cy.findByRole('button', { name: /save/i }).click();
     cy.wait('@create');
     cy.url().should('match', /\/admin\/listings\/123/);

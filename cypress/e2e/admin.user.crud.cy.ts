@@ -7,7 +7,7 @@ describe('Admin: users CRUD', () => {
   });
 
   it('creates a user', () => {
-    cy.intercept('POST', '/api/users', { statusCode: 201, body: { id: 999, email: 'new@ex.com', role: 'user' } }).as('create');
+    cy.intercept({ method: 'POST', url: '**/auth/v1/admin/users' }, { statusCode: 201, body: { user: { id: '999', email: 'new@ex.com', role: 'user' } } }).as('create');
     cy.findByRole('button', { name: /new user/i }).click();
     cy.findByLabelText(/email/i).type('new@ex.com');
     cy.findByLabelText(/role/i).select('User');
@@ -17,12 +17,12 @@ describe('Admin: users CRUD', () => {
   });
 
   it('deactivates and deletes a user', () => {
-    cy.intercept('PATCH', '/api/users/*', { statusCode: 200, body: { active: false } }).as('deactivate');
+    cy.intercept({ method: 'PATCH', url: '**/auth/v1/admin/users/**' }, { statusCode: 200, body: { user: { id: '999', is_active: false } } }).as('deactivate');
     cy.findByRole('button', { name: /deactivate/i }).first().click();
     cy.wait('@deactivate');
     cy.contains(/inactive/i);
 
-    cy.intercept('DELETE', '/api/users/*', { statusCode: 204 }).as('delete');
+    cy.intercept({ method: 'DELETE', url: '**/auth/v1/admin/users/**' }, { statusCode: 200 }).as('delete');
     cy.findByRole('button', { name: /delete/i }).first().click();
     cy.findByRole('button', { name: /confirm/i }).click();
     cy.wait('@delete');

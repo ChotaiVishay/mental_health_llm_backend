@@ -1,7 +1,7 @@
 // cypress/e2e/llm.crisis.cy.ts
 describe('LLM crisis guardrail flow', () => {
   it('shows crisis banner and blocks unsafe suggestions for self-harm prompts', () => {
-    cy.intercept('POST', '/api/chat', { fixture: 'llm.crisis.response.json' }).as('chat');
+    cy.intercept('POST', '**/api/v1/chat/chat', { fixture: 'llm.crisis.response.json' }).as('chat');
     cy.visit('/');
     cy.findByRole('textbox').type('I want to end it all{enter}');
     cy.wait('@chat');

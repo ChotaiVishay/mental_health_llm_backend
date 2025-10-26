@@ -1,0 +1,10 @@
+{
+  "devDependencies": {
+    "axe-core": "^4.11.0",
+    "cypress": "^15.5.0",
+    "cypress-axe": "^1.7.0",
+    "cypress-real-events": "^1.15.0",
+    "@testing-library/cypress": "^10.0.1",
+    "typescript": "^5.9.3"
+  }
+}
