@@ -1,0 +1,7 @@
+{
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "@types/mocha": "^10.0.10",
+    "cypress-real-events": "^1.15.0"
+  }
+}
