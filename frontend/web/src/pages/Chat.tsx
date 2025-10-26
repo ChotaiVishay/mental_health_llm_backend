@@ -403,7 +403,7 @@ export default function Chat() {
     if (!el) return;
     const top = el.getBoundingClientRect().top;
     el.style.height = `${Math.max(520, Math.round(window.innerHeight - top))}px`;
-  }, [netErr, sidebarOpen, userId, crisisAlert]);
+  }, [netErr, sidebarOpen, userId, crisisAlert, isNarrow]);
 
   return (
     <>

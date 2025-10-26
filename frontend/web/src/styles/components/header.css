@@ -4,26 +4,12 @@
   border-bottom: 1px solid var(--grey-300);
   backdrop-filter: blur(6px);
 }
-.header-inner{
+.header-inner {
   display:flex;
-  flex-wrap:wrap;
   align-items:center;
+  justify-content:space-between;
   gap: var(--space-4);
   padding: var(--space-4) 0;
-}
-
-.header-primary{
-  display:flex;
-  align-items:center;
-  gap: var(--space-3);
-  flex:1 1 320px;
-}
-
-.header-utilities{
-  display:flex;
-  align-items:center;
-  gap: var(--space-3);
-  flex:0 1 auto;
 }
 
 .brand { display:flex; align-items:center; gap:12px; font-weight:700; color: var(--text); }
@@ -44,6 +30,12 @@
 .nav a:hover { background: var(--surface-alt); transform: translateY(-1px); }
 .nav a.active, .nav a[aria-current="page"] { background: var(--surface-alt); }
 
+.header-right{ display:flex; align-items:center; gap: var(--space-4); }
+.header-controls{
+  display:flex;
+  align-items:center;
+  gap: var(--space-3);
+}
 .language-switcher{ display:inline-flex; align-items:center; }
 .language-switcher select{
   appearance:none;
@@ -133,16 +125,16 @@
     padding: var(--space-3) 0;
   }
 
-  .header-primary{
+  .header-right{
     width:100%;
-    justify-content:space-between;
-    gap: var(--space-2);
+    flex-direction:column;
+    align-items:stretch;
+    gap: var(--space-3);
   }
 
-  .header-utilities{
+  .header-controls{
     width:100%;
-    display:grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    flex-wrap:wrap;
     gap: var(--space-2);
   }
 
@@ -150,25 +142,35 @@
     display:none;
   }
 
+  .language-switcher,
+  .language-switcher select,
+  .accessibility-trigger,
+  .auth-actions,
+  .auth-actions .btn,
+  .auth-actions .btn-secondary,
+  .auth-actions .btn-link,
+  .auth-actions .profile-chip{
+    width:100%;
+  }
+
   .language-switcher{
-    width:100%;
-  }
-
-  .language-switcher select{
-    width:100%;
-  }
-
-  .accessibility-trigger{
-    width:100%;
+    display:flex;
     justify-content:center;
-    padding: 10px 12px;
-    font-size: 0.95rem;
+  }
+
+  .language-switcher select,
+  .accessibility-trigger,
+  .auth-actions .btn,
+  .auth-actions .btn-secondary,
+  .auth-actions .btn-link,
+  .auth-actions .profile-chip{
+    justify-content:center;
+    text-align:center;
   }
 
   .auth-actions{
-    flex-wrap:nowrap;
-    justify-content:flex-end;
-    gap: var(--space-2);
+    margin-left:0;
+    justify-content:center;
   }
 
   .nav-mobile{
@@ -178,9 +180,8 @@
     left:0;
     right:0;
     z-index: 1100;
-    background: var(--surface);
-    border-top: 1px solid color-mix(in srgb, var(--grey-300) 80%, transparent);
-    box-shadow: 0 -6px 18px rgba(15, 23, 42, 0.12);
+    background: var(--bg);
+    border-top: 1px solid var(--grey-300);
     padding: 0 clamp(12px, 5vw, 24px);
     padding-bottom: calc(env(safe-area-inset-bottom, 0) + 0px);
   }
@@ -193,7 +194,6 @@
     border-right:1px solid var(--grey-300);
     white-space: nowrap;
     font-weight:600;
-    font-size:0.95rem;
   }
 
   .nav-mobile a:last-child{
