@@ -1,4 +1,5 @@
 """
+ONE-TIME RUN
 Generate embeddings for all services using httpx (matching your existing codebase).
 This avoids the supabase library version issues.
 """
