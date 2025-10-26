@@ -1,7 +1,6 @@
 // web/src/api/serviceDraft.ts
 import { VITE } from '@/utils/env';
 
-// Get API base URL from environment variable, fallback to CloudFront
 const API_BASE_URL = 
   VITE.VITE_API_BASE_URL?.trim() || 
   'https://d1hfq1dvtow5bt.cloudfront.net';
@@ -13,9 +12,6 @@ export interface ServiceDraftResponse {
   data: Record<string, unknown>;
 }
 
-/**
- * Submit a service draft form to the backend
- */
 export async function submitServiceDraft(
   form: Record<string, unknown>,
   sessionId: string | null,
@@ -46,7 +42,7 @@ export async function submitServiceDraft(
       );
     }
 
-    const result = (await response.json()) as ServiceDraftResponse;
+    const result = await response.json() as ServiceDraftResponse;
     console.log('Service draft submitted successfully:', result);
     
     return result;
@@ -55,17 +51,3 @@ export async function submitServiceDraft(
     throw error;
   }
 }
-
-// Export URL for debugging
-export { SERVICE_DRAFT_URL };
-```
-
----
-
-## Vercel Environment Variables
-
-Make sure these are set in **Vercel Dashboard** → **Settings** → **Environment Variables**:
-
-### For Both Preview & Production:
-```
-VITE_API_BASE_URL=https://d1hfq1dvtow5bt.cloudfront.net

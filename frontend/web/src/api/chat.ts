@@ -158,7 +158,7 @@ export async function sendMessageToAPI(
       services_found: (raw.services_found ?? 0) as number,
       raw_data: (raw.raw_data ?? []) as Array<Record<string, unknown>>,
       query_successful: (raw.query_successful ?? false) as boolean,
-      suggestion: (raw.suggestion ?? null) as string | null,
+      suggestion: raw.suggestion as string | undefined,
     };
   } catch (error) {
     console.error('Error sending message to API:', error);
