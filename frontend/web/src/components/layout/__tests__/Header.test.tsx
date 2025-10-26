@@ -30,15 +30,9 @@ it('renders primary nav links (no Admin in header)', () => {
 
   // Scope to the header’s primary navigation so footer links don’t interfere
   const navs = screen.getAllByRole('navigation', { name: /primary/i });
-  const desktopNav = navs.find((el) => el.getAttribute('data-variant') === 'desktop');
-  const mobileNav = navs.find((el) => el.getAttribute('data-variant') === 'mobile');
-
-  expect(desktopNav).toBeTruthy();
-  expect(mobileNav).toBeTruthy();
-
-  if (!desktopNav || !mobileNav) {
-    throw new Error('Expected both desktop and mobile nav variants to be rendered');
-  }
+  expect(navs).toHaveLength(1);
+  const desktopNav = navs[0];
+  expect(desktopNav.getAttribute('data-variant')).toBe('desktop');
 
   ['Home', 'Chat', 'Help & Crisis', 'FAQ'].forEach((label) => {
     expect(within(desktopNav).getByRole('link', { name: label })).toBeInTheDocument();
@@ -48,7 +42,4 @@ it('renders primary nav links (no Admin in header)', () => {
   expect(within(desktopNav).queryByRole('link', { name: /admin/i })).not.toBeInTheDocument();
 
   expect(screen.getByRole('link', { name: /accessibility/i })).toBeInTheDocument();
-
-  expect(mobileNav).toHaveAttribute('data-mobile-bar', 'true');
-  expect(within(mobileNav).getAllByRole('link')).toHaveLength(4);
 });

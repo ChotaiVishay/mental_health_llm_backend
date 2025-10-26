@@ -177,17 +177,48 @@ html[data-high-contrast="on"] .btn-secondary {
   color: var(--link);
 }
 
-html[data-high-contrast="on"] .nav-mobile {
+html[data-high-contrast="on"] .top-header{
   background: var(--surface);
-  border-top: 2px solid var(--focus);
+  border-bottom: 2px solid var(--focus);
 }
 
-html[data-high-contrast="on"] .nav-mobile a {
-  border-right: 2px solid var(--focus);
+html[data-high-contrast="on"] .top-header-signin,
+html[data-high-contrast="on"] .top-header-menu-btn,
+html[data-high-contrast="on"] .top-header-avatar{
+  border-width: 2px;
 }
 
-html[data-high-contrast="on"] .nav-mobile a:last-child {
-  border-right: 0;
+html[data-high-contrast="on"] .bottom-tab-bar-inner{
+  border: 2px solid var(--focus);
+  background: var(--surface);
+  box-shadow: none;
+}
+
+html[data-high-contrast="on"] .bottom-tab-pill.active{
+  background: var(--focus);
+  color: var(--brand-contrast);
+  box-shadow: none;
+}
+
+html[data-high-contrast="on"] .mobile-menu-panel{
+  border-left: 2px solid var(--focus);
+  box-shadow: none;
+  background: var(--surface);
+}
+
+html[data-high-contrast="on"] .mobile-menu-language,
+html[data-high-contrast="on"] .mobile-menu-link{
+  border-width: 2px;
+  background: var(--surface);
+}
+
+html[data-high-contrast="on"] .mobile-menu-language.active{
+  background: var(--focus);
+  color: var(--brand-contrast);
+}
+
+html[data-high-contrast="on"] .mobile-menu-language.active .mobile-menu-language-native{
+  color: inherit;
 }
 
 /* High contrast refinements for chat experience */

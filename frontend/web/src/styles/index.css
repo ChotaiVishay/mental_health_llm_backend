@@ -5,6 +5,7 @@
 
 /* Shared components */
 @import "./components/header.css";
+@import "./components/mobile-shell.css";
 @import "./components/footer.css";
 @import "./components/button.css";
 @import "./components/card.css";

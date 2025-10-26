@@ -7,9 +7,11 @@ import AuthCallback from '@/pages/AuthCallback';
 import ResetPassword from '@/pages/ResetPassword';
 import Accessibility from '@/pages/Accessibility';
 import Contact from '@/pages/Contact';
+import TopHeader from '@/components/TopHeader';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import Container from '@/components/layout/Container';
+import BottomTabBar from '@/components/BottomTabBar';
 import AdminSignIn from '@/pages/admin/AdminSignIn';
 import AdminLayout from '@/pages/admin/AdminLayout';
 import AdminDashboard from '@/pages/admin/AdminDashboard';
@@ -27,6 +29,7 @@ import NotFound from '@/pages/NotFound';
 export default function App() {
   return (
     <div className="app">
+      <TopHeader />
       <Header />
       <Container as="main" id="main" tabIndex={-1}>
         <Routes>
@@ -77,6 +80,7 @@ export default function App() {
         </Routes>
       </Container>
       <Footer />
+      <BottomTabBar />
     </div>
   );
 }
