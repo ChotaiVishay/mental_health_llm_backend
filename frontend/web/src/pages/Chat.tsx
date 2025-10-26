@@ -86,7 +86,11 @@ export default function Chat() {
   const { easyMode } = useEasyMode();
   const navigate = useNavigate();
   const { language, locale, t } = useLanguage();
-  const [sidebarOpen, setSidebarOpen] = useState(() => !easyMode);
+
+  const getIsNarrow = () => (typeof window !== 'undefined' ? window.matchMedia('(max-width: 900px)').matches : false);
+
+  const [isNarrow, setIsNarrow] = useState<boolean>(getIsNarrow);
+  const [sidebarOpen, setSidebarOpen] = useState<boolean>(() => (getIsNarrow() ? false : !easyMode));
   const userId = user?.id ? String(user.id) : undefined;
   const isAuthenticated = Boolean(user);
 
@@ -191,8 +195,33 @@ export default function Chat() {
   }, [t, userId]);
 
   useEffect(() => {
+    if (isNarrow) {
+      setSidebarOpen(false);
+      return;
+    }
     setSidebarOpen(easyMode ? false : true);
-  }, [easyMode]);
+  }, [easyMode, isNarrow]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return;
+    const mq = window.matchMedia('(max-width: 900px)');
+    setIsNarrow(mq.matches);
+
+    const handleChange = (event: MediaQueryListEvent) => {
+      setIsNarrow(event.matches);
+    };
+
+    if (typeof mq.addEventListener === 'function') {
+      mq.addEventListener('change', handleChange);
+      return () => mq.removeEventListener('change', handleChange);
+    }
+
+    const legacyHandler = (event: MediaQueryListEvent) => {
+      setIsNarrow(event.matches);
+    };
+    mq.addListener(legacyHandler);
+    return () => mq.removeListener(legacyHandler);
+  }, []);
 
   // persist
   useEffect(() => {
@@ -279,9 +308,14 @@ export default function Chat() {
 
   // === Fit the page grid to the viewport from its actual top (so composer is visible at 100% zoom)
   useEffect(() => {
-    let raf = 0;
     const el = pageRef.current;
     if (!el) return;
+    if (isNarrow) {
+      el.style.height = '';
+      return;
+    }
+
+    let raf = 0;
 
     const recalc = () => {
       const top = el.getBoundingClientRect().top;
@@ -318,15 +352,20 @@ export default function Chat() {
       window.removeEventListener('orientationchange', schedule);
       ro?.disconnect();
     };
-  }, []);
+  }, [isNarrow]);
 
   // Recalculate when these toggle height above the grid
   useEffect(() => {
+    if (isNarrow) {
+      const el = pageRef.current;
+      if (el) el.style.height = '';
+      return;
+    }
     const el = pageRef.current;
     if (!el) return;
     const top = el.getBoundingClientRect().top;
     el.style.height = `${Math.max(520, Math.round(window.innerHeight - top))}px`;
-  }, [netErr, sidebarOpen, userId]);
+  }, [netErr, sidebarOpen, userId, isNarrow]);
 
   return (
     <>

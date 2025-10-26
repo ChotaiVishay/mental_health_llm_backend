@@ -11,6 +11,37 @@ export default function Header() {
   const { screenReaderAssist } = useScreenReaderMode();
   const { t } = useLanguage();
 
+  const navItems = [
+    {
+      key: 'home',
+      kind: 'route' as const,
+      to: '/',
+      label: t('header.nav.home'),
+      end: true,
+    },
+    {
+      key: 'chat',
+      kind: 'route' as const,
+      to: '/chat',
+      label: t('header.nav.chat'),
+      dataEasyMode: 'priority',
+    },
+    {
+      key: 'help',
+      kind: 'anchor' as const,
+      href: '/#help-crisis',
+      label: t('header.nav.helpCrisis'),
+      dataEasyMode: 'priority',
+    },
+    {
+      key: 'faq',
+      kind: 'anchor' as const,
+      href: '/#faq',
+      label: t('header.nav.faq'),
+      dataEasyMode: 'hide',
+    },
+  ];
+
   const initials = useMemo(() => {
     const source = user?.name ?? user?.email ?? '';
     if (!source) return 'U';
@@ -29,6 +60,32 @@ export default function Header() {
     }
   };
 
+  const renderNavLinks = () => navItems.map((item) => {
+    if (item.kind === 'route') {
+      return (
+        <NavLink
+          key={item.key}
+          to={item.to}
+          end={item.end}
+          data-easy-mode={item.dataEasyMode}
+          className={({ isActive }) => (isActive ? 'active' : undefined)}
+        >
+          {item.label}
+        </NavLink>
+      );
+    }
+
+    return (
+      <a
+        key={item.key}
+        href={item.href}
+        data-easy-mode={item.dataEasyMode}
+      >
+        {item.label}
+      </a>
+    );
+  });
+
   return (
     <header className="header">
       <Container>
@@ -46,65 +103,65 @@ export default function Header() {
               </p>
             )}
             <nav
-              className="nav"
+              className="nav nav-desktop"
+              data-variant="desktop"
               aria-label={screenReaderAssist ? t('header.nav.ariaPrimaryLong') : t('header.nav.ariaPrimaryShort')}
             >
-              <NavLink to="/" end className={({ isActive }) => (isActive ? 'active' : undefined)}>
-                {t('header.nav.home')}
-              </NavLink>
-              <NavLink
-                to="/chat"
-                data-easy-mode="priority"
-                className={({ isActive }) => (isActive ? 'active' : undefined)}
-              >
-                {t('header.nav.chat')}
-              </NavLink>
-              {/* Removed Services; add in-page anchors for Help & Crisis and FAQ */}
-              <a href="/#help-crisis" data-easy-mode="priority">{t('header.nav.helpCrisis')}</a>
-              <a href="/#faq" data-easy-mode="hide">{t('header.nav.faq')}</a>
+              {renderNavLinks()}
             </nav>
 
-            <LanguageSwitcher />
+            <div className="header-controls">
+              <LanguageSwitcher />
 
-            <NavLink
-              to="/accessibility"
-              className={({ isActive }) => (isActive ? 'accessibility-trigger active' : 'accessibility-trigger')}
-            >
-              <span className="accessibility-trigger-label">{t('header.nav.accessibility')}</span>
-            </NavLink>
+              <NavLink
+                to="/accessibility"
+                className={({ isActive }) => (isActive ? 'accessibility-trigger active' : 'accessibility-trigger')}
+              >
+                <span className="accessibility-trigger-label">{t('header.nav.accessibility')}</span>
+              </NavLink>
 
-            <div className="auth-actions" aria-label={t('header.nav.accountActions')}>
-              {loading ? (
-                <span className="auth-status" aria-live="polite">{t('header.nav.loading')}</span>
-              ) : user ? (
-                <>
-                  <NavLink
-                    to="/profile"
-                    className={({ isActive }) => (isActive ? 'profile-chip active' : 'profile-chip')}
-                  >
-                    <span className="profile-chip-avatar" aria-hidden>
-                      {user.avatarUrl ? <img src={user.avatarUrl} alt="" /> : initials}
-                    </span>
-                    <span className="profile-chip-label">
-                      <strong>{user.name ?? user.email ?? 'Profile'}</strong>
-                      {user.name && user.email && (
-                        <small data-easy-mode="hide">{user.email}</small>
-                      )}
-                    </span>
+              <div className="auth-actions" aria-label={t('header.nav.accountActions')}>
+                {loading ? (
+                  <span className="auth-status" aria-live="polite">{t('header.nav.loading')}</span>
+                ) : user ? (
+                  <>
+                    <NavLink
+                      to="/profile"
+                      className={({ isActive }) => (isActive ? 'profile-chip active' : 'profile-chip')}
+                    >
+                      <span className="profile-chip-avatar" aria-hidden>
+                        {user.avatarUrl ? <img src={user.avatarUrl} alt="" /> : initials}
+                      </span>
+                      <span className="profile-chip-label">
+                        <strong>{user.name ?? user.email ?? 'Profile'}</strong>
+                        {user.name && user.email && (
+                          <small data-easy-mode="hide">{user.email}</small>
+                        )}
+                      </span>
+                    </NavLink>
+                    <button type="button" className="btn btn-link auth-signout" onClick={handleSignOut}>
+                      {t('header.nav.signOut')}
+                    </button>
+                  </>
+                ) : (
+                  <NavLink to="/login" className="btn btn-secondary">
+                    {t('header.nav.signIn')}
                   </NavLink>
-                  <button type="button" className="btn btn-link auth-signout" onClick={handleSignOut}>
-                    {t('header.nav.signOut')}
-                  </button>
-                </>
-              ) : (
-                <NavLink to="/login" className="btn btn-secondary">
-                  {t('header.nav.signIn')}
-                </NavLink>
-              )}
+                )}
+              </div>
             </div>
           </div>
         </div>
       </Container>
+
+      <nav
+        className="nav nav-mobile"
+        data-variant="mobile"
+        data-mobile-bar="true"
+        aria-label={screenReaderAssist ? t('header.nav.ariaPrimaryLong') : t('header.nav.ariaPrimaryShort')}
+      >
+        {renderNavLinks()}
+      </nav>
     </header>
   );
 }

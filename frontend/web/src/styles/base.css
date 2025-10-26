@@ -40,3 +40,9 @@ img { max-width: 100%; display: block; }
   .muted { color: color-mix(in srgb, var(--muted), black 25%); }
   .btn-primary { box-shadow: 0 0 0 2px color-mix(in srgb, var(--brand), black 25%) inset; }
 }
+
+@media (max-width: 768px) {
+  body {
+    padding-bottom: calc(96px + env(safe-area-inset-bottom, 0));
+  }
+}

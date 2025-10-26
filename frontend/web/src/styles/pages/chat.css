@@ -398,3 +398,71 @@
 .chat-service-form-multiselect .multiselect-close:hover{
   background:var(--surface);
 }
+
+@media (max-width: 900px){
+  .anon-banner{
+    flex-direction:column;
+    align-items:flex-start;
+    gap:8px;
+  }
+
+  .chat-page{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    height:auto !important;
+    min-height:calc(100vh - 160px);
+    overflow:visible;
+    padding-bottom:calc(96px + env(safe-area-inset-bottom, 0));
+  }
+
+  .chat-page.-collapsed{
+    padding-bottom:calc(96px + env(safe-area-inset-bottom, 0));
+  }
+
+  .chat-sidebar{
+    position:fixed;
+    inset:72px 16px calc(140px + env(safe-area-inset-bottom, 0));
+    z-index:1300;
+    max-height:calc(100vh - 72px - (140px + env(safe-area-inset-bottom, 0)));
+    overflow:hidden;
+    box-shadow:var(--shadow-md);
+  }
+
+  .chat-sidebar .sidebar-body{
+    overflow:auto;
+    max-height:calc(100vh - 72px - (190px + env(safe-area-inset-bottom, 0)));
+  }
+
+  .chat-page.-collapsed .chat-sidebar{
+    display:none;
+  }
+
+  .hambtn{
+    position:fixed;
+    top:auto;
+    bottom:calc(108px + env(safe-area-inset-bottom, 0));
+    right:16px;
+    left:auto;
+    z-index:1300;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    background:var(--surface);
+    box-shadow:var(--shadow-md);
+  }
+
+  .chat-main{
+    min-height:45vh;
+  }
+
+  .composer-dock{
+    position:sticky;
+    bottom:calc(96px + env(safe-area-inset-bottom, 0));
+    margin-bottom:calc(96px + env(safe-area-inset-bottom, 0));
+  }
+
+  .chat-alert{
+    margin:8px 12px 0;
+  }
+}

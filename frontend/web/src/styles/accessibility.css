@@ -177,6 +177,96 @@ html[data-high-contrast="on"] .btn-secondary {
   color: var(--link);
 }
 
+html[data-high-contrast="on"] .nav-mobile {
+  background: var(--surface);
+  border-top: 2px solid var(--focus);
+}
+
+html[data-high-contrast="on"] .nav-mobile a {
+  border-right: 2px solid var(--focus);
+}
+
+html[data-high-contrast="on"] .nav-mobile a:last-child {
+  border-right: 0;
+}
+
+/* High contrast refinements for chat experience */
+html[data-high-contrast="on"] .chat-page {
+  background: var(--bg);
+  color: var(--text);
+}
+
+html[data-high-contrast="on"] .chat-sidebar,
+html[data-high-contrast="on"] .chat-main,
+html[data-high-contrast="on"] .composer-dock,
+html[data-high-contrast="on"] .anon-banner,
+html[data-high-contrast="on"] .chat-alert {
+  background: var(--surface);
+  border: 2px solid color-mix(in srgb, var(--focus) 70%, transparent);
+  box-shadow: none;
+  color: var(--text);
+}
+
+html[data-high-contrast="on"] .chat-sidebar .sidebar-head,
+html[data-high-contrast="on"] .chat-main .chat-head {
+  border-bottom: 1px solid var(--focus);
+}
+
+html[data-high-contrast="on"] .chat-sidebar .sidebar-body,
+html[data-high-contrast="on"] .chat-scroller {
+  background: var(--surface);
+}
+
+html[data-high-contrast="on"] .hambtn,
+html[data-high-contrast="on"] .jump-latest {
+  background: var(--surface-alt);
+  border: 2px solid var(--focus);
+  color: var(--text);
+  box-shadow: none;
+}
+
+html[data-high-contrast="on"] .msg.assistant {
+  background: color-mix(in srgb, var(--surface) 90%, rgba(255, 255, 255, 0.1));
+  border: 2px solid var(--focus);
+  color: var(--text);
+}
+
+html[data-high-contrast="on"] .msg.user {
+  background: var(--brand);
+  color: var(--brand-contrast);
+  border: 2px solid color-mix(in srgb, var(--focus) 60%, transparent);
+}
+
+html[data-high-contrast="on"] .typing-bubble {
+  background: var(--surface-alt);
+  border: 2px solid var(--focus);
+  color: var(--text);
+}
+
+html[data-high-contrast="on"] .chat-alert {
+  border-color: var(--danger);
+  background: color-mix(in srgb, var(--danger) 20%, var(--surface));
+}
+
+html[data-high-contrast="on"] .composer-dock .chat-input textarea {
+  background: var(--surface);
+  color: var(--text);
+  border: 2px solid var(--focus);
+}
+
+html[data-high-contrast="on"] .composer-dock .btn {
+  border: 2px solid var(--focus);
+  color: var(--text);
+  background: var(--surface-alt);
+}
+
+html[data-high-contrast="on"] .composer-dock .btn.btn-primary,
+html[data-high-contrast="on"] .composer-dock .btn-primary {
+  background: var(--brand);
+  color: var(--brand-contrast);
+  border-color: var(--brand);
+}
+
 html[data-high-contrast="on"] *:focus-visible {
   outline: 3px solid var(--focus);
   outline-offset: 4px;
