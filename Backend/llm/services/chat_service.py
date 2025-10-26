@@ -37,9 +37,48 @@ class MentalHealthChatService:
                        message=message, 
                        session_id=session_id)
 
+            openai_client = get_openai_client()
+            flagged_self_harm = False
+            if self.settings.openai_api_key:
+                try:
+                    moderation = openai_client.check_moderation(message)
+                    categories = moderation.get("categories") or {}
+                    flagged_self_harm = bool(
+                        moderation.get("flagged")
+                        and any(
+                            key.startswith("self-harm") and categories.get(key)
+                            for key in categories
+                        )
+                    )
+                except Exception as moderation_error:
+                    logger.error("Moderation check failed",
+                                 error=str(moderation_error),
+                                 exc_info=True)
+
+            if flagged_self_harm:
+                logger.warning("Crisis intent detected; halting chat", session_id=session_id)
+                crisis_text = (
+                    "It sounds like you might be in immediate danger. "
+                    "I can't continue this conversation, but please reach out to emergency services or the crisis helplines below."
+                )
+                return {
+                    "message": crisis_text,
+                    "response": crisis_text,
+                    "session_id": session_id,
+                    "services_found": 0,
+                    "query_successful": False,
+                    "action": "crisis_halt",
+                    "resources": [
+                        {"label": "Call Emergency (000)", "href": "tel:000"},
+                        {"label": "Call Lifeline 13 11 14", "href": "tel:131114"},
+                        {"label": "Text Lifeline 0477 13 11 14", "href": "sms:0477131114"},
+                        {"label": "Suicide Call Back Service 1300 659 467", "href": "tel:1300659467"},
+                    ],
+                }
+
             # Detect intent
             intent = detect_intent(message)
-            
+
             if intent == "add_service":
                 logger.info("Add service intent detected")
                 return {
@@ -64,7 +103,7 @@ class MentalHealthChatService:
             # Get vector search service
             try:
                 vector_search = get_vector_search_service()
-                logger.info("✓ Vector search service initialized")
+                logger.info("Vector search service initialized")
             except Exception as e:
                 logger.error("Failed to initialize vector search", error=str(e), exc_info=True)
                 return {
@@ -85,9 +124,9 @@ class MentalHealthChatService:
                     user_context=user_context
                 )
                 
-                logger.info("✓ Vector search completed",
-                           results_count=len(search_results),
-                           avg_similarity=sum(r.get('similarity', 0) for r in search_results) / len(search_results) if search_results else 0)
+                logger.info("Vector search completed",
+                results_count=len(search_results),
+                avg_similarity=sum(r.get('similarity', 0) for r in search_results) / len(search_results) if search_results else 0)
                 
                 # Log top result for debugging
                 if search_results:
@@ -105,7 +144,7 @@ class MentalHealthChatService:
                 try:
                     supabase_db = await get_supabase_db()
                     search_results = supabase_db.search_services_by_text(message, limit=10)
-                    logger.info("✓ Fallback keyword search completed", count=len(search_results))
+                    logger.info("Fallback keyword search completed", count=len(search_results))
                 except Exception as e2:
                     logger.error("Fallback search also failed", error=str(e2))
                     return {

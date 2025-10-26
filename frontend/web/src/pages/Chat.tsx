@@ -30,6 +30,8 @@ import '@/styles/pages/chat.css';
 import { useLanguage } from '@/i18n/LanguageProvider';
 
 type ChatMessageStore = { id: string; role: 'user' | 'assistant'; text: string; at: number };
+type CrisisResource = { label: string; href: string };
+type CrisisAlert = { message: string; resources: CrisisResource[] };
 
 function mkId() { return Math.random().toString(36).slice(2); }
 function toUI(items?: ChatMessageStore[]): Message[] {
@@ -114,6 +116,7 @@ export default function Chat() {
   const [agreementsError, setAgreementsError] = useState<string | null>(null);
   const [showAgreementsModal, setShowAgreementsModal] = useState(true);
   const [savingAgreement, setSavingAgreement] = useState(false);
+  const [crisisAlert, setCrisisAlert] = useState<CrisisAlert | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -236,7 +239,23 @@ export default function Chat() {
   // auto-scroll only when already near the bottom
   useEffect(() => { if (atBottom) scrollToBottom(); }, [messages.length, atBottom, scrollToBottom]);
 
+  const handleCrisisDismiss = () => {
+    setCrisisAlert(null);
+  };
+
+  const filterCrisisResources = (raw: unknown): CrisisResource[] => {
+    if (!Array.isArray(raw)) return [];
+    return raw
+      .filter((item): item is Record<string, unknown> => typeof item === 'object' && item !== null)
+      .map((item) => item as Record<string, unknown>)
+      .filter((item) => typeof item.label === 'string' && typeof item.href === 'string')
+      .map((item) => ({ label: item.label as string, href: item.href as string }));
+  };
+
   const onSend = async (text: string) => {
+    if (crisisAlert) {
+      return;
+    }
     if (agreementsLoading || showAgreementsModal) return;
     setNetErr(null);
     const userMsg: Message = { id: mkId(), role: 'user', text };
@@ -245,7 +264,26 @@ export default function Chat() {
     try {
       const reply = await sendMessageToAPI(text, sessionId, language);
       if (reply.session_id) setSessionId(reply.session_id);
-      setMessages((prev) => [...prev, { id: mkId(), role: 'assistant', text: reply.response }]);
+      const assistantText =
+        (typeof reply.response === 'string' && reply.response.trim().length
+          ? reply.response
+          : typeof reply.message === 'string'
+            ? reply.message
+            : t('chat.errors.generic'));
+      setMessages((prev) => [...prev, { id: mkId(), role: 'assistant', text: assistantText }]);
+
+      if (reply.action === 'crisis_halt') {
+        setServiceAction(null);
+        setServiceFormOpen(false);
+        setCrisisAlert({
+          message: assistantText,
+          resources: filterCrisisResources(reply.resources),
+        });
+        return;
+      }
+
+      setCrisisAlert(null);
+
       const action = reply.action as ServiceFormAction | undefined;
       if (action && action.type === 'collect_service_details') {
         setServiceAction(action);
@@ -365,7 +403,7 @@ export default function Chat() {
     if (!el) return;
     const top = el.getBoundingClientRect().top;
     el.style.height = `${Math.max(520, Math.round(window.innerHeight - top))}px`;
-  }, [netErr, sidebarOpen, userId, isNarrow]);
+  }, [netErr, sidebarOpen, userId, crisisAlert]);
 
   return (
     <>
@@ -417,6 +455,24 @@ export default function Chat() {
             </div>
           )}
 
+          {crisisAlert && (
+            <div className="chat-alert crisis" role="alert" aria-live="assertive">
+              <p>{crisisAlert.message}</p>
+              {crisisAlert.resources.length > 0 && (
+                <ul className="crisis-resources">
+                  {crisisAlert.resources.map((item) => (
+                    <li key={`${item.label}-${item.href}`}>
+                      <a href={item.href}>{item.label}</a>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              <button type="button" className="btn" onClick={handleCrisisDismiss}>
+                I understand
+              </button>
+            </div>
+          )}
+
           {/* Only this div scrolls */}
           <div ref={scrollerRef} className="chat-scroller">
             <div className="chat-body">
@@ -440,7 +496,7 @@ export default function Chat() {
 
         {/* Composer dock — separate row pinned at grid bottom */}
         <div className="composer-dock">
-          <MessageInput onSend={onSend} disabled={busy || agreementsLoading || showAgreementsModal} />
+          <MessageInput onSend={onSend} disabled={busy || agreementsLoading || showAgreementsModal || Boolean(crisisAlert)} />
         </div>
       </div>
 

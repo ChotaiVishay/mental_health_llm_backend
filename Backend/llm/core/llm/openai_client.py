@@ -24,6 +24,25 @@ class OpenAIClient:
         if self._client is None:
             self._client = openai.OpenAI(api_key=self.settings.openai_api_key)
         return self._client
+
+    def check_moderation(self, text: str) -> Dict[str, Any]:
+        """Run text through OpenAI's moderation endpoint."""
+        if not text or not text.strip():
+            return {"flagged": False, "categories": {}}
+
+        if not self.settings.openai_api_key:
+            logger.warning("OpenAI moderation attempted without API key")
+            return {"flagged": False, "categories": {}}
+
+        response = self.client.moderations.create(
+            model="omni-moderation-latest",
+            input=text
+        )
+        result = response.results[0]
+        return {
+            "flagged": bool(result.flagged),
+            "categories": result.categories if hasattr(result, "categories") else {}
+        }
     
     async def test_connection(self) -> Dict[str, Any]:
         """Test OpenAI API connection."""

@@ -25,10 +25,10 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                 <DyslexicModeProvider>
                   <AuthProvider>
                     <AdminAuthProvider>
-                    <LanguageProvider>
-                      <App />
-                    </LanguageProvider>
-                     </AdminAuthProvider>
+                      <LanguageProvider>
+                        <App />
+                      </LanguageProvider>
+                    </AdminAuthProvider>
                   </AuthProvider>
                 </DyslexicModeProvider>
               </EasyModeProvider>

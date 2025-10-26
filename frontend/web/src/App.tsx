@@ -51,7 +51,6 @@ export default function App() {
             )}
           />
 
-          
           <Route path="/admin/signin" element={<AdminSignIn />} />
           <Route
             path="/admin"
@@ -68,7 +67,6 @@ export default function App() {
             <Route path="admins" element={<AdminAdminsPage />} />
             <Route path="profile" element={<AdminProfilePage />} />
           </Route>
-          
 
           <Route path="/accessibility" element={<Accessibility />} />
           <Route path="/contact" element={<Contact />} />
