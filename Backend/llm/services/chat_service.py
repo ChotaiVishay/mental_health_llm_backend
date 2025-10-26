@@ -1,13 +1,12 @@
 """
-Main chat service orchestrating mental health chatbot functionality.
-Enhanced with comprehensive debug logging.
+Enhanced chat service using vector search for semantic understanding.
 """
 
 from typing import Dict, Any, List, Optional
-from datetime import datetime
 import uuid
 import structlog
 
+from core.database.vector_search import get_vector_search_service
 from core.database.supabase_only import get_supabase_db
 from core.llm.openai_client import get_openai_client
 from app.config import get_settings
@@ -16,32 +15,35 @@ from services.flows.service_creation import prepare_payload
 
 logger = structlog.get_logger(__name__)
 
+
 class MentalHealthChatService:
-    """Main service for handling mental health chatbot conversations."""
+    """Enhanced chat service with vector search capabilities."""
 
     def __init__(self):
         self.settings = get_settings()
 
-    async def process_message(self, message: str, session_id: Optional[str] = None, user_context: Optional[Dict] = None) -> Dict[str, Any]:
-        """Process a user message and return a response."""
+    async def process_message(
+        self,
+        message: str,
+        session_id: Optional[str] = None,
+        user_context: Optional[Dict] = None
+    ) -> Dict[str, Any]:
+        """Process user message using vector search for semantic understanding."""
         try:
             if not session_id:
                 session_id = str(uuid.uuid4())
 
-            logger.info("=== CHAT SERVICE START ===", message=message, session_id=session_id)
+            logger.info("=== PROCESSING MESSAGE (VECTOR SEARCH) ===", 
+                       message=message, 
+                       session_id=session_id)
 
-            # Step 0: Detect intent early. If it's an add-service intent, signal frontend to open the form.
-            try:
-                intent = detect_intent(message)
-            except Exception:
-                intent = "query_services"
-
+            # Detect intent
+            intent = detect_intent(message)
+            
             if intent == "add_service":
-                logger.info("Detected add_service intent; prompting for form")
+                logger.info("Add service intent detected")
                 return {
-                    "message": (
-                        "I can help add a new service. Please provide the service details via the form."
-                    ),
+                    "message": "I can help add a new service. Please provide the details via the form.",
                     "session_id": session_id,
                     "services_found": 0,
                     "query_successful": True,
@@ -52,105 +54,129 @@ class MentalHealthChatService:
             if not self.settings.openai_api_key:
                 logger.error("OpenAI API key not configured")
                 return {
-                    "message": "Configuration error: OpenAI API key is missing. Please set OPENAI_API_KEY environment variable.",
+                    "message": "Configuration error: OpenAI API key missing.",
                     "session_id": session_id,
                     "services_found": 0,
                     "query_successful": False,
                     "error": "OPENAI_API_KEY not configured"
                 }
-            
-            if not self.settings.supabase_url or not self.settings.supabase_key:
-                logger.error("Supabase not configured")
-                return {
-                    "message": "Configuration error: Supabase is not configured. Please set SUPABASE_URL and SUPABASE_KEY.",
-                    "session_id": session_id,
-                    "services_found": 0,
-                    "query_successful": False,
-                    "error": "Supabase not configured"
-                }
 
-            # Get clients
+            # Get vector search service
             try:
-                logger.info("Initializing clients...")
-                openai_client = get_openai_client()
-                supabase_db = await get_supabase_db()
-                logger.info("✓ Clients initialized successfully")
+                vector_search = get_vector_search_service()
+                logger.info("✓ Vector search service initialized")
             except Exception as e:
-                logger.error("Failed to initialize clients", error=str(e), exc_info=True)
+                logger.error("Failed to initialize vector search", error=str(e), exc_info=True)
                 return {
-                    "message": "Failed to initialize services. Please check configuration.",
+                    "message": "Failed to initialize search service.",
                     "session_id": session_id,
                     "services_found": 0,
                     "query_successful": False,
-                    "error": f"Client initialization failed: {str(e)}"
+                    "error": f"Vector search init failed: {str(e)}"
                 }
 
-            # Search for services with comprehensive logging
+            # Perform vector search
             try:
-                logger.info("Starting database search", search_term=message, limit=10)
+                logger.info("Starting vector search...", query=message)
                 
-                search_results = supabase_db.search_services_by_text(message, limit=10)
+                search_results = vector_search.search_with_context(
+                    query=message,
+                    limit=10,
+                    user_context=user_context
+                )
                 
-                logger.info("✓ Database search completed", 
+                logger.info("✓ Vector search completed",
                            results_count=len(search_results),
-                           search_term=message)
+                           avg_similarity=sum(r.get('similarity', 0) for r in search_results) / len(search_results) if search_results else 0)
                 
-                # Log details of first result for verification
+                # Log top result for debugging
                 if search_results:
-                    first = search_results[0]
-                    logger.info("First result details:", 
-                               service_name=first.get('service_name'),
-                               organisation=first.get('organisation_name'),
-                               suburb=first.get('suburb'),
-                               state=first.get('state'))
-                else:
-                    logger.warning("Search returned zero results", search_term=message)
-                    
+                    top = search_results[0]
+                    logger.info("Top result",
+                               service=top.get('service_name'),
+                               similarity=f"{top.get('similarity', 0):.2%}",
+                               location=f"{top.get('suburb')}, {top.get('state')}")
+                
             except Exception as e:
-                logger.error("Database search FAILED", 
-                            error=str(e), 
-                            search_term=message,
-                            exc_info=True)
-                return {
-                    "message": "I apologise, but I'm having trouble accessing the service database right now. Please try again later or contact support.",
-                    "session_id": session_id,
-                    "services_found": 0,
-                    "query_successful": False,
-                    "error": f"Database search failed: {str(e)}"
-                }
+                logger.error("Vector search failed", error=str(e), exc_info=True)
+                
+                # Fallback to keyword search if vector search fails
+                logger.warning("Falling back to keyword search")
+                try:
+                    supabase_db = await get_supabase_db()
+                    search_results = supabase_db.search_services_by_text(message, limit=10)
+                    logger.info("✓ Fallback keyword search completed", count=len(search_results))
+                except Exception as e2:
+                    logger.error("Fallback search also failed", error=str(e2))
+                    return {
+                        "message": "I'm having trouble searching for services right now. Please try again later.",
+                        "session_id": session_id,
+                        "services_found": 0,
+                        "query_successful": False,
+                        "error": f"Both vector and keyword search failed"
+                    }
 
-            # Generate response using OpenAI
+            # Generate AI response
             try:
+                openai_client = get_openai_client()
+                
                 if search_results:
-                    logger.info("Generating AI response for results", count=len(search_results))
+                    logger.info("Generating AI response", results_count=len(search_results))
                     
-                    # Format search results for better readability
+                    # Format top 5 results
                     formatted_services = []
-                    for service in search_results[:5]:  # Top 5 results
+                    for idx, service in enumerate(search_results[:5], 1):
+                        similarity = service.get('similarity', 0)
+                        
                         service_info = f"""
-- Service: {service.get('service_name', 'N/A')}
-  Organization: {service.get('organisation_name', 'N/A')}
-  Location: {service.get('suburb', 'N/A')}, {service.get('state', 'N/A')}
-  Cost: {service.get('cost', 'N/A')}
-  Phone: {service.get('phone', 'N/A')}
-  Delivery: {service.get('delivery_method', 'N/A')}
+{idx}. {service.get('service_name', 'N/A')}"""
+                        
+                        if similarity:
+                            service_info += f" (Relevance: {similarity:.0%})"
+                        
+                        service_info += f"""
+   Organization: {service.get('organisation_name', 'N/A')}
+   Location: {service.get('suburb', 'N/A')}, {service.get('state', 'N/A')}
+   Cost: {service.get('cost', 'N/A')}
+   Phone: {service.get('phone', 'N/A')}
+   Delivery: {service.get('delivery_method', 'N/A')}
+   Type: {service.get('service_type', 'N/A')}
 """
                         formatted_services.append(service_info)
 
-                    prompt = f"""The user asked: "{message}"
+                    # Check for crisis indicators
+                    crisis_keywords = ['suicide', 'crisis', 'emergency', 'urgent', 'help me', 'desperate']
+                    is_crisis = any(word in message.lower() for word in crisis_keywords)
+                    
+                    crisis_prompt = ""
+                    if is_crisis:
+                        crisis_prompt = """
+IMPORTANT: This appears to be a crisis or urgent situation. 
+- Prioritize immediate support options
+- Include crisis helpline numbers (Lifeline 13 11 14, Beyond Blue 1300 22 4636)
+- Emphasize 24/7 and free services
+- Be empathetic and supportive
+"""
 
-I found these mental health services:
+                    prompt = f"""You are a compassionate mental health services assistant helping people in Australia.
+
+User asked: "{message}"
+
+I found these relevant services:
 {''.join(formatted_services)}
 
-Please provide a helpful response that:
-1. Directly answers their question
-2. Lists the relevant services with key details (name, location, cost, contact)
-3. Is empathetic and supportive
-4. Keeps response under 250 words
-5. Encourages them to contact the services for more information
-6. Return plain text only. Do not use Markdown.
+{crisis_prompt}
 
-Respond as a helpful mental health services assistant."""
+Provide a helpful response that:
+1. Directly answers their question with empathy and understanding
+2. Highlights the 2-3 most relevant services with key details (name, location, cost, contact)
+3. Mentions if services are free or bulk-billed
+4. Includes phone numbers and how to access the service
+5. Encourages them to reach out
+6. Uses plain, clear language (no markdown formatting)
+7. Keeps response under 300 words
+
+Be warm, supportive, and practical in your response."""
 
                     logger.info("Calling OpenAI API...")
                     response = openai_client.client.chat.completions.create(
@@ -161,7 +187,7 @@ Respond as a helpful mental health services assistant."""
                     )
                     
                     response_text = response.choices[0].message.content
-                    logger.info("✓ OpenAI response generated", length=len(response_text))
+                    logger.info("✓ AI response generated", length=len(response_text))
                     
                     return {
                         "message": response_text,
@@ -170,19 +196,26 @@ Respond as a helpful mental health services assistant."""
                         "raw_data": search_results[:3],
                         "query_successful": True,
                     }
+                
                 else:
-                    logger.info("No results found, generating fallback response")
+                    # No results found
+                    logger.info("No results found, generating helpful response")
                     
                     prompt = f"""The user asked: "{message}"
 
 I couldn't find specific mental health services matching their request in the database.
 
-Please provide a supportive response that:
-1. Acknowledges we couldn't find specific matches
-2. Suggests they try different search terms (be specific about what to try)
-3. Recommends contacting their GP or calling mental health helplines (Lifeline 13 11 14, Beyond Blue 1300 22 4636)
-4. Is empathetic and helpful
-5. Keeps response under 150 words"""
+Provide a supportive response that:
+1. Acknowledges we couldn't find exact matches
+2. Suggests alternative search terms (be specific - e.g., try "counseling" instead of "therapy", or specify a suburb)
+3. Recommends calling these helplines for immediate support:
+   - Lifeline: 13 11 14 (24/7 crisis support)
+   - Beyond Blue: 1300 22 4636 (24/7 anxiety/depression support)
+   - Suicide Call Back Service: 1300 659 467
+4. Suggests contacting their GP for a mental health care plan
+5. Remains warm, empathetic and helpful
+6. Uses plain language (no markdown)
+7. Keeps response under 200 words"""
 
                     response = openai_client.client.chat.completions.create(
                         model=self.settings.openai_model,
@@ -196,18 +229,18 @@ Please provide a supportive response that:
                         "session_id": session_id,
                         "services_found": 0,
                         "query_successful": True,
-                        "suggestion": "Try different search terms like 'counseling', 'therapy', or specify a location",
+                        "suggestion": "Try different search terms or call the helplines above for immediate support",
                     }
                     
             except Exception as e:
-                logger.error("✗ OpenAI API call failed", error=str(e), exc_info=True)
+                logger.error("OpenAI API failed", error=str(e), exc_info=True)
                 
-                # Fallback response if OpenAI fails
+                # Fallback if AI fails but we have results
                 if search_results:
-                    fallback_msg = f"I found {len(search_results)} mental health services, but I'm having trouble generating a detailed response. Here are the first few results:\n\n"
+                    fallback_msg = f"I found {len(search_results)} mental health services. Here are the top results:\n\n"
                     for i, service in enumerate(search_results[:3], 1):
-                        fallback_msg += f"{i}. {service.get('service_name', 'N/A')} - {service.get('suburb', 'N/A')}, {service.get('state', 'N/A')}\n"
-                        fallback_msg += f"   Organization: {service.get('organisation_name', 'N/A')}\n"
+                        fallback_msg += f"{i}. {service.get('service_name', 'N/A')}\n"
+                        fallback_msg += f"   {service.get('suburb', 'N/A')}, {service.get('state', 'N/A')}\n"
                         fallback_msg += f"   Phone: {service.get('phone', 'N/A')}\n"
                         fallback_msg += f"   Cost: {service.get('cost', 'N/A')}\n\n"
                     
@@ -217,51 +250,57 @@ Please provide a supportive response that:
                         "services_found": len(search_results),
                         "raw_data": search_results[:3],
                         "query_successful": True,
-                        "warning": "Using fallback response due to AI service issue"
+                        "warning": "Using fallback response (AI service unavailable)"
                     }
                 else:
                     return {
-                        "message": "I apologize, but I'm experiencing technical difficulties with the AI service. Please try again later.",
+                        "message": "I'm experiencing technical difficulties. Please try again or call Lifeline on 13 11 14 for support.",
                         "session_id": session_id,
                         "services_found": 0,
                         "query_successful": False,
-                        "error": f"OpenAI API failed: {str(e)}"
+                        "error": f"AI service failed: {str(e)}"
                     }
 
         except Exception as e:
-            logger.error("✗ CHAT PROCESSING COMPLETELY FAILED", 
-                        message=message, 
-                        error=str(e), 
+            logger.error("✗ CHAT PROCESSING FAILED",
+                        message=message,
+                        error=str(e),
                         exc_info=True)
             return {
-                "message": "I apologize, but I'm experiencing technical difficulties. Please try again later or contact support.",
+                "message": "I apologize, I'm experiencing technical difficulties. Please try again later or contact support.",
                 "session_id": session_id or str(uuid.uuid4()),
                 "services_found": 0,
                 "query_successful": False,
                 "error": str(e),
             }
 
-    async def process_service_form(self, form_data: Dict[str, Any], session_id: Optional[str] = None) -> Dict[str, Any]:
-        """Validate form data and insert a new service into Supabase."""
+    async def process_service_form(
+        self,
+        form_data: Dict[str, Any],
+        session_id: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """Process service creation form submission."""
         if not session_id:
             session_id = str(uuid.uuid4())
 
         try:
             logger.info("=== SERVICE CREATION START ===", session_id=session_id)
 
-            # Validate/normalize via flow helper
+            # Validate and normalize
             payload = prepare_payload(form_data)
             logger.info("Service form validated", keys=list(payload.keys()))
 
-            # Insert into Supabase
+            # Insert into database
             supabase_db = await get_supabase_db()
             created = supabase_db.insert_service(payload)
 
-            name = created.get("service_name") or payload.get("service_name")
-            sid = created.get("id")
+            service_name = created.get("service_name") or payload.get("service_name")
+            
+            # TODO: Generate embedding for new service asynchronously
+            # For now, embeddings will be generated in next batch run
 
             return {
-                "message": f"Thanks! The service '{name}' has been submitted successfully.",
+                "message": f"Thanks! The service '{service_name}' has been submitted successfully. It will appear in search results shortly.",
                 "session_id": session_id,
                 "services_found": 0,
                 "query_successful": True,
@@ -293,17 +332,18 @@ Please provide a supportive response that:
             return []
 
     async def get_suggested_questions(self) -> List[str]:
-        """Get suggested questions to help users get started."""
+        """Get suggested questions using relevant terminology."""
         return [
-            "Find mental health services in Melbourne",
-            "What free counseling services are available?",
-            "I need help with anxiety - what services can help?",
-            "Show me telehealth therapy options",
-            "Are there services for young people with depression?",
+            "I need help with anxiety and depression",
+            "Find free counseling services in Melbourne",
+            "Online therapy for young adults",
+            "Crisis support available now",
+            "Bulk-billed psychology services near me",
+            "Mental health services for teenagers",
         ]
 
     async def health_check(self) -> Dict[str, Any]:
-        """Check the health of chat service components."""
+        """Check health of all chat service components."""
         try:
             # Check configuration
             config_status = {
@@ -311,7 +351,25 @@ Please provide a supportive response that:
                 "supabase_url_set": bool(self.settings.supabase_url),
                 "supabase_key_set": bool(self.settings.supabase_key),
                 "openai_model": self.settings.openai_model,
+                "embed_model": self.settings.embed_model,
             }
+            
+            # Check vector search
+            try:
+                vector_search = get_vector_search_service()
+                test_embedding = vector_search.get_embedding("test query")
+                test_results = vector_search.vector_search("mental health", limit=1)
+                
+                vector_status = {
+                    "status": "healthy",
+                    "embedding_dimension": len(test_embedding),
+                    "search_functional": len(test_results) > 0,
+                }
+            except Exception as e:
+                vector_status = {
+                    "status": "error",
+                    "error": str(e),
+                }
             
             # Check database
             supabase_db = await get_supabase_db()
@@ -326,7 +384,8 @@ Please provide a supportive response that:
                 config_status["supabase_url_set"] and
                 config_status["supabase_key_set"] and
                 db_status.get("status") == "connected" and
-                openai_status.get("status") == "connected"
+                openai_status.get("status") == "connected" and
+                vector_status.get("status") == "healthy"
             )
 
             return {
@@ -334,10 +393,11 @@ Please provide a supportive response that:
                 "configuration": config_status,
                 "database": db_status,
                 "openai": openai_status,
+                "vector_search": vector_status,
                 "ready_for_chat": all_healthy,
             }
         except Exception as e:
-            logger.error("Chat service health check failed", error=str(e), exc_info=True)
+            logger.error("Health check failed", error=str(e), exc_info=True)
             return {
                 "status": "error",
                 "error": str(e),
@@ -345,7 +405,10 @@ Please provide a supportive response that:
             }
 
 
+# Singleton instance
 chat_service = MentalHealthChatService()
 
+
 async def get_chat_service() -> MentalHealthChatService:
+    """Get chat service singleton."""
     return chat_service
