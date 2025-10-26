@@ -5,6 +5,7 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { vi } from 'vitest';
 import Chat from '@/pages/Chat';
 import { savePreloginChat } from '@/features/chat/sessionStore';
+import { fetchAgreementStatus, acceptAgreements } from '@/api/agreements';
 
 // Mock AuthContext with a typed surface (no `require`, no `any`)
 vi.mock('@/auth/AuthContext', () => {
@@ -32,6 +33,27 @@ vi.mock('@/auth/AuthContext', () => {
 });
 
 import { AuthProvider, useAuth } from '@/auth/AuthContext';
+
+vi.mock('@/api/agreements', () => ({
+  fetchAgreementStatus: vi.fn(),
+  acceptAgreements: vi.fn(),
+}));
+
+vi.mocked(fetchAgreementStatus).mockResolvedValue({
+  termsVersion: 'test',
+  privacyVersion: 'test',
+  termsAccepted: true,
+  privacyAccepted: true,
+  requiresAcceptance: false,
+});
+
+vi.mocked(acceptAgreements).mockResolvedValue({
+  termsVersion: 'test',
+  privacyVersion: 'test',
+  termsAccepted: true,
+  privacyAccepted: true,
+  requiresAcceptance: false,
+});
 
 type MockAuth = { setUser: (u: unknown) => void };
 

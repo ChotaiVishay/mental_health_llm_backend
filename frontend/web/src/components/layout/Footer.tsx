@@ -51,7 +51,7 @@ export default function Footer() {
             <div className="cta-copy">
               <h2 id="cta-title" className="cta-title">Get support in minutes.</h2>
               <p className="cta-sub">Chat with our assistant or explore services near you — free.</p>
-              <ul className="cta-bullets" aria-hidden="true">
+              <ul className="cta-bullets" aria-hidden="true" data-easy-mode="hide">
                 <li>✓ Private</li>
                 <li>✓ Quick to start</li>
                 <li>✓ No sign-in required</li>
@@ -64,6 +64,7 @@ export default function Footer() {
                   key={b.label}
                   className={`btn ${b.variant === 'primary' ? 'btn-primary' : 'btn-secondary'}`}
                   href={b.href}
+                  data-easy-mode={b.variant === 'primary' ? 'priority' : 'hide'}
                 >
                   {b.label}
                 </a>
@@ -95,7 +96,7 @@ export default function Footer() {
               </ul>
             </nav>
 
-            <nav aria-label="More">
+            <nav aria-label="More" data-easy-mode="hide">
               <h3 className="footer-heading">More</h3>
               <ul className="footer-list">
                 <li><a href="/admin">Admin</a></li>

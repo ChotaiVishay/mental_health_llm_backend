@@ -1,11 +1,42 @@
-import { it, expect } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import {
+  afterEach, beforeEach, expect, it, vi,
+} from 'vitest';
+import {
+  render, screen, fireEvent, waitFor,
+} from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from '@/auth/AuthContext';
 import Home from '@/pages/Home';
 import Chat from '@/pages/Chat';
+import { fetchAgreementStatus, acceptAgreements } from '@/api/agreements';
 
-it('shows Start Chat and navigates (when logged in)', () => {
+vi.mock('@/api/agreements', () => ({
+  fetchAgreementStatus: vi.fn(),
+  acceptAgreements: vi.fn(),
+}));
+
+beforeEach(() => {
+  vi.mocked(fetchAgreementStatus).mockResolvedValue({
+    termsVersion: 'test',
+    privacyVersion: 'test',
+    termsAccepted: true,
+    privacyAccepted: true,
+    requiresAcceptance: false,
+  });
+  vi.mocked(acceptAgreements).mockResolvedValue({
+    termsVersion: 'test',
+    privacyVersion: 'test',
+    termsAccepted: true,
+    privacyAccepted: true,
+    requiresAcceptance: false,
+  });
+});
+
+afterEach(() => {
+  vi.clearAllMocks();
+});
+
+it('shows Start Chat and navigates (when logged in)', async () => {
   render(
     <MemoryRouter initialEntries={['/']}>
       <AuthProvider initialState={{ user: { id: 'u1', name: 'Test User' } }}>
@@ -18,5 +49,6 @@ it('shows Start Chat and navigates (when logged in)', () => {
   );
 
   fireEvent.click(screen.getByRole('button', { name: /^start chat —/i }));
-  expect(screen.getByRole('textbox', { name: /message/i })).toBeInTheDocument();
+  await waitFor(() => expect(fetchAgreementStatus).toHaveBeenCalled());
+  expect(await screen.findByRole('textbox', { name: /message/i })).toBeInTheDocument();
 });

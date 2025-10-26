@@ -15,11 +15,24 @@ function join(origin: string, path: string) {
 const BACKEND_ORIGIN = (VITE.VITE_BACKEND_ORIGIN ?? '').toString();
 const DJANGO_ADMIN_PATH = (VITE.VITE_DJANGO_ADMIN_PATH ?? '/admin/').toString();
 
-export const ADMIN_CONSOLE_URL = BACKEND_ORIGIN
-  ? join(BACKEND_ORIGIN, DJANGO_ADMIN_PATH)
-  : '/admin/'; // sensible placeholder in dev if origin missing
+const SUPABASE_STUDIO_URL = (VITE.VITE_SUPABASE_STUDIO_URL ?? '').toString();
+const EXPLICIT_PORTAL_URL = (VITE.VITE_ADMIN_PORTAL_URL ?? '').toString();
 
-// Optional social auth start endpoints on the backend (Django side)
+/**
+ * Resolve the admin portal URL. Preference order:
+ *  1. An explicit `VITE_ADMIN_PORTAL_URL`
+ *  2. Supabase Studio URL (useful when managing auth/users directly)
+ *  3. Legacy Django admin path (still works in hybrid deployments)
+ */
+export const ADMIN_PORTAL_URL =
+  EXPLICIT_PORTAL_URL ||
+  SUPABASE_STUDIO_URL ||
+  (BACKEND_ORIGIN ? join(BACKEND_ORIGIN, DJANGO_ADMIN_PATH) : '/admin/');
+
+// Backwards compatibility: some imports still expect ADMIN_CONSOLE_URL
+export const ADMIN_CONSOLE_URL = ADMIN_PORTAL_URL;
+
+// Optional social auth start endpoints on the backend (legacy Django side)
 const OAUTH_PATHS = {
   google: VITE.VITE_ADMIN_AUTH_GOOGLE?.toString(),
   github: VITE.VITE_ADMIN_AUTH_GITHUB?.toString(),
@@ -38,7 +51,7 @@ export function getAdminOAuthUrl(provider: AdminProvider): string | null {
 
   const startUrl = join(BACKEND_ORIGIN, path);
   const sep = startUrl.includes('?') ? '&' : '?';
-  const next = encodeURIComponent(ADMIN_CONSOLE_URL);
+  const next = encodeURIComponent(ADMIN_PORTAL_URL);
   return `${startUrl}${sep}next=${next}`;
 }
 

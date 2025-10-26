@@ -12,8 +12,7 @@ function toEpoch(v: string | number | Date | undefined): number {
   return Number.isFinite(t) ? t : 0;
 }
 
-const rawBase = VITE.VITE_API_BASE_URL?.trim() || VITE.VITE_BACKEND_ORIGIN?.trim();
-const BASE = rawBase ? rawBase.replace(/\/+$/, '') : undefined;
+const BASE = VITE.VITE_API_BASE_URL?.trim();
 const USE_MOCK = VITE.VITE_SERVICES_MOCK === '1' || !BASE;
 
 export async function fetchServices(): Promise<Service[]> {
@@ -27,7 +26,7 @@ export async function fetchServices(): Promise<Service[]> {
     return JSON.parse(t) as Service[];
   }
 
-  const url = `${BASE!}/api/services`;
+  const url = `${BASE!.replace(/\/$/, '')}/api/services`;
   const r = await fetch(url, { headers: { Accept: 'application/json' } });
   const t = await r.text();
   if (!r.ok) throw new Error(`HTTP ${r.status} on ${url}: ${t.slice(0, 120)}`);

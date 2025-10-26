@@ -2,13 +2,15 @@
 export type ViteEnv = {
   VITE_AUTH_MOCK?: string;
   VITE_API_BASE_URL?: string;
-  VITE_CHAT_API_BASE?: string;
   VITE_SUPPORTED_LANGS?: string;
   VITE_SERVICES_MOCK?: string; // '1' enables mock services
   VITE_SUPABASE_URL?: string;
   VITE_SUPABASE_ANON_KEY?: string;
+  VITE_SUPABASE_SERVICE_KEY?: string;
   VITE_BACKEND_ORIGIN?: string;
   VITE_DJANGO_ADMIN_PATH?: string;
+  VITE_SUPABASE_STUDIO_URL?: string;
+  VITE_ADMIN_PORTAL_URL?: string;
   VITE_ADMIN_AUTH_GOOGLE?: string;
   VITE_ADMIN_AUTH_GITHUB?: string;
   VITE_ADMIN_AUTH_APPLE?: string;

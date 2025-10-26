@@ -1,6 +1,7 @@
 @import "./tokens.css";
 @import "./base.css";
 @import "./utilities.css";
+@import "./accessibility.css";
 
 /* Shared components */
 @import "./components/header.css";
@@ -16,4 +17,6 @@
 @import "./pages/services.css";
 @import "./pages/help.css";
 @import "./pages/admin.css";
-@import './pages/home.css'; 
+@import './pages/home.css';
+@import './pages/accessibility.css';
+@import './pages/contact.css';

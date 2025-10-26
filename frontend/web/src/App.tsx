@@ -2,16 +2,24 @@ import { Route, Routes, Navigate } from 'react-router-dom';
 import Home from '@/pages/Home';
 import Chat from '@/pages/Chat';
 import Login from '@/pages/Login';
-import AdminSignIn from '@/pages/admin/AdminSignIn';
-import AdminIndex from '@/pages/admin/AdminIndex';
 import Profile from '@/pages/Profile';
 import AuthCallback from '@/pages/AuthCallback';
 import ResetPassword from '@/pages/ResetPassword';
+import Accessibility from '@/pages/Accessibility';
+import Contact from '@/pages/Contact';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import Container from '@/components/layout/Container';
+// import AdminSignIn from '@/pages/admin/AdminSignIn';
+// import AdminLayout from '@/pages/admin/AdminLayout';
+// import AdminDashboard from '@/pages/admin/AdminDashboard';
+// import AdminUsersPage from '@/pages/admin/AdminUsersPage';
+// import AdminProvidersPage from '@/pages/admin/AdminProvidersPage';
+// import AdminServicesPage from '@/pages/admin/AdminServicesPage';
+// import AdminAdminsPage from '@/pages/admin/AdminAdminsPage';
+// import AdminProfilePage from '@/pages/admin/AdminProfilePage';
+// import RequireAdmin from '@/auth/RequireAdmin';
 import RequireAuth from '@/auth/RequireAuth';
-import RequireAdmin from '@/auth/RequireAdmin';
 import Styleguide from '@/pages/Styleguide';
 import '@/styles/index.css';
 import NotFound from '@/pages/NotFound';
@@ -20,7 +28,7 @@ export default function App() {
   return (
     <div className="app">
       <Header />
-      <Container as="main">
+      <Container as="main" id="main" tabIndex={-1}>
         <Routes>
           <Route path="/" element={<Home />} />
 
@@ -42,16 +50,29 @@ export default function App() {
               </RequireAuth>
             )}
           />
-          {/* Admin */}
+
+          {/* Admin routes temporarily disabled until admin setup is configured. */}
+          {/*
           <Route path="/admin/signin" element={<AdminSignIn />} />
           <Route
             path="/admin"
             element={(
               <RequireAdmin>
-                <AdminIndex />
+                <AdminLayout />
               </RequireAdmin>
             )}
-          />
+          >
+            <Route index element={<AdminDashboard />} />
+            <Route path="users" element={<AdminUsersPage />} />
+            <Route path="providers" element={<AdminProvidersPage />} />
+            <Route path="services" element={<AdminServicesPage />} />
+            <Route path="admins" element={<AdminAdminsPage />} />
+            <Route path="profile" element={<AdminProfilePage />} />
+          </Route>
+          */}
+
+          <Route path="/accessibility" element={<Accessibility />} />
+          <Route path="/contact" element={<Contact />} />
           <Route path="/styleguide" element={<Styleguide />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

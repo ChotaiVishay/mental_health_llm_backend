@@ -1,13 +1,23 @@
 // src/components/layout/Container.tsx
-import { ReactNode, ElementType } from 'react';
+import { ComponentPropsWithoutRef, ReactNode, ElementType } from 'react';
 
-type Props = {
+type ContainerProps<T extends ElementType> = {
   children: ReactNode;
-  as?: ElementType;
+  as?: T;
   className?: string;
-};
+} & Omit<ComponentPropsWithoutRef<T>, 'as' | 'className' | 'children'>;
 
-export default function Container({ children, as: Tag = 'div', className = '' }: Props) {
-  const Cmp = Tag as ElementType; // typed, not any
-  return <Cmp className={`container ${className}`}>{children}</Cmp>;
+export default function Container<T extends ElementType = 'div'>({
+  children,
+  as,
+  className = '',
+  ...rest
+}: ContainerProps<T>) {
+  const Component = (as ?? 'div') as ElementType;
+  const composedClassName = ['container', className].filter(Boolean).join(' ');
+  return (
+    <Component className={composedClassName} {...rest}>
+      {children}
+    </Component>
+  );
 }

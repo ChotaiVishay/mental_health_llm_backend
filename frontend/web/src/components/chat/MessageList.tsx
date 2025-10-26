@@ -32,9 +32,6 @@ export default function MessageList({ items }: Props) {
           {m.role === 'assistant' ? (
             <div
               className="msg-text"
-              // The content comes from our backend LLM. We escape HTML
-              // before converting lightweight Markdown to HTML in the
-              // renderer to reduce XSS risk.
               dangerouslySetInnerHTML={{ __html: markdownToHtml(m.text) }}
             />
           ) : (

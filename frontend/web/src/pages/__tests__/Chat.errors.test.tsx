@@ -1,7 +1,12 @@
-import { it, expect, vi } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import {
+  afterEach, beforeEach, expect, it, vi,
+} from 'vitest';
+import {
+  render, screen, fireEvent, waitFor,
+} from '@testing-library/react';
 import Chat from '@/pages/Chat';
 import { Providers } from '@/test-utils';
+import { fetchAgreementStatus, acceptAgreements } from '@/api/agreements';
 
 // Force the API call to fail so we can assert the banner & composer behaviour
 vi.mock('@/api/chat', () => ({
@@ -9,12 +14,49 @@ vi.mock('@/api/chat', () => ({
   fetchChatSessions: vi.fn(async () => []),
 }));
 
+vi.mock('@/api/agreements', () => ({
+  fetchAgreementStatus: vi.fn(),
+  acceptAgreements: vi.fn(),
+}));
+
+beforeEach(() => {
+  vi.mocked(fetchAgreementStatus).mockResolvedValue({
+    termsVersion: 'test',
+    privacyVersion: 'test',
+    termsAccepted: true,
+    privacyAccepted: true,
+    requiresAcceptance: false,
+  });
+  vi.mocked(acceptAgreements).mockResolvedValue({
+    termsVersion: 'test',
+    privacyVersion: 'test',
+    termsAccepted: true,
+    privacyAccepted: true,
+    requiresAcceptance: false,
+  });
+});
+
+afterEach(() => {
+  vi.clearAllMocks();
+});
+
 it('shows a friendly banner when API fails and keeps composer enabled', async () => {
   render(
-    <Providers router={{ initialEntries: ['/chat'] }} auth={{ user: { id: 'u1', name: 'Test' } }}>
+    <Providers
+      router={{ initialEntries: ['/chat'], withRoutes: true }}
+      auth={{ user: { id: 'u1', name: 'Test' } }}
+    >
       <Chat />
     </Providers>
   );
+
+  await waitFor(() => expect(fetchAgreementStatus).toHaveBeenCalled());
+
+  // Accept agreements so the composer becomes active
+  fireEvent.click(await screen.findByLabelText(/I have read and agree/i));
+  fireEvent.click(screen.getByLabelText(/I understand and accept/i));
+  fireEvent.click(screen.getByRole('button', { name: /Accept and continue/i }));
+  await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
 
   // Textbox is accessible via its label "Message" now
   const box = await screen.findByRole('textbox', { name: /message/i });
@@ -22,7 +64,7 @@ it('shows a friendly banner when API fails and keeps composer enabled', async ()
   fireEvent.click(screen.getByRole('button', { name: /send/i }));
 
   // Friendly error text appears
-  await screen.findByText(/couldn’t reach the assistant|network error/i);
+  await screen.findByText(/network error/i);
 
   // Composer remains usable
   await waitFor(() => expect(screen.getByRole('textbox', { name: /message/i })).not.toBeDisabled());

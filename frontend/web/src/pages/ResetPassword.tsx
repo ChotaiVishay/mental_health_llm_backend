@@ -33,7 +33,7 @@ export default function ResetPassword() {
           return;
         }
         setReady(true);
-      } catch (err) {
+      } catch {
         if (!cancelled) {
           setError('Something went wrong while preparing password reset. Please try again.');
           setReady(false);

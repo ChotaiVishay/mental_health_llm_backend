@@ -77,34 +77,6 @@ function commitSession(session: Session | null, setUser: React.Dispatch<React.Se
   if (uid) mergePreloginIntoUser(uid);
 }
 
-async function attachProfileRole(setUser: React.Dispatch<React.SetStateAction<User | null>>) {
-  try {
-    const supabase = getSupabaseClient();
-    if (!supabase) return;
-    const { data: auth } = await supabase.auth.getUser();
-    const uid = auth.user?.id;
-    if (!uid) return;
-    // Try app_metadata first
-    const appMeta = (auth.user?.app_metadata ?? {}) as Record<string, unknown>;
-    const metaRole = (appMeta.role as string | undefined) || undefined;
-    const metaRoles = (appMeta.roles as string[] | undefined) || undefined;
-    if (metaRole || metaRoles) {
-      setUser((prev) => (prev ? { ...prev, role: metaRole as any, roles: metaRoles } : prev));
-    }
-    // Also try profiles table for canonical role/org
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('role, organization_id')
-      .eq('id', uid)
-      .single();
-    if (!error && data) {
-      setUser((prev) => (prev ? { ...prev, role: (data.role as any) ?? prev.role, org_id: (data as any).organization_id ?? null } : prev));
-    }
-  } catch {
-    // ignore — UI gating is secondary to RLS
-  }
-}
-
 type AuthProviderProps = {
   children: ReactNode;
   initialState?: { user?: User | null; loading?: boolean };
@@ -132,7 +104,6 @@ export function AuthProvider({ children, initialState }: AuthProviderProps) {
         const { data } = await supabase.auth.getSession();
         if (!mounted) return;
         commitSession(data.session, setUser);
-        await attachProfileRole(setUser);
       } finally {
         if (mounted) setLoading(false);
       }
@@ -141,10 +112,9 @@ export function AuthProvider({ children, initialState }: AuthProviderProps) {
     hydrate();
 
     if (!isMockAuth && supabase) {
-      const { data: listener } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
         if (!mounted) return;
         commitSession(session, setUser);
-        await attachProfileRole(setUser);
       });
       return () => {
         mounted = false;
@@ -198,7 +168,6 @@ export function AuthProvider({ children, initialState }: AuthProviderProps) {
       if (supabase) {
         const { data } = await supabase.auth.getSession();
         commitSession(data.session, setUser);
-        await attachProfileRole(setUser);
       }
       return state;
     } finally {
@@ -325,7 +294,7 @@ export function AuthProvider({ children, initialState }: AuthProviderProps) {
       if (name) updatePayload.data = { full_name: name };
 
       if (Object.keys(updatePayload).length > 0) {
-        const { data: updated, error: updateError } = await supabase.auth.updateUser(updatePayload); 
+        const { error: updateError } = await supabase.auth.updateUser(updatePayload); 
         if (updateError) {
           return { ok: false, error: updateError.message };
         }

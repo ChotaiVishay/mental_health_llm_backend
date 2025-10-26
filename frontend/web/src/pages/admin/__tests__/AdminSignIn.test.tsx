@@ -1,46 +1,51 @@
+import { MemoryRouter } from 'react-router-dom';
 import { render, screen } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
+import userEvent from '@testing-library/user-event';
+import AdminSignIn from '../AdminSignIn';
+import * as AdminAuthContext from '@/admin/AdminAuthContext';
 
-// Mock config helper so we can assert the exact hrefs.
-// Apple is intentionally disabled (returns null) to verify conditional rendering.
-vi.mock('@/config/admin', () => ({
-  ADMIN_CONSOLE_URL: 'http://backend.test/admin/',
-  getAdminOAuthUrl: (provider: 'google' | 'github' | 'apple') => {
-    const next = encodeURIComponent('http://backend.test/admin/');
-    if (provider === 'google') return `http://backend.test/auth/google/login/?next=${next}`;
-    if (provider === 'github') return `http://backend.test/auth/github/login/?next=${next}`;
-    return null; // apple disabled
-  },
-}));
+const loginMock = vi.fn().mockResolvedValue({ ok: true });
 
-import AdminSignIn from '@/pages/admin/AdminSignIn';
+describe('AdminSignIn', () => {
+  beforeEach(() => {
+    loginMock.mockReset().mockResolvedValue({ ok: true });
+    vi.spyOn(AdminAuthContext, 'useAdminAuth').mockReturnValue({
+      admin: null,
+      loading: false,
+      error: null,
+      login: loginMock,
+      logout: vi.fn(),
+      refresh: vi.fn(),
+      reload: vi.fn(),
+      updateProfile: vi.fn().mockResolvedValue({ ok: true }),
+    });
+  });
 
-describe('AdminSignIn (/admin/signin)', () => {
-  it('shows provider buttons with hrefs from helper and hides missing providers', () => {
-    render(<AdminSignIn />);
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
 
-    // Providers
-    expect(
-      screen.getByRole('link', { name: /continue with google/i })
-    ).toHaveAttribute(
-      'href',
-      'http://backend.test/auth/google/login/?next=http%3A%2F%2Fbackend.test%2Fadmin%2F'
+  it('renders form fields', () => {
+    render(
+      <MemoryRouter initialEntries={['/admin/signin']}>
+        <AdminSignIn />
+      </MemoryRouter>,
+    );
+    expect(screen.getByLabelText(/email or username/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
+  });
+
+  it('submits credentials via context', async () => {
+    render(
+      <MemoryRouter initialEntries={['/admin/signin']}>
+        <AdminSignIn />
+      </MemoryRouter>,
     );
 
-    expect(
-      screen.getByRole('link', { name: /continue with github/i })
-    ).toHaveAttribute(
-      'href',
-      'http://backend.test/auth/github/login/?next=http%3A%2F%2Fbackend.test%2Fadmin%2F'
-    );
+    await userEvent.type(screen.getByLabelText(/email or username/i), 'admin@example.com');
+    await userEvent.type(screen.getByLabelText(/password/i), 'Passw0rd!');
+    await userEvent.click(screen.getByRole('button', { name: /sign in/i }));
 
-    expect(
-      screen.queryByRole('link', { name: /continue with apple/i })
-    ).not.toBeInTheDocument(); // disabled via mock
-
-    // Fallback link
-    expect(
-      screen.getByRole('link', { name: /open admin console/i })
-    ).toHaveAttribute('href', 'http://backend.test/admin/');
+    expect(loginMock).toHaveBeenCalledWith('admin@example.com', 'Passw0rd!');
   });
 });

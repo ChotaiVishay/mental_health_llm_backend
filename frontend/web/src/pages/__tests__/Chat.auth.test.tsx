@@ -1,5 +1,7 @@
-import { it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import {
+  afterEach, beforeEach, expect, it, vi,
+} from 'vitest';
+import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from '@/auth/AuthContext';
 
@@ -10,8 +12,35 @@ vi.mock('@/auth/RequireAuth', () => ({
 
 import RequireAuth from '@/auth/RequireAuth';
 import Chat from '@/pages/Chat';
+import { fetchAgreementStatus, acceptAgreements } from '@/api/agreements';
 
-it('renders /chat when logged in', () => {
+vi.mock('@/api/agreements', () => ({
+  fetchAgreementStatus: vi.fn(),
+  acceptAgreements: vi.fn(),
+}));
+
+beforeEach(() => {
+  vi.mocked(fetchAgreementStatus).mockResolvedValue({
+    termsVersion: 'test',
+    privacyVersion: 'test',
+    termsAccepted: true,
+    privacyAccepted: true,
+    requiresAcceptance: false,
+  });
+  vi.mocked(acceptAgreements).mockResolvedValue({
+    termsVersion: 'test',
+    privacyVersion: 'test',
+    termsAccepted: true,
+    privacyAccepted: true,
+    requiresAcceptance: false,
+  });
+});
+
+afterEach(() => {
+  vi.clearAllMocks();
+});
+
+it('renders /chat when logged in', async () => {
   render(
     <MemoryRouter initialEntries={['/chat']}>
       <AuthProvider>
@@ -30,5 +59,6 @@ it('renders /chat when logged in', () => {
     </MemoryRouter>
   );
 
-  expect(screen.getByText(/How can I help you today/i)).toBeInTheDocument();
+  await waitFor(() => expect(fetchAgreementStatus).toHaveBeenCalled());
+  expect(await screen.findByText(/How can I help you today/i)).toBeInTheDocument();
 });

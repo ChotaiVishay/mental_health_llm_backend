@@ -1,12 +1,14 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Title from '@/components/misc/Title';
 import Container from '@/components/layout/Container';
 import { savePreloginChat } from '@/features/chat/sessionStore';
+import { useTranslation } from '@/i18n/LanguageProvider';
 import '@/styles/pages/home.css';
 
 export default function Home() {
   const nav = useNavigate();
+  const t = useTranslation();
 
   const start = (seed?: string) => {
     if (seed) {
@@ -31,19 +33,73 @@ export default function Home() {
     return () => io.disconnect();
   }, []);
 
+  const prompts = useMemo(
+    () => [
+      { text: t('home.hero.prompt1.text'), aria: t('home.hero.prompt1.aria') },
+      { text: t('home.hero.prompt2.text'), aria: t('home.hero.prompt2.aria') },
+      { text: t('home.hero.prompt3.text'), aria: t('home.hero.prompt3.aria') },
+      { text: t('home.hero.prompt4.text'), aria: t('home.hero.prompt4.aria') },
+    ],
+    [t],
+  );
+
+  const steps = useMemo(
+    () => [
+      { num: '1', title: t('home.how.step1.title'), body: t('home.how.step1.body') },
+      { num: '2', title: t('home.how.step2.title'), body: t('home.how.step2.body') },
+      { num: '3', title: t('home.how.step3.title'), body: t('home.how.step3.body') },
+    ],
+    [t],
+  );
+
+  const helpCards = useMemo(
+    () => [
+      { title: t('home.help.card1.title'), body: t('home.help.card1.body') },
+      { title: t('home.help.card2.title'), body: t('home.help.card2.body') },
+      { title: t('home.help.card3.title'), body: t('home.help.card3.body') },
+    ],
+    [t],
+  );
+
+  const principles = useMemo(
+    () => [
+      { title: t('home.principles.calm.title'), body: t('home.principles.calm.body') },
+      { title: t('home.principles.trust.title'), body: t('home.principles.trust.body') },
+      { title: t('home.principles.support.title'), body: t('home.principles.support.body') },
+      { title: t('home.principles.inclusive.title'), body: t('home.principles.inclusive.body') },
+    ],
+    [t],
+  );
+
+  const faqItems = useMemo(
+    () => [
+      { question: t('home.faq.q1.question'), answer: t('home.faq.q1.answer') },
+      { question: t('home.faq.q2.question'), answer: t('home.faq.q2.answer') },
+      { question: t('home.faq.q3.question'), answer: t('home.faq.q3.answer') },
+      { question: t('home.faq.q4.question'), answer: t('home.faq.q4.answer') },
+      { question: t('home.faq.q5.question'), answer: t('home.faq.q5.answer') },
+      {
+        question: t('home.faq.q6.question'),
+        answer: (
+          <>
+            {t('home.faq.q6.answer.part1')} <strong>000</strong>. {t('home.faq.q6.answer.part2')}
+          </>
+        ),
+      },
+    ],
+    [t],
+  );
+
   return (
     <div className="home">
-      <Title value="Support Atlas — Find support fast" />
+      <Title value={t('home.metaTitle')} />
 
       {/* HERO */}
       <section id="top" className="edge hero hero-block">
         <Container>
           <header className="hero-head">
-            <h1 className="hero-title reveal">Find mental-health support, fast.</h1>
-            <p className="hero-sub reveal delay-1">
-              Browse trusted information about services or ask the assistant. Anonymous by default —
-              sign in later to save your history.
-            </p>
+            <h1 className="hero-title reveal">{t('home.hero.title')}</h1>
+            <p className="hero-sub reveal delay-1">{t('home.hero.subtitle')}</p>
           </header>
 
           <button
@@ -52,39 +108,37 @@ export default function Home() {
             aria-describedby="cta-note"
             onClick={() => start()}
           >
-            Start chat — no sign-in required
+            {t('home.hero.cta')}
           </button>
 
           <p id="cta-note" className="hero-note reveal delay-3" role="note">
-            We’re an information directory. We don’t provide medical advice, diagnosis, referrals, or
-            endorsements. Verify details directly with providers.
+            {t('home.hero.note')}
           </p>
 
-          <div className="chips reveal delay-4" role="group" aria-label="Quick prompts">
-            {[
-              'Low-cost counselling',
-              'Find a psychologist near me',
-              'Crisis help in Australia',
-              'LGBTQIA+ friendly services',
-            ].map(q => (
+          <div
+            className="chips reveal delay-4"
+            role="group"
+            aria-label={t('home.hero.prompts.aria')}
+          >
+            {prompts.map(prompt => (
               <button
-                key={q}
+                key={prompt.text}
                 type="button"
                 className="chip"
-                aria-label={`Start chat with: ${q}`}
-                onClick={() => start(q)}
+                aria-label={prompt.aria}
+                onClick={() => start(prompt.text)}
               >
-                {q}
+                {prompt.text}
               </button>
             ))}
           </div>
 
           {/* Updated order to match new section order */}
-          <nav className="hero-links reveal delay-5" aria-label="On this page">
-            <a href="#how">How it works</a>
-            <a href="#help-crisis">Help & Crisis</a>
-            <a href="#principles">Our principles</a>
-            <a href="#faq">FAQ</a>
+          <nav className="hero-links reveal delay-5" aria-label={t('home.hero.nav.aria')}>
+            <a href="#how">{t('home.hero.nav.how')}</a>
+            <a href="#help-crisis">{t('home.hero.nav.help')}</a>
+            <a href="#principles">{t('home.hero.nav.principles')}</a>
+            <a href="#faq">{t('home.hero.nav.faq')}</a>
           </nav>
         </Container>
       </section>
@@ -95,32 +149,20 @@ export default function Home() {
           <div className="how-grid">
             <div className="how-copy">
               <header className="section-head reveal">
-                <h2 className="h1">How it works</h2>
-                <p className="muted">Simple steps. No matching. No endorsements.</p>
+                <h2 className="h1">{t('home.how.title')}</h2>
+                <p className="muted">{t('home.how.subtitle')}</p>
               </header>
 
               <ol className="steps reveal delay-1">
-                <li>
-                  <div className="step-num">1</div>
-                  <div>
-                    <h3>Search your area</h3>
-                    <p>Enter a suburb or postcode to explore services, including telehealth options.</p>
-                  </div>
-                </li>
-                <li>
-                  <div className="step-num">2</div>
-                  <div>
-                    <h3>Review information</h3>
-                    <p>See specialties, fees, hours, languages and access options at a glance.</p>
-                  </div>
-                </li>
-                <li>
-                  <div className="step-num">3</div>
-                  <div>
-                    <h3>Contact directly</h3>
-                    <p>Reach providers via their website, phone or email. Always verify details.</p>
-                  </div>
-                </li>
+                {steps.map(step => (
+                  <li key={step.num}>
+                    <div className="step-num">{step.num}</div>
+                    <div>
+                      <h3>{step.title}</h3>
+                      <p>{step.body}</p>
+                    </div>
+                  </li>
+                ))}
               </ol>
             </div>
 
@@ -166,25 +208,29 @@ export default function Home() {
       <section id="help-crisis" className="edge section pattern-crisis hero-block" aria-labelledby="help-title">
         <Container>
           <header className="section-head reveal">
-            <h2 id="help-title" className="h1">Help & Crisis</h2>
+            <h2 id="help-title" className="h1">{t('home.help.title')}</h2>
           </header>
 
           <aside className="crisis-banner reveal delay-1" role="note" aria-live="polite">
-            <strong>If you’re in immediate danger, call 000.</strong>
+            <strong>{t('home.help.banner')}</strong>
           </aside>
 
-          <div className="hotlines reveal delay-2" role="group" aria-label="24/7 support numbers">
-            <a className="hotline" href="tel:131114" aria-label="Call Lifeline on 13 11 14">
+          <div
+            className="hotlines reveal delay-2"
+            role="group"
+            aria-label={t('home.help.hotline.aria')}
+          >
+            <a className="hotline" href="tel:131114" aria-label={t('home.help.hotline.lifeline.aria')}>
               <h3>Lifeline</h3>
               <p className="phone">13 11 14</p>
               <span className="tag">24/7</span>
             </a>
-            <a className="hotline" href="tel:1800551800" aria-label="Call Kids Helpline on 1800 55 1800">
+            <a className="hotline" href="tel:1800551800" aria-label={t('home.help.hotline.kids.aria')}>
               <h3>Kids Helpline</h3>
               <p className="phone">1800 55 1800</p>
               <span className="tag">24/7</span>
             </a>
-            <a className="hotline" href="tel:1300224636" aria-label="Call Beyond Blue on 1300 22 4636">
+            <a className="hotline" href="tel:1300224636" aria-label={t('home.help.hotline.beyond.aria')}>
               <h3>Beyond Blue</h3>
               <p className="phone">1300 22 4636</p>
               <span className="tag">24/7</span>
@@ -192,22 +238,18 @@ export default function Home() {
           </div>
 
           <div className="grid grid-3 reveal delay-3">
-            <div className="card">
-              <h3>What is Support Atlas?</h3>
-              <p>We’re an information directory. We don’t diagnose, refer, or endorse providers.</p>
-            </div>
-            <div className="card">
-              <h3>Anonymous chat</h3>
-              <p>Use chat without an account. Messages aren’t stored. Sign in to save history.</p>
-            </div>
-            <div className="card">
-              <h3>List a service</h3>
-              <p>Suggest a new service or update an existing one. Anonymous suggestions are moderated.</p>
-            </div>
+            {helpCards.map(card => (
+              <div className="card" key={card.title}>
+                <h3>{card.title}</h3>
+                <p>{card.body}</p>
+              </div>
+            ))}
           </div>
 
           <div className="cta-row reveal delay-4">
-            <button className="btn btn-primary" onClick={() => start()}>Ask in chat</button>
+            <button className="btn btn-primary" onClick={() => start()}>
+              {t('home.help.cta')}
+            </button>
           </div>
         </Container>
       </section>
@@ -216,26 +258,19 @@ export default function Home() {
       <section id="principles" className="edge section hero-block" aria-labelledby="principles-title">
         <Container>
           <header className="section-head reveal">
-            <h2 id="principles-title" className="h1">Our principles</h2>
+            <h2 id="principles-title" className="h1">{t('home.principles.title')}</h2>
           </header>
 
-          <div className="p-grid reveal delay-1" role="group" aria-label="Principles">
-            <article className="p-card">
-              <header><span className="p-dot" aria-hidden="true" />Calm</header>
-              <p>Gentle colour, clear hierarchy and generous spacing lower anxiety.</p>
-            </article>
-            <article className="p-card">
-              <header><span className="p-dot" aria-hidden="true" />Trust</header>
-              <p>Consistent design, plain language and privacy by default build confidence.</p>
-            </article>
-            <article className="p-card">
-              <header><span className="p-dot" aria-hidden="true" />Support</header>
-              <p>Meet people where they are. Offer kind, actionable next steps.</p>
-            </article>
-            <article className="p-card">
-              <header><span className="p-dot" aria-hidden="true" />Inclusive</header>
-              <p>Keyboard-friendly, screen-reader-ready, and reduced-motion aware.</p>
-            </article>
+          <div className="p-grid reveal delay-1" role="group" aria-label={t('home.principles.aria')}>
+            {principles.map(card => (
+              <article className="p-card" key={card.title}>
+                <header>
+                  <span className="p-dot" aria-hidden="true" />
+                  {card.title}
+                </header>
+                <p>{card.body}</p>
+              </article>
+            ))}
           </div>
         </Container>
       </section>
@@ -244,35 +279,17 @@ export default function Home() {
       <section id="faq" className="edge section pattern-faq hero-block" aria-labelledby="faq-title">
         <Container>
           <header className="section-head reveal">
-            <h2 id="faq-title" className="h1">Frequently asked questions</h2>
-            <p className="muted">Tap a question to reveal the answer.</p>
+            <h2 id="faq-title" className="h1">{t('home.faq.title')}</h2>
+            <p className="muted">{t('home.faq.subtitle')}</p>
           </header>
 
           <div className="faq-list">
-            <details className="faq-min reveal">
-              <summary>Is this medical advice or a referral service?</summary>
-              <div>No — we provide information only. Contact providers directly for care.</div>
-            </details>
-            <details className="faq-min reveal delay-1">
-              <summary>Can I use chat without an account?</summary>
-              <div>Yes. Anonymous chat is available; messages aren’t stored. Sign in to save history.</div>
-            </details>
-            <details className="faq-min reveal delay-2">
-              <summary>How do I find services near me?</summary>
-              <div>Start a chat or search by suburb/postcode to browse nearby and telehealth options.</div>
-            </details>
-            <details className="faq-min reveal delay-3">
-              <summary>What about privacy?</summary>
-              <div>We minimise data collection and don’t share without consent.</div>
-            </details>
-            <details className="faq-min reveal delay-4">
-              <summary>Do you endorse or rate providers?</summary>
-              <div>No. We list information only, so you can reach out and decide what’s right for you.</div>
-            </details>
-            <details className="faq-min reveal delay-5">
-              <summary>What should I do in an emergency?</summary>
-              <div>Call <strong>000</strong>. You can also use the crisis numbers above for 24/7 support.</div>
-            </details>
+            {faqItems.map((item, idx) => (
+              <details className={`faq-min reveal${idx ? ` delay-${idx}` : ''}`} key={item.question}>
+                <summary>{item.question}</summary>
+                <div>{item.answer}</div>
+              </details>
+            ))}
           </div>
         </Container>
       </section>

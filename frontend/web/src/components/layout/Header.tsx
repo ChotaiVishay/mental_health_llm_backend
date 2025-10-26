@@ -2,9 +2,14 @@ import { useMemo } from 'react';
 import { NavLink } from 'react-router-dom';
 import Container from './Container';
 import { useAuth } from '@/auth/AuthContext';
+import { useScreenReaderMode } from '@/accessibility/ScreenReaderModeContext';
+import { useLanguage } from '@/i18n/LanguageProvider';
+import LanguageSwitcher from '@/i18n/LanguageSwitcher';
 
 export default function Header() {
   const { user, loading, signOut } = useAuth();
+  const { screenReaderAssist } = useScreenReaderMode();
+  const { t } = useLanguage();
 
   const initials = useMemo(() => {
     const source = user?.name ?? user?.email ?? '';
@@ -27,6 +32,7 @@ export default function Header() {
   return (
     <header className="header">
       <Container>
+        <a href="#main" className="skip-link">{t('header.skipLink')}</a>
         <div className="header-inner">
           <a href="/" className="brand" aria-label="Support Atlas home">
             <span aria-hidden className="logo">SA</span>
@@ -34,21 +40,42 @@ export default function Header() {
           </a>
 
           <div className="header-right">
-            <nav className="nav" aria-label="Primary">
+            {screenReaderAssist && (
+              <p className="sr-only" aria-live="polite">
+                {t('header.screenReader')}
+              </p>
+            )}
+            <nav
+              className="nav"
+              aria-label={screenReaderAssist ? t('header.nav.ariaPrimaryLong') : t('header.nav.ariaPrimaryShort')}
+            >
               <NavLink to="/" end className={({ isActive }) => (isActive ? 'active' : undefined)}>
-                Home
+                {t('header.nav.home')}
               </NavLink>
-              <NavLink to="/chat" className={({ isActive }) => (isActive ? 'active' : undefined)}>
-                Chat
+              <NavLink
+                to="/chat"
+                data-easy-mode="priority"
+                className={({ isActive }) => (isActive ? 'active' : undefined)}
+              >
+                {t('header.nav.chat')}
               </NavLink>
               {/* Removed Services; add in-page anchors for Help & Crisis and FAQ */}
-              <a href="/#help-crisis">Help &amp; Crisis</a>
-              <a href="/#faq">FAQ</a>
+              <a href="/#help-crisis" data-easy-mode="priority">{t('header.nav.helpCrisis')}</a>
+              <a href="/#faq" data-easy-mode="hide">{t('header.nav.faq')}</a>
             </nav>
 
-            <div className="auth-actions" aria-label="Account actions">
+            <LanguageSwitcher />
+
+            <NavLink
+              to="/accessibility"
+              className={({ isActive }) => (isActive ? 'accessibility-trigger active' : 'accessibility-trigger')}
+            >
+              <span className="accessibility-trigger-label">{t('header.nav.accessibility')}</span>
+            </NavLink>
+
+            <div className="auth-actions" aria-label={t('header.nav.accountActions')}>
               {loading ? (
-                <span className="auth-status" aria-live="polite">Loading…</span>
+                <span className="auth-status" aria-live="polite">{t('header.nav.loading')}</span>
               ) : user ? (
                 <>
                   <NavLink
@@ -61,17 +88,17 @@ export default function Header() {
                     <span className="profile-chip-label">
                       <strong>{user.name ?? user.email ?? 'Profile'}</strong>
                       {user.name && user.email && (
-                        <small>{user.email}</small>
+                        <small data-easy-mode="hide">{user.email}</small>
                       )}
                     </span>
                   </NavLink>
                   <button type="button" className="btn btn-link auth-signout" onClick={handleSignOut}>
-                    Sign out
+                    {t('header.nav.signOut')}
                   </button>
                 </>
               ) : (
                 <NavLink to="/login" className="btn btn-secondary">
-                  Sign in
+                  {t('header.nav.signIn')}
                 </NavLink>
               )}
             </div>
