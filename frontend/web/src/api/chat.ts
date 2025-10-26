@@ -104,13 +104,28 @@ export interface ChatReply {
 /**
  * Send a message or form to the chat API
  */
-export async function sendMessageToAPI(payload: ChatRequestPayload): Promise<ChatReply> {
+export async function sendMessageToAPI(
+  payload: ChatRequestPayload | string,
+  sessionId?: string | null,
+  language?: string,
+): Promise<ChatReply> {
   try {
-    // Construct request body
-    const body =
-      'type' in payload
+    // Handle both old signature (message, sessionId) and new signature (payload)
+    let body: Record<string, unknown>;
+    
+    if (typeof payload === 'string') {
+      // Old signature: sendMessageToAPI(message, sessionId, language)
+      body = {
+        message: payload,
+        session_id: sessionId ?? null,
+      };
+      if (language) body.language = language;
+    } else {
+      // New signature: sendMessageToAPI(payload)
+      body = 'type' in payload
         ? { ...payload, session_id: payload.session_id ?? null }
         : { message: payload.message, session_id: payload.session_id ?? null };
+    }
 
     console.log('Sending request to:', CHAT_ENDPOINT);
     console.log('Request payload:', JSON.stringify(body, null, 2));

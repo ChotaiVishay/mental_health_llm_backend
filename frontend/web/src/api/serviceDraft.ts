@@ -58,3 +58,14 @@ export async function submitServiceDraft(
 
 // Export URL for debugging
 export { SERVICE_DRAFT_URL };
+```
+
+---
+
+## Vercel Environment Variables
+
+Make sure these are set in **Vercel Dashboard** → **Settings** → **Environment Variables**:
+
+### For Both Preview & Production:
+```
+VITE_API_BASE_URL=https://d1hfq1dvtow5bt.cloudfront.net
