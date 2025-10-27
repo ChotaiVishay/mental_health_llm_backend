@@ -143,8 +143,8 @@ export function useSpeechToText(opts?: { lang?: string; interim?: boolean }) {
         if (err === 'language-not-supported') {
           const handled = onLangUnsupported();
           if (!handled) setError('lang-unsupported');
-          if (!startedRef.current) {
-            startPromiseRef.current?.(handled);
+          if (startPromiseRef.current) {
+            startPromiseRef.current(handled);
             startPromiseRef.current = null;
           }
           return;
