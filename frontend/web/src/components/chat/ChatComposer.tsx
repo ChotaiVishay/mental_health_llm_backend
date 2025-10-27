@@ -101,6 +101,7 @@ const ChatComposer = forwardRef<HTMLTextAreaElement, ChatComposerProps>((props, 
         aria-label={ariaLabel ?? 'Message input'}
         onKeyDown={handleKeyDown}
         lang={lang}
+        data-testid="composer-input"
       />
       <button
         type="submit"
@@ -108,6 +109,7 @@ const ChatComposer = forwardRef<HTMLTextAreaElement, ChatComposerProps>((props, 
         disabled={computedSendDisabled}
         aria-label={sendAriaLabel}
         title={sendAriaLabel}
+        data-testid="composer-send"
       >
         {loading ? <Loader2 className="spinner" aria-hidden /> : <Send aria-hidden />}
       </button>

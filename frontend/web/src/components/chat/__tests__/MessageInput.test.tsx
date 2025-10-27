@@ -17,7 +17,7 @@ describe('MessageInput', () => {
       </Providers>,
     );
 
-    const textarea = screen.getByRole('textbox', { name: /message/i });
+    const textarea = screen.getByTestId('composer-input');
     fireEvent.change(textarea, { target: { value: 'Hello world' } });
     fireEvent.keyDown(textarea, { key: 'Enter' });
 
@@ -34,11 +34,28 @@ describe('MessageInput', () => {
       </Providers>,
     );
 
-    const textarea = screen.getByRole('textbox', { name: /message/i });
+    const textarea = screen.getByTestId('composer-input');
     fireEvent.change(textarea, { target: { value: 'Line one' } });
     fireEvent.keyDown(textarea, { key: 'Enter', shiftKey: true });
 
     expect(handleSend).not.toHaveBeenCalled();
     expect(textarea).toHaveValue('Line one');
+  });
+
+  it('disables the send button when input is empty', () => {
+    const handleSend = vi.fn();
+
+    render(
+      <Providers>
+        <MessageInput onSend={handleSend} />
+      </Providers>,
+    );
+
+    const sendButton = screen.getByTestId('composer-send');
+    expect(sendButton).toBeDisabled();
+
+    const textarea = screen.getByTestId('composer-input');
+    fireEvent.change(textarea, { target: { value: 'Ping' } });
+    expect(sendButton).not.toBeDisabled();
   });
 });

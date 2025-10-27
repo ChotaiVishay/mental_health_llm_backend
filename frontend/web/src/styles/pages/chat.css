@@ -386,6 +386,23 @@
   background: rgba(0,0,0,0.08);
 }
 
+.chat-anon-container{
+  width:100%;
+}
+
+.chat-anon-text{
+  flex:1;
+  min-width:0;
+}
+
+.chat-anon-link{
+  font-weight:600;
+}
+
+.chat-anon-close{
+  cursor:pointer;
+}
+
 .chat-composer{
   display:grid;
   grid-template-columns:auto 1fr auto;
@@ -661,6 +678,158 @@
     min-height:28px;
     padding:0 10px;
     font-size:0.78rem;
+  }
+}
+
+@media (max-width: 768px){
+  .chat-route-main{
+    padding:0;
+    gap:0;
+  }
+  .chat-shell{
+    display:flex;
+    flex-direction:column;
+    min-height:100dvh;
+    height:100dvh;
+    background:var(--bg);
+    overflow:hidden;
+  }
+  @supports not (min-height: 100dvh){
+    .chat-shell{
+      min-height:100vh;
+      height:auto;
+    }
+  }
+  .chat-topbar{
+    position:sticky;
+    top:0;
+    z-index:40;
+    padding-top:calc(env(safe-area-inset-top, 0));
+    background: color-mix(in srgb, var(--surface) 97%, rgba(255, 255, 255, 0.94));
+    border-bottom:1px solid color-mix(in srgb, var(--grey-200) 70%, transparent);
+    backdrop-filter: blur(14px);
+  }
+  .chat-topbar .chat-head{
+    padding:12px 16px;
+    border:none;
+    box-shadow:none;
+    background:transparent;
+    border-radius:0;
+  }
+  .chat-topbar .chat-head .muted{
+    width:100%;
+    text-align:right;
+  }
+  .chat-shell .chat-alert{
+    margin:8px 16px;
+  }
+  .chat-messages{
+    flex:1 1 auto;
+    min-height:0;
+    overflow-y:auto;
+    overflow-x:hidden;
+    padding:12px 16px 18px;
+    scroll-behavior:smooth;
+    scroll-padding-bottom:140px;
+    -webkit-overflow-scrolling:touch;
+  }
+  .chat-messages .chat-body{
+    gap:12px;
+  }
+  .chat-messages .jump-latest{
+    position:sticky;
+    bottom:16px;
+    margin:16px auto 0;
+    width:max-content;
+  }
+  .chat-anon-notice{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:8px 16px;
+    font-size:0.85rem;
+    color: color-mix(in srgb, var(--muted) 70%, transparent);
+    border:none;
+    border-bottom:1px solid color-mix(in srgb, var(--grey-200) 45%, transparent);
+    background:transparent;
+  }
+  .chat-anon-text{
+    flex:1;
+    min-width:0;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .chat-anon-link{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-height:30px;
+    padding:0 12px;
+    border-radius:999px;
+    border:1px solid color-mix(in srgb, var(--brand) 60%, transparent);
+    background: color-mix(in srgb, var(--surface) 95%, rgba(255, 255, 255, 0.9));
+    color: var(--brand);
+    text-decoration:none;
+  }
+  .chat-anon-link:hover{
+    background: color-mix(in srgb, var(--surface) 88%, rgba(255, 255, 255, 0.9));
+    text-decoration:none;
+  }
+  .chat-anon-close{
+    border:none;
+    background:transparent;
+    width:32px;
+    height:32px;
+    border-radius:50%;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    font-size:1rem;
+    color:inherit;
+  }
+  .chat-anon-close:hover{
+    background: rgba(15, 23, 42, 0.08);
+  }
+  .chat-composer-bar{
+    position:sticky;
+    bottom:0;
+    z-index:40;
+    padding:8px 12px calc(8px + env(safe-area-inset-bottom, 0));
+    background: color-mix(in srgb, var(--surface) 96%, rgba(255, 255, 255, 0.92));
+    border-top:1px solid color-mix(in srgb, var(--grey-200) 60%, transparent);
+    box-shadow:0 -8px 24px rgba(15, 23, 42, 0.1);
+    backdrop-filter: blur(18px);
+  }
+  .chat-composer-bar .chat-composer{
+    gap:8px;
+    padding:8px 10px;
+    border-radius:18px;
+    border:1px solid color-mix(in srgb, var(--grey-200) 65%, transparent);
+    background: color-mix(in srgb, var(--surface) 98%, rgba(255, 255, 255, 0.95));
+  }
+  .chat-composer-bar .chat-composer textarea{
+    padding:0;
+    min-height:40px;
+    max-height:9.5rem;
+    border:none;
+    background:transparent;
+    font-size:0.95rem;
+  }
+  .chat-composer-bar .composer-icon-btn{
+    width:44px;
+    height:44px;
+  }
+  .chat-composer-bar .composer-icon-btn svg,
+  .chat-composer-bar .composer-icon-btn .spinner{
+    width:18px;
+    height:18px;
+  }
+  .chat-shell,
+  .chat-messages,
+  .chat-composer-bar,
+  .chat-composer{
+    overflow-x:hidden;
   }
 }
 

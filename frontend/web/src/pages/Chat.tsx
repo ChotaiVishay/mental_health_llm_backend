@@ -423,124 +423,172 @@ export default function Chat() {
 
   const lastActivityLabel = useMemo(() => formatRelativeTime(lastActivity, locale), [lastActivity, locale]);
 
+  const composerDisabled = busy || agreementsLoading || showAgreementsModal || Boolean(crisisAlert);
+  const messageInput = (
+    <MessageInput
+      onSend={onSend}
+      disabled={composerDisabled}
+      maxVisibleLines={isMobileLayout ? 4 : undefined}
+      isSending={busy}
+    />
+  );
+
+  const renderAnonNotice = () => {
+    if (!user && showAnonNotice) {
+      const containerClass = isMobileLayout ? 'chat-anon-notice' : 'anon-pill';
+      const linkClass = isMobileLayout ? 'chat-anon-link' : 'anon-pill-link chat-anon-link';
+      const closeClass = isMobileLayout ? 'chat-anon-close' : 'anon-pill-close chat-anon-close';
+      return (
+        <div
+          className={`${containerClass} chat-anon-container`}
+          role="note"
+          aria-live="polite"
+          aria-label={t('chat.banner.aria')}
+          data-easy-mode="hide"
+        >
+          <span className="chat-anon-text">{t('chat.anonBanner')}</span>
+          <a className={linkClass} href="/login">{t('chat.banner.button')}</a>
+          <button
+            type="button"
+            className={closeClass}
+            aria-label={t('chat.alert.dismiss')}
+            onClick={() => setShowAnonNotice(false)}
+          >
+            ×
+          </button>
+        </div>
+      );
+    }
+    return null;
+  };
+
+  const netErrorBanner = netErr ? (
+    <div role="alert" className="chat-alert" aria-live="polite">
+      <span>{netErr}</span>
+      <button
+        type="button"
+        className="alert-dismiss"
+        aria-label={t('chat.alert.dismiss')}
+        onClick={() => setNetErr(null)}
+      >
+        ×
+      </button>
+    </div>
+  ) : null;
+
+  const crisisBanner = crisisAlert ? (
+    <div className="chat-alert crisis" role="alert" aria-live="assertive">
+      <p>{crisisAlert.message}</p>
+      {crisisAlert.resources.length > 0 && (
+        <ul className="crisis-resources">
+          {crisisAlert.resources.map((item) => (
+            <li key={`${item.label}-${item.href}`}>
+              <a href={item.href}>{item.label}</a>
+            </li>
+          ))}
+        </ul>
+      )}
+      <button type="button" className="btn" onClick={handleCrisisDismiss}>
+        I understand
+      </button>
+    </div>
+  ) : null;
+
+  const typingIndicator = busy ? (
+    <div className="typing-row" aria-live="polite" aria-label={t('chat.typing')}>
+      <div className="typing-bubble">
+        <span className="typing-dot" />
+        <span className="typing-dot" />
+        <span className="typing-dot" />
+      </div>
+    </div>
+  ) : null;
+
+  const jumpToLatest = !atBottom ? (
+    <button className="jump-latest" onClick={scrollToBottom}>{t('chat.jumpToLatest')}</button>
+  ) : null;
+
+  const transcriptContent = (
+    <div className="chat-body">
+      <MessageList items={messages} />
+      {typingIndicator}
+    </div>
+  );
+
+  const chatHeader = (
+    <header className="chat-head">
+      <div className="chat-head-left">
+        <button
+          type="button"
+          className="chat-back"
+          onClick={handleBack}
+        >
+          <ArrowLeft aria-hidden />
+          <span>{t('chat.back')}</span>
+        </button>
+        <h2 className="h2" style={{ margin: 0 }}>{t('chat.heading')}</h2>
+      </div>
+      <span className="muted small">{t('chat.lastActivity')} {lastActivityLabel}</span>
+    </header>
+  );
+
+  const renderMobileContent = () => (
+    <div className="chat-shell">
+      <div className="chat-topbar">
+        {chatHeader}
+      </div>
+      {netErrorBanner}
+      {crisisBanner}
+      <div ref={scrollerRef} className="chat-messages">
+        {transcriptContent}
+        {jumpToLatest}
+      </div>
+      {renderAnonNotice()}
+      <div className="chat-composer-bar">
+        {messageInput}
+      </div>
+    </div>
+  );
+
+  const renderDesktopContent = () => (
+    <div className={`chat-page ${sidebarOpen ? '' : '-collapsed'}`}>
+      {sidebarOpen ? (
+        <aside className="chat-sidebar">
+          <header className="sidebar-head">
+            <h2 className="h3" style={{ margin: 0 }}>{t('chat.sidebar.title')}</h2>
+            <button className="icon-btn" aria-label={t('chat.sidebar.hide')} onClick={() => setSidebarOpen(false)}>×</button>
+          </header>
+          <div className="sidebar-body">
+            <ChatList />
+          </div>
+        </aside>
+      ) : (
+        !isNarrow && (
+          <button className="hambtn" aria-label={t('chat.sidebar.open')} onClick={() => setSidebarOpen(true)}>☰</button>
+        )
+      )}
+
+      <section className="chat-main">
+        {chatHeader}
+        {netErrorBanner}
+        {crisisBanner}
+        <div ref={scrollerRef} className="chat-scroller">
+          {transcriptContent}
+          {jumpToLatest}
+        </div>
+      </section>
+
+      <div className="composer-dock">
+        {renderAnonNotice()}
+        {messageInput}
+      </div>
+    </div>
+  );
+
   return (
     <>
       <Title value={t('chat.metaTitle')} />
-
-      {/* Page grid: [sidebar | main] above, [sidebar | composer] below */}
-      <div className={`chat-page ${sidebarOpen ? '' : '-collapsed'}`}>
-        {/* Sidebar */}
-        {sidebarOpen ? (
-          <aside className="chat-sidebar">
-            <header className="sidebar-head">
-              <h2 className="h3" style={{ margin: 0 }}>{t('chat.sidebar.title')}</h2>
-              <button className="icon-btn" aria-label={t('chat.sidebar.hide')} onClick={() => setSidebarOpen(false)}>×</button>
-            </header>
-            <div className="sidebar-body">
-              <ChatList />
-            </div>
-          </aside>
-        ) : (
-          !isNarrow && (
-            <button className="hambtn" aria-label={t('chat.sidebar.open')} onClick={() => setSidebarOpen(true)}>☰</button>
-          )
-        )}
-
-        {/* Main chat panel (no composer here) */}
-        <section className="chat-main">
-          <header className="chat-head">
-            <div className="chat-head-left">
-              <button
-                type="button"
-                className="chat-back"
-                onClick={handleBack}
-              >
-                <ArrowLeft aria-hidden />
-                <span>{t('chat.back')}</span>
-              </button>
-              <h2 className="h2" style={{ margin: 0 }}>{t('chat.heading')}</h2>
-            </div>
-            <span className="muted small">{t('chat.lastActivity')} {lastActivityLabel}</span>
-          </header>
-
-          {netErr && (
-            <div role="alert" className="chat-alert" aria-live="polite">
-              <span>{netErr}</span>
-              <button
-                type="button"
-                className="alert-dismiss"
-                aria-label={t('chat.alert.dismiss')}
-                onClick={() => setNetErr(null)}
-              >
-                ×
-              </button>
-            </div>
-          )}
-
-          {crisisAlert && (
-            <div className="chat-alert crisis" role="alert" aria-live="assertive">
-              <p>{crisisAlert.message}</p>
-              {crisisAlert.resources.length > 0 && (
-                <ul className="crisis-resources">
-                  {crisisAlert.resources.map((item) => (
-                    <li key={`${item.label}-${item.href}`}>
-                      <a href={item.href}>{item.label}</a>
-                    </li>
-                  ))}
-                </ul>
-              )}
-              <button type="button" className="btn" onClick={handleCrisisDismiss}>
-                I understand
-              </button>
-            </div>
-          )}
-
-          {/* Only this div scrolls */}
-          <div ref={scrollerRef} className="chat-scroller">
-            <div className="chat-body">
-              <MessageList items={messages} />
-              {busy && (
-                <div className="typing-row" aria-live="polite" aria-label={t('chat.typing')}>
-                  <div className="typing-bubble">
-                    <span className="typing-dot" />
-                    <span className="typing-dot" />
-                    <span className="typing-dot" />
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {!atBottom && (
-              <button className="jump-latest" onClick={scrollToBottom}>{t('chat.jumpToLatest')}</button>
-            )}
-          </div>
-        </section>
-
-        {/* Composer dock — separate row pinned at grid bottom */}
-        <div className="composer-dock">
-          {!user && showAnonNotice && (
-            <div className="anon-pill" role="note" aria-live="polite" aria-label={t('chat.banner.aria')} data-easy-mode="hide">
-              <span>{t('chat.anonBanner')}</span>
-              <a className="anon-pill-link" href="/login">{t('chat.banner.button')}</a>
-              <button
-                type="button"
-                className="anon-pill-close"
-                aria-label={t('chat.alert.dismiss')}
-                onClick={() => setShowAnonNotice(false)}
-              >
-                ×
-              </button>
-            </div>
-          )}
-          <MessageInput
-            onSend={onSend}
-            disabled={busy || agreementsLoading || showAgreementsModal || Boolean(crisisAlert)}
-            maxVisibleLines={isMobileLayout ? 3 : undefined}
-            isSending={busy}
-          />
-        </div>
-      </div>
-
+      {isMobileLayout ? renderMobileContent() : renderDesktopContent()}
       <AgreementsModal
         open={showAgreementsModal}
         loading={agreementsLoading || savingAgreement}
