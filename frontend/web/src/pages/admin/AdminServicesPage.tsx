@@ -35,6 +35,14 @@ const DEFAULT_FORM: ServiceForm = {
 
 const STATUSES: Service['status'][] = ['draft', 'pending', 'approved', 'disabled', 'rejected'];
 
+const STATUS_LABELS: Record<Service['status'], string> = {
+  draft: 'Draft',
+  pending: 'Pending',
+  approved: 'Approved',
+  disabled: 'Disabled',
+  rejected: 'Rejected',
+};
+
 export default function AdminServicesPage() {
   const { admin } = useAdminAuth();
   const [services, setServices] = useState<Service[]>([]);
@@ -238,217 +246,336 @@ export default function AdminServicesPage() {
     }
   };
 
+  const submissionCountLabel = submissions.length === 1 ? '1 waiting' : `${submissions.length} waiting`;
+
   return (
-    <div className="admin-services">
-      <header className="admin-section-head">
+    <div className="admin-services admin-page">
+      <header className="admin-page__hero">
         <div>
-          <h1>Service management</h1>
-          <p className="muted">Approve and curate the services directory.</p>
+          <p className="admin-page__eyebrow">Service directory</p>
+          <h1>Guide support listings with confidence</h1>
+          <p className="admin-page__lede">
+            Review community submissions and keep information accurate for people looking for help.
+          </p>
         </div>
-        <label>
-          <span className="sr-only">Filter status</span>
-          <select value={filter} onChange={(e) => setFilter(e.target.value as typeof filter)}>
+        <div className="admin-services__filters">
+          <label htmlFor="admin-service-status-filter">Status filter</label>
+          <select
+            id="admin-service-status-filter"
+            value={filter}
+            onChange={(e) => setFilter(e.target.value as typeof filter)}
+          >
             <option value="all">All statuses</option>
             {STATUSES.map((status) => (
-              <option key={status} value={status}>{status}</option>
+              <option key={status} value={status}>{STATUS_LABELS[status]}</option>
             ))}
           </select>
-        </label>
+        </div>
       </header>
 
-      {error && <p className="error" role="alert">{error}</p>}
+      {error && (
+        <div className="admin-page__alert" role="alert">
+          <span className="admin-page__alert-label">We hit a snag:</span> {error}
+        </div>
+      )}
 
-      <section className="service-submissions">
-        <h2>Pending service submissions</h2>
-        {loading ? (
-          <p>Loading…</p>
-        ) : submissions.length ? (
-          <div className="table-wrapper">
-            <table>
-              <thead>
-                <tr>
-                  <th>Service</th>
-                  <th>Organisation</th>
-                  <th>Submitted</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {submissions.map((submission) => (
-                  <tr key={submission.id} className={selectedSubmission?.id === submission.id ? 'is-active' : undefined}>
-                    <td>{submission.service_name}</td>
-                    <td>{submission.organisation_name}</td>
-                    <td>{new Date(submission.submitted_at).toLocaleString()}</td>
-                    <td>
-                      <div className="table-actions">
-                        <button type="button" onClick={() => selectSubmission(submission)} disabled={saving}>
-                          Review
-                        </button>
-                        <button type="button" onClick={() => removeSubmission(submission)} disabled={saving}>
-                          Remove
-                        </button>
-                      </div>
-                    </td>
+      <div className="admin-page__grid admin-services__grid">
+        <section className="admin-page__panel admin-services__panel admin-services__panel--queue">
+          <header className="admin-page__panel-head">
+            <div>
+              <h2>Submission queue</h2>
+              <p className="muted">Load a submission to prefill the form, then save it to publish.</p>
+            </div>
+            <span className="admin-services__count">{submissionCountLabel}</span>
+          </header>
+
+          {loading ? (
+            <p className="admin-page__empty">Loading submissions...</p>
+          ) : submissions.length ? (
+            <div className="table-wrapper">
+              <table>
+                <caption className="sr-only">Service submissions awaiting review</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Service</th>
+                    <th scope="col">Organisation</th>
+                    <th scope="col">Submitted</th>
+                    <th scope="col" aria-label="Actions" />
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ) : (
-          <p>No submissions awaiting review.</p>
-        )}
-      </section>
+                </thead>
+                <tbody>
+                  {submissions.map((submission) => (
+                    <tr
+                      key={submission.id}
+                      className={selectedSubmission?.id === submission.id ? 'is-active' : undefined}
+                    >
+                      <td>{submission.service_name}</td>
+                      <td>{submission.organisation_name}</td>
+                      <td>{new Date(submission.submitted_at).toLocaleString()}</td>
+                      <td>
+                        <div className="admin-page__table-actions">
+                          <button
+                            type="button"
+                            className="admin-page__table-link"
+                            onClick={() => selectSubmission(submission)}
+                            disabled={saving}
+                          >
+                            Review
+                          </button>
+                          <button
+                            type="button"
+                            className="admin-page__table-link admin-page__table-link--danger"
+                            onClick={() => removeSubmission(submission)}
+                            disabled={saving || !canApproveServices}
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <p className="admin-page__empty">No submissions waiting right now.</p>
+          )}
+        </section>
 
-      <section className="service-form">
-        <h2>{selected ? 'Edit service' : 'Create service'}</h2>
-        {selectedSubmission && (
-          <div className="alert info">
-            <p>
-              Prefilling from submission <strong>{selectedSubmission.service_name}</strong>.
-              Review the generated details and save to create a catalogue entry.
-            </p>
-            <button type="button" className="btn -ghost" onClick={() => setSelectedSubmission(null)}>
-              Clear submission context
-            </button>
-          </div>
-        )}
-        <form className="stack" onSubmit={submit}>
-          <label>
-            <span>Service name</span>
-            <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
-          </label>
-          <label>
-            <span>Summary</span>
-            <input value={form.summary} onChange={(e) => setForm({ ...form, summary: e.target.value })} />
-          </label>
-          <label>
-            <span>Description</span>
-            <textarea
-              value={form.description}
-              onChange={(e) => setForm({ ...form, description: e.target.value })}
-              rows={4}
-              required
-            />
-          </label>
-          <div className="form-row">
-            <label>
-              <span>Provider</span>
-              <select
-                value={form.provider_id ?? ''}
-                onChange={(e) => setForm({ ...form, provider_id: e.target.value || null })}
-              >
-                <option value="">Unassigned</option>
-                {providers.map((provider) => (
-                  <option key={provider.id} value={provider.id}>{provider.display_name}</option>
-                ))}
-              </select>
-            </label>
-            <label>
-              <span>Category</span>
-              <select
-                value={form.category_id ?? ''}
-                onChange={(e) => setForm({ ...form, category_id: e.target.value || null })}
-              >
-                <option value="">Uncategorised</option>
-                {categories.map((category) => (
-                  <option key={category.id} value={category.id}>{category.name}</option>
-                ))}
-              </select>
-            </label>
-          </div>
+        <section className="admin-page__panel admin-services__panel admin-services__panel--form">
+          <header className="admin-page__panel-head">
+            <div>
+              <h2>{selected ? 'Edit service' : 'Create service'}</h2>
+              <p className="muted">
+                {selected
+                  ? 'Update the details that surface for people browsing support options.'
+                  : 'Capture the essentials so people understand who the service supports and how to reach them.'}
+              </p>
+            </div>
+          </header>
 
-          <div className="form-row">
-            <label>
-              <span>Status</span>
-              <select
-                value={form.status}
-                onChange={(e) => {
-                  const next = e.target.value as Service['status'];
-                  if (
-                    admin?.profile.role === 'moderator'
-                    && !['pending', 'approved', 'disabled', 'rejected'].includes(next)
-                  ) {
-                    return;
-                  }
-                  setForm({ ...form, status: next });
-                }}
-              >
-                {STATUSES.map((status) => (
-                  <option key={status} value={status}>{status}</option>
-                ))}
-              </select>
-            </label>
-            <label>
-              <span>Approval notes</span>
+          {selectedSubmission && (
+            <div className="admin-callout admin-callout--info">
+              <p>
+                Prefilling from <strong>{selectedSubmission.service_name}</strong> by {selectedSubmission.organisation_name}.
+                Review the details and save to add it to the directory.
+              </p>
+              <button type="button" className="btn btn-link" onClick={() => setSelectedSubmission(null)}>
+                Clear submission context
+              </button>
+            </div>
+          )}
+
+          <form className="admin-page__form" onSubmit={submit} noValidate>
+            <label htmlFor="admin-service-name">
+              <span>Service name</span>
               <input
-                value={form.approval_notes ?? ''}
-                onChange={(e) => setForm({ ...form, approval_notes: e.target.value })}
+                id="admin-service-name"
+                value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+                required
               />
             </label>
-          </div>
+            <label htmlFor="admin-service-summary">
+              <span>Summary</span>
+              <input
+                id="admin-service-summary"
+                value={form.summary}
+                onChange={(e) => setForm({ ...form, summary: e.target.value })}
+              />
+            </label>
+            <label htmlFor="admin-service-description">
+              <span>Description</span>
+              <textarea
+                id="admin-service-description"
+                value={form.description}
+                onChange={(e) => setForm({ ...form, description: e.target.value })}
+                rows={5}
+                required
+              />
+            </label>
 
-          <div className="actions">
-            <button type="submit" className="btn" disabled={saving || (!canModifyContent && !selected)}>
-              {saving ? 'Saving…' : selected ? 'Update service' : 'Create service'}
-            </button>
-            {selected && (
-              <button type="button" className="btn -ghost" onClick={resetForm}>
-                Cancel
-              </button>
-            )}
-            {selected && canModifyContent && (
-              <button type="button" className="btn -ghost" onClick={() => remove(selected)}>
-                Delete
-              </button>
-            )}
-          </div>
-        </form>
-      </section>
+            <div className="admin-page__field-grid">
+              <label htmlFor="admin-service-provider">
+                <span>Provider</span>
+                <select
+                  id="admin-service-provider"
+                  value={form.provider_id ?? ''}
+                  onChange={(e) => setForm({ ...form, provider_id: e.target.value || null })}
+                >
+                  <option value="">Unassigned</option>
+                  {providers.map((provider) => (
+                    <option key={provider.id} value={provider.id}>{provider.display_name}</option>
+                  ))}
+                </select>
+              </label>
+              <label htmlFor="admin-service-category">
+                <span>Category</span>
+                <select
+                  id="admin-service-category"
+                  value={form.category_id ?? ''}
+                  onChange={(e) => setForm({ ...form, category_id: e.target.value || null })}
+                >
+                  <option value="">Uncategorised</option>
+                  {categories.map((category) => (
+                    <option key={category.id} value={category.id}>{category.name}</option>
+                  ))}
+                </select>
+              </label>
+            </div>
 
-      <section>
-        <h2>Services</h2>
+            <div className="admin-page__field-grid">
+              <label htmlFor="admin-service-status">
+                <span>Status</span>
+                <select
+                  id="admin-service-status"
+                  value={form.status}
+                  onChange={(e) => {
+                    const next = e.target.value as Service['status'];
+                    if (
+                      admin?.profile.role === 'moderator'
+                      && !['pending', 'approved', 'disabled', 'rejected'].includes(next)
+                    ) {
+                      return;
+                    }
+                    setForm({ ...form, status: next });
+                  }}
+                >
+                  {STATUSES.map((status) => (
+                    <option key={status} value={status}>{STATUS_LABELS[status]}</option>
+                  ))}
+                </select>
+              </label>
+              <label htmlFor="admin-service-notes">
+                <span>Approval notes</span>
+                <input
+                  id="admin-service-notes"
+                  value={form.approval_notes ?? ''}
+                  onChange={(e) => setForm({ ...form, approval_notes: e.target.value })}
+                />
+              </label>
+            </div>
+
+            <div className="admin-page__actions">
+              <button type="submit" className="btn btn-primary" disabled={saving || (!canModifyContent && !selected)}>
+                {saving ? 'Saving...' : selected ? 'Update service' : 'Create service'}
+              </button>
+              {selected && (
+                <button type="button" className="btn btn-secondary" onClick={resetForm} disabled={saving}>
+                  Cancel
+                </button>
+              )}
+              {selected && canModifyContent && (
+                <button
+                  type="button"
+                  className="btn btn-link admin-services__danger-link"
+                  onClick={() => remove(selected)}
+                  disabled={saving}
+                >
+                  Delete
+                </button>
+              )}
+            </div>
+          </form>
+        </section>
+      </div>
+
+      <section className="admin-page__panel admin-services__panel admin-services__panel--list">
+        <header className="admin-page__panel-head">
+          <div>
+            <h2>Services</h2>
+            <p className="muted">We show the latest 50 entries for quick edits.</p>
+          </div>
+        </header>
+
         {loading ? (
-          <p>Loading…</p>
-        ) : (
+          <p className="admin-page__empty">Loading services...</p>
+        ) : services.length ? (
           <div className="table-wrapper">
             <table>
+              <caption className="sr-only">Managed services and their current status</caption>
               <thead>
                 <tr>
-                  <th>Name</th>
-                  <th>Provider</th>
-                  <th>Status</th>
-                  <th>Updated</th>
-                  <th>Actions</th>
+                  <th scope="col">Service</th>
+                  <th scope="col">Provider</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Updated</th>
+                  <th scope="col" aria-label="Actions" />
                 </tr>
               </thead>
               <tbody>
                 {services.map((service) => (
                   <tr key={service.id}>
-                    <td>{service.name}</td>
-                    <td>{service.provider?.display_name ?? '—'}</td>
-                    <td>{service.status}</td>
-                    <td>{new Date(service.updated_at).toLocaleString()}</td>
                     <td>
-                      <div className="table-actions">
-                        <button type="button" onClick={() => startEdit(service)}>Edit</button>
-                        {admin?.profile.role !== 'moderator' && (
-                          <button type="button" onClick={() => remove(service)}>Delete</button>
+                      <div className="admin-services__service">
+                        <span className="admin-services__service-name">{service.name}</span>
+                        {service.summary && (
+                          <span className="admin-services__service-summary">{service.summary}</span>
                         )}
-                        <button type="button" onClick={() => changeStatus(service, 'approved')}>Approve</button>
-                        <button type="button" onClick={() => changeStatus(service, 'disabled')}>Disable</button>
-                        <button type="button" onClick={() => changeStatus(service, 'rejected')}>Reject</button>
+                      </div>
+                    </td>
+                    <td>{service.provider?.display_name ?? 'Unassigned'}</td>
+                    <td>
+                      <span className={`admin-services__status is-${service.status}`}>
+                        {STATUS_LABELS[service.status]}
+                      </span>
+                    </td>
+                    <td>
+                      <span className="admin-services__meta">
+                        {new Date(service.updated_at).toLocaleString()}
+                      </span>
+                    </td>
+                    <td>
+                      <div className="admin-page__table-actions admin-services__actions">
+                        <button
+                          type="button"
+                          className="admin-page__table-link"
+                          onClick={() => startEdit(service)}
+                        >
+                          Edit
+                        </button>
+                        {canModifyContent && (
+                          <button
+                            type="button"
+                            className="admin-page__table-link admin-page__table-link--danger"
+                            onClick={() => remove(service)}
+                          >
+                            Delete
+                          </button>
+                        )}
+                        <button
+                          type="button"
+                          className="admin-page__table-link"
+                          onClick={() => changeStatus(service, 'approved')}
+                          disabled={!canApproveServices}
+                        >
+                          Approve
+                        </button>
+                        <button
+                          type="button"
+                          className="admin-page__table-link"
+                          onClick={() => changeStatus(service, 'disabled')}
+                          disabled={!canApproveServices}
+                        >
+                          Disable
+                        </button>
+                        <button
+                          type="button"
+                          className="admin-page__table-link admin-page__table-link--danger"
+                          onClick={() => changeStatus(service, 'rejected')}
+                          disabled={!canApproveServices}
+                        >
+                          Reject
+                        </button>
                       </div>
                     </td>
                   </tr>
                 ))}
-                {services.length === 0 && (
-                  <tr>
-                    <td colSpan={5} style={{ textAlign: 'center', padding: '24px 0' }}>No services found.</td>
-                  </tr>
-                )}
               </tbody>
             </table>
           </div>
+        ) : (
+          <p className="admin-page__empty">No services match this status yet.</p>
         )}
       </section>
     </div>

@@ -1,7 +1,6 @@
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 import { useAuth } from '@/auth/AuthContext';
 import { getSupabaseClient } from '@/auth/supabaseClient';
-import type { User } from '@/auth/types';
 import { mapSupabaseUser } from '@/auth/mapSupabaseUser';
 import { getSupabaseAdminClient } from '@/admin/supabaseAdminClient';
 import '@/styles/pages/profile.css';

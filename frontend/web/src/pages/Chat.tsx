@@ -111,8 +111,6 @@ export default function Chat() {
   const [isMobileLayout, setIsMobileLayout] = useState<boolean>(getIsMobileLayout);
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(() => (getIsNarrow() ? false : !easyMode));
   const userId = user?.id ? String(user.id) : undefined;
-  const isAuthenticated = Boolean(user);
-
   // Refs
   const scrollerRef = useRef<HTMLDivElement>(null!) as React.RefObject<HTMLDivElement>; // transcript scroller
 

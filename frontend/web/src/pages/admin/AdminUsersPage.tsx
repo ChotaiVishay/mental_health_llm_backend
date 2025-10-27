@@ -1,4 +1,5 @@
 import { FormEvent, useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { createUser, deleteUser, listUsers, updateUser } from '@/api/admin';
 import { useAdminAuth } from '@/admin/AdminAuthContext';
 import type { AdminRole, AdminUser } from '@/types/admin';
@@ -28,6 +29,14 @@ const ADMIN_ROLE_OPTIONS: { value: AdminRole; label: string }[] = [
   { value: 'admin', label: 'Admin' },
   { value: 'super_admin', label: 'Super admin' },
 ];
+
+const ROLE_LABELS: Record<AdminRole, string> = {
+  user: 'Service user',
+  provider: 'Provider',
+  moderator: 'Moderator',
+  admin: 'Admin',
+  super_admin: 'Super admin',
+};
 
 export default function AdminUsersPage() {
   const { admin } = useAdminAuth();
@@ -125,144 +134,238 @@ export default function AdminUsersPage() {
   const filteredUsers = users;
 
   return (
-    <div className="admin-users">
-      <header className="admin-section-head">
+    <div className="admin-users admin-page">
+      <header className="admin-page__hero">
         <div>
-          <h1>Manage users</h1>
-          <p className="muted">Create, update, or remove user accounts.</p>
+          <p className="admin-page__eyebrow">Team access</p>
+          <h1>Manage accounts with care</h1>
+          <p className="admin-page__lede">
+            Invite the people who support our community, and match their access to the help they provide.
+          </p>
         </div>
-        <div className="search">
-          <label>
-            <span className="sr-only">Search users</span>
-            <input
-              type="search"
-              placeholder="Search users…"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              onBlur={fetchUsers}
-            />
-          </label>
-          <button type="button" className="btn" onClick={fetchUsers}>Search</button>
-        </div>
+        <Link to="/help/crisis" className="btn btn-crisis">
+          Get help now (24/7)
+        </Link>
       </header>
 
-      {error && <p className="error" role="alert">{error}</p>}
+      {error && (
+        <div className="admin-page__alert" role="alert">
+          <span className="admin-page__alert-label">We hit a snag:</span> {error}
+        </div>
+      )}
 
-      <section className="admin-form">
-        <h2>{editingId ? 'Edit user' : 'Create new user'}</h2>
-        <form onSubmit={onSubmit} className="stack">
-          <div className="form-row">
-            <label>
-              <span>Username</span>
-              <input value={form.username} onChange={(e) => setForm({ ...form, username: e.target.value })} required />
-            </label>
-            <label>
-              <span>Email</span>
-              <input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
-            </label>
-          </div>
+      <div className="admin-page__grid">
+        <section className="admin-page__panel admin-users__panel--form">
+          <header className="admin-page__panel-head">
+            <div>
+              <h2>{editingId ? 'Update account' : 'Create new user'}</h2>
+              <p className="muted">
+                {editingId
+                  ? 'Adjust their details to keep access current.'
+                  : 'Give someone access with a temporary password they can change after their first sign-in.'}
+              </p>
+            </div>
+          </header>
 
-          <div className="form-row">
-            <label>
-              <span>First name</span>
-              <input value={form.first_name} onChange={(e) => setForm({ ...form, first_name: e.target.value })} />
-            </label>
-            <label>
-              <span>Last name</span>
-              <input value={form.last_name} onChange={(e) => setForm({ ...form, last_name: e.target.value })} />
-            </label>
-          </div>
+          <form onSubmit={onSubmit} className="admin-page__form" noValidate>
+            <div className="admin-page__field-grid">
+              <label htmlFor="admin-user-username">
+                <span>Username</span>
+                <input
+                  id="admin-user-username"
+                  name="username"
+                  autoComplete="username"
+                  value={form.username}
+                  onChange={(e) => setForm({ ...form, username: e.target.value })}
+                  required
+                />
+              </label>
+              <label htmlFor="admin-user-email">
+                <span>Email</span>
+                <input
+                  id="admin-user-email"
+                  type="email"
+                  autoComplete="email"
+                  value={form.email}
+                  onChange={(e) => setForm({ ...form, email: e.target.value })}
+                  required
+                />
+              </label>
+            </div>
 
-          <label>
-            <span>Role</span>
-            <select
-              value={form.role}
-              onChange={(e) => setForm({ ...form, role: e.target.value as AdminRole })}
-            >
-              {roleOptions.map((opt) => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </select>
-          </label>
+            <div className="admin-page__field-grid">
+              <label htmlFor="admin-user-firstname">
+                <span>First name</span>
+                <input
+                  id="admin-user-firstname"
+                  autoComplete="given-name"
+                  value={form.first_name}
+                  onChange={(e) => setForm({ ...form, first_name: e.target.value })}
+                />
+              </label>
+              <label htmlFor="admin-user-lastname">
+                <span>Last name</span>
+                <input
+                  id="admin-user-lastname"
+                  autoComplete="family-name"
+                  value={form.last_name}
+                  onChange={(e) => setForm({ ...form, last_name: e.target.value })}
+                />
+              </label>
+            </div>
 
-          {!editingId && (
-            <label>
-              <span>Temporary password</span>
-              <input
-                type="password"
-                value={form.password ?? ''}
-                onChange={(e) => setForm({ ...form, password: e.target.value })}
-                required
-              />
-            </label>
-          )}
-
-          <div className="actions">
-            <button type="submit" className="btn" disabled={saving}>
-              {saving ? 'Saving…' : editingId ? 'Update user' : 'Create user'}
-            </button>
-            {editingId && (
-              <button
-                type="button"
-                className="btn -ghost"
-                onClick={startCreate}
+            <label htmlFor="admin-user-role">
+              <span>Role</span>
+              <select
+                id="admin-user-role"
+                value={form.role}
+                onChange={(e) => setForm({ ...form, role: e.target.value as AdminRole })}
+                aria-describedby="admin-user-role-hint"
               >
-                Cancel
-              </button>
-            )}
-          </div>
-        </form>
-      </section>
-
-      <section>
-        <h2>All users</h2>
-        {loading ? (
-          <p>Loading…</p>
-        ) : (
-          <div className="table-wrapper">
-            <table>
-              <thead>
-                <tr>
-                  <th>Username</th>
-                  <th>Email</th>
-                  <th>Role</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredUsers.map((user) => (
-                  <tr key={user.id}>
-                    <td>{user.username}</td>
-                    <td>{user.email}</td>
-                    <td>{user.profile.role}</td>
-                    <td>{user.is_active ? 'Active' : 'Disabled'}</td>
-                    <td>
-                      <div className="table-actions">
-                        <button type="button" onClick={() => startEdit(user)}>Edit</button>
-                        <button
-                          type="button"
-                          onClick={() => onDelete(user.id)}
-                          disabled={!canManageAdmins && ['admin', 'super_admin', 'moderator'].includes(user.profile.role)}
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
+                {roleOptions.map((opt) => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
                 ))}
-                {filteredUsers.length === 0 && (
+              </select>
+              <p id="admin-user-role-hint" className="admin-page__hint">
+                Choose the lightest access that lets them do their job—you can adjust it anytime.
+              </p>
+            </label>
+
+            {!editingId && (
+              <label htmlFor="admin-user-password">
+                <span>Temporary password</span>
+                <input
+                  id="admin-user-password"
+                  type="password"
+                  autoComplete="new-password"
+                  value={form.password ?? ''}
+                  onChange={(e) => setForm({ ...form, password: e.target.value })}
+                  required
+                  aria-describedby="admin-user-password-hint"
+                />
+                <p id="admin-user-password-hint" className="admin-page__hint">
+                  Share it securely. They will create their own password after signing in.
+                </p>
+              </label>
+            )}
+
+            <div className="admin-page__actions">
+              <button type="submit" className="btn btn-primary" disabled={saving}>
+                {saving ? 'Saving...' : editingId ? 'Update user' : 'Create user'}
+              </button>
+              {editingId && (
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={startCreate}
+                  disabled={saving}
+                >
+                  Cancel
+                </button>
+              )}
+            </div>
+          </form>
+        </section>
+
+        <section className="admin-page__panel admin-users__panel--list">
+          <header className="admin-page__panel-head">
+            <div>
+              <h2>All users</h2>
+              <p className="muted">Search by name, email, or username. We load the latest 50 accounts.</p>
+            </div>
+            <form
+              className="admin-page__search"
+              onSubmit={(event: FormEvent<HTMLFormElement>) => {
+                event.preventDefault();
+                fetchUsers();
+              }}
+            >
+              <label htmlFor="admin-user-search" className="sr-only">Search users</label>
+              <input
+                id="admin-user-search"
+                type="search"
+                placeholder="Name, email, or username"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+              <button type="submit" className="btn btn-secondary">
+                Search
+              </button>
+            </form>
+          </header>
+
+          {loading ? (
+            <p className="admin-page__empty">Loading...</p>
+          ) : (
+            <div className="table-wrapper">
+              <table>
+                <caption className="sr-only">Existing admin users and their access level</caption>
+                <thead>
                   <tr>
-                    <td colSpan={5} style={{ textAlign: 'center', padding: '24px 0' }}>
-                      No users found.
-                    </td>
+                    <th scope="col">Person</th>
+                    <th scope="col">Role</th>
+                    <th scope="col">Status</th>
+                    <th scope="col" aria-label="Actions" />
                   </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </section>
+                </thead>
+                <tbody>
+                  {filteredUsers.map((user) => {
+                    const displayName = [user.first_name, user.last_name].filter(Boolean).join(' ').trim();
+                    const roleLabel = ROLE_LABELS[user.profile.role] ?? user.profile.role;
+                    return (
+                      <tr key={user.id}>
+                        <td>
+                          <div className="admin-users__person">
+                            <span className="admin-users__person-name">{displayName || user.username}</span>
+                            <span className="admin-users__person-meta">{user.email}</span>
+                            {displayName && (
+                              <span className="admin-users__person-meta">@{user.username}</span>
+                            )}
+                          </div>
+                        </td>
+                        <td>
+                          <span className="admin-users__role-chip">{roleLabel}</span>
+                        </td>
+                        <td>
+                          <span className={`admin-users__status ${user.is_active ? 'is-active' : 'is-disabled'}`}>
+                            {user.is_active ? 'Active' : 'Disabled'}
+                          </span>
+                        </td>
+                        <td>
+                          <div className="admin-page__table-actions">
+                            <button
+                              type="button"
+                              className="admin-page__table-link"
+                              onClick={() => startEdit(user)}
+                            >
+                              Edit
+                            </button>
+                            <button
+                              type="button"
+                              className="admin-page__table-link admin-page__table-link--danger"
+                              onClick={() => onDelete(user.id)}
+                              disabled={!canManageAdmins && ['admin', 'super_admin', 'moderator'].includes(user.profile.role)}
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                  {filteredUsers.length === 0 && (
+                    <tr>
+                      <td colSpan={4} className="admin-page__empty">
+                        No users found. Try another name or role.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </section>
+      </div>
     </div>
   );
 }

@@ -14,6 +14,12 @@ const ROLES = [
   { value: 'super_admin', label: 'Super admin' },
 ] as const;
 
+const ROLE_LABELS: Record<typeof ROLES[number]['value'], string> = {
+  admin: 'Admin',
+  moderator: 'Moderator',
+  super_admin: 'Super admin',
+};
+
 type FormState = {
   username: string;
   email: string;
@@ -62,9 +68,14 @@ export default function AdminAdminsPage() {
 
   if (!isSuperAdmin) {
     return (
-      <section>
-        <h1>Administrator access</h1>
-        <p className="muted">Only super administrators may manage admin accounts.</p>
+      <section className="admin-admins admin-page">
+        <header className="admin-page__hero">
+          <div>
+            <p className="admin-page__eyebrow">Admin access</p>
+            <h1>Administrator access</h1>
+            <p className="admin-page__lede">Only super administrators may manage admin accounts.</p>
+          </div>
+        </header>
       </section>
     );
   }
@@ -124,103 +135,179 @@ export default function AdminAdminsPage() {
   };
 
   return (
-    <div className="admin-admins">
-      <h1>Manage administrators</h1>
-      <p className="muted">Create or revoke administrative access.</p>
+    <div className="admin-admins admin-page">
+      <header className="admin-page__hero">
+        <div>
+          <p className="admin-page__eyebrow">Admin access</p>
+          <h1>Invite administrators with care</h1>
+          <p className="admin-page__lede">Grant access to teammates who safeguard our community and data.</p>
+        </div>
+      </header>
 
-      {error && <p className="error" role="alert">{error}</p>}
+      {error && (
+        <div className="admin-page__alert" role="alert">
+          <span className="admin-page__alert-label">We hit a snag:</span> {error}
+        </div>
+      )}
 
-      <section className="admin-form">
-        <h2>{editingId ? 'Update administrator' : 'Invite administrator'}</h2>
-        <form className="stack" onSubmit={submit}>
-          <div className="form-row">
-            <label>
-              <span>Username</span>
-              <input value={form.username} onChange={(e) => setForm({ ...form, username: e.target.value })} required />
-            </label>
-            <label>
-              <span>Email</span>
-              <input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
-            </label>
-          </div>
-          <div className="form-row">
-            <label>
-              <span>First name</span>
-              <input value={form.first_name} onChange={(e) => setForm({ ...form, first_name: e.target.value })} />
-            </label>
-            <label>
-              <span>Last name</span>
-              <input value={form.last_name} onChange={(e) => setForm({ ...form, last_name: e.target.value })} />
-            </label>
-          </div>
-          <label>
-            <span>Role</span>
-            <select value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value as FormState['role'] })}>
-              {ROLES.map((role) => (
-                <option key={role.value} value={role.value}>{role.label}</option>
-              ))}
-            </select>
-          </label>
-          {!editingId && (
-            <label>
-              <span>Temporary password</span>
-              <input type="password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} required />
-            </label>
-          )}
-          <div className="actions">
-            <button type="submit" className="btn" disabled={saving}>
-              {saving ? 'Saving…' : editingId ? 'Save changes' : 'Create admin'}
-            </button>
-            {editingId && (
-              <button type="button" className="btn -ghost" onClick={resetForm}>Cancel</button>
-            )}
-          </div>
-        </form>
-      </section>
+      <div className="admin-page__grid admin-admins__grid">
+        <section className="admin-page__panel admin-admins__panel admin-admins__panel--form">
+          <header className="admin-page__panel-head">
+            <div>
+              <h2>{editingId ? 'Update administrator' : 'Invite administrator'}</h2>
+              <p className="muted">
+                {editingId
+                  ? 'Tidy up a colleague profile or adjust their access.'
+                  : 'Send a temporary password they can change on first sign-in.'}
+              </p>
+            </div>
+          </header>
 
-      <section>
-        <h2>Administrators</h2>
-        {loading ? (
-          <p>Loading…</p>
-        ) : (
-          <div className="table-wrapper">
-            <table>
-              <thead>
-                <tr>
-                  <th>Username</th>
-                  <th>Email</th>
-                  <th>Role</th>
-                  <th>Last login</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {admins.map((user) => (
-                  <tr key={user.id}>
-                    <td>{user.username}</td>
-                    <td>{user.email}</td>
-                    <td>{user.profile.role}</td>
-                    <td>{user.last_login ? new Date(user.last_login).toLocaleString() : '—'}</td>
-                    <td>
-                      <div className="table-actions">
-                        <button type="button" onClick={() => startEdit(user)}>Edit</button>
-                        {admin?.id !== user.id && (
-                          <button type="button" onClick={() => remove(user.id)}>Delete</button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
+          <form className="admin-page__form" onSubmit={submit} noValidate>
+            <div className="admin-page__field-grid">
+              <label htmlFor="admin-admin-username">
+                <span>Username</span>
+                <input
+                  id="admin-admin-username"
+                  value={form.username}
+                  onChange={(e) => setForm({ ...form, username: e.target.value })}
+                  required
+                  autoComplete="username"
+                />
+              </label>
+              <label htmlFor="admin-admin-email">
+                <span>Email</span>
+                <input
+                  id="admin-admin-email"
+                  type="email"
+                  value={form.email}
+                  onChange={(e) => setForm({ ...form, email: e.target.value })}
+                  required
+                  autoComplete="email"
+                />
+              </label>
+            </div>
+
+            <div className="admin-page__field-grid">
+              <label htmlFor="admin-admin-firstname">
+                <span>First name</span>
+                <input
+                  id="admin-admin-firstname"
+                  value={form.first_name}
+                  onChange={(e) => setForm({ ...form, first_name: e.target.value })}
+                  autoComplete="given-name"
+                />
+              </label>
+              <label htmlFor="admin-admin-lastname">
+                <span>Last name</span>
+                <input
+                  id="admin-admin-lastname"
+                  value={form.last_name}
+                  onChange={(e) => setForm({ ...form, last_name: e.target.value })}
+                  autoComplete="family-name"
+                />
+              </label>
+            </div>
+
+            <label htmlFor="admin-admin-role">
+              <span>Role</span>
+              <select
+                id="admin-admin-role"
+                value={form.role}
+                onChange={(e) => setForm({ ...form, role: e.target.value as FormState['role'] })}
+              >
+                {ROLES.map((role) => (
+                  <option key={role.value} value={role.value}>{role.label}</option>
                 ))}
-                {admins.length === 0 && (
+              </select>
+            </label>
+
+            {!editingId && (
+              <label htmlFor="admin-admin-password">
+                <span>Temporary password</span>
+                <input
+                  id="admin-admin-password"
+                  type="password"
+                  value={form.password}
+                  onChange={(e) => setForm({ ...form, password: e.target.value })}
+                  required
+                  autoComplete="new-password"
+                />
+              </label>
+            )}
+
+            <div className="admin-page__actions">
+              <button type="submit" className="btn btn-primary" disabled={saving}>
+                {saving ? 'Saving...' : editingId ? 'Save changes' : 'Create admin'}
+              </button>
+              {editingId && (
+                <button type="button" className="btn btn-secondary" onClick={resetForm} disabled={saving}>
+                  Cancel
+                </button>
+              )}
+            </div>
+          </form>
+        </section>
+
+        <section className="admin-page__panel admin-admins__panel admin-admins__panel--list">
+          <header className="admin-page__panel-head">
+            <div>
+              <h2>Administrators</h2>
+              <p className="muted">We show the latest 50 accounts for quick updates.</p>
+            </div>
+          </header>
+          {loading ? (
+            <p className="admin-page__empty">Loading administrators...</p>
+          ) : admins.length ? (
+            <div className="table-wrapper">
+              <table>
+                <caption className="sr-only">Existing administrators and their access level</caption>
+                <thead>
                   <tr>
-                    <td colSpan={5} style={{ textAlign: 'center', padding: '24px 0' }}>No admin accounts yet.</td>
+                    <th scope="col">Username</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Role</th>
+                    <th scope="col">Last login</th>
+                    <th scope="col" aria-label="Actions" />
                   </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </section>
+                </thead>
+                <tbody>
+                  {admins.map((user) => (
+                    <tr key={user.id}>
+                      <td>{user.username}</td>
+                      <td>{user.email}</td>
+                      <td>{ROLE_LABELS[user.profile.role as FormState['role']] ?? user.profile.role}</td>
+                      <td>{user.last_login ? new Date(user.last_login).toLocaleString() : 'Not yet'}</td>
+                      <td>
+                        <div className="admin-page__table-actions">
+                          <button
+                            type="button"
+                            className="admin-page__table-link"
+                            onClick={() => startEdit(user)}
+                          >
+                            Edit
+                          </button>
+                          {admin?.id !== user.id && (
+                            <button
+                              type="button"
+                              className="admin-page__table-link admin-page__table-link--danger"
+                              onClick={() => remove(user.id)}
+                            >
+                              Delete
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <p className="admin-page__empty">No administrator accounts yet.</p>
+          )}
+        </section>
+      </div>
     </div>
   );
 }
