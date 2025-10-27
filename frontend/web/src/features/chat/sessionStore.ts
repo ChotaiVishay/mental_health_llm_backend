@@ -1,6 +1,7 @@
 export type Role = 'user' | 'assistant';
 export interface ChatMessage { id: string; role: Role; text: string; at: number }
-export interface ChatSession { messages: ChatMessage[] }
+export interface PendingPrompt { text: string; createdAt: number }
+export interface ChatSession { messages: ChatMessage[]; pendingPrompt?: PendingPrompt }
 
 const PRE_KEY = 'sa_prelogin_chat_v1';
 const USER_KEY = (uid: string) => `sa_chat_${uid}_v1`;

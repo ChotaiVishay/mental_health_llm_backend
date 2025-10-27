@@ -19,6 +19,7 @@ import {
   saveUserChat,
   type ChatSession,
   type ChatMessage as ChatMsgStore,
+  type PendingPrompt,
 } from '@/features/chat/sessionStore';
 import ChatList from '@/components/chat/ChatList';
 import { sendMessageToAPI } from '@/api/chat';
@@ -113,6 +114,8 @@ export default function Chat() {
   const userId = user?.id ? String(user.id) : undefined;
   // Refs
   const scrollerRef = useRef<HTMLDivElement>(null!) as React.RefObject<HTMLDivElement>; // transcript scroller
+  const autoSendKeyRef = useRef<string | null>(null);
+  const onSendRef = useRef<((text: string) => void | Promise<void>) | null>(null);
 
   const { atBottom, scrollToBottom } = useAtBottom(scrollerRef, 200);
 
@@ -132,6 +135,8 @@ export default function Chat() {
   const [savingAgreement, setSavingAgreement] = useState(false);
   const [crisisAlert, setCrisisAlert] = useState<CrisisAlert | null>(null);
   const [showAnonNotice, setShowAnonNotice] = useState(true);
+  const [pendingPrompt, setPendingPrompt] = useState<PendingPrompt | null>(null);
+  const [autoSendReady, setAutoSendReady] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -193,9 +198,12 @@ export default function Chat() {
 
   // initial load
   useEffect(() => {
+    const prelogin = loadPreloginChat();
     const session: ChatSession | null = userId
-      ? loadUserChat(userId) ?? loadPreloginChat()
-      : loadPreloginChat();
+      ? loadUserChat(userId) ?? prelogin
+      : prelogin;
+
+    setPendingPrompt(prelogin?.pendingPrompt ?? null);
 
     setSessionId(null);
     setServiceAction(null);
@@ -271,12 +279,17 @@ export default function Chat() {
   // persist
   useEffect(() => {
     const prev = userId ? loadUserChat(userId) ?? undefined : loadPreloginChat() ?? undefined;
-    const payload = { messages: toStore(messages, (prev?.messages as unknown as ChatMessageStore[] | undefined)) };
+    const prevMessages = prev?.messages as unknown as ChatMessageStore[] | undefined;
+    const storedMessages = toStore(messages, prevMessages);
+    const payload: ChatSession = {
+      messages: storedMessages,
+      ...(pendingPrompt ? { pendingPrompt } : {}),
+    };
     const maxAt = payload.messages.length ? Math.max(...payload.messages.map((m) => m.at)) : Date.now();
     setLastActivity(maxAt);
-    if (userId) saveUserChat(userId, payload as { messages: ChatMessageStore[] });
-    else savePreloginChat(payload as { messages: ChatMessageStore[] });
-  }, [messages, userId]);
+    if (userId) saveUserChat(userId, payload);
+    else savePreloginChat(payload);
+  }, [messages, userId, pendingPrompt]);
 
   // auto-scroll only when already near the bottom
   useEffect(() => { if (atBottom) scrollToBottom(); }, [messages.length, atBottom, scrollToBottom]);
@@ -285,27 +298,27 @@ export default function Chat() {
     setCrisisAlert(null);
   };
 
-  const filterCrisisResources = (raw: unknown): CrisisResource[] => {
+  const filterCrisisResources = useCallback((raw: unknown): CrisisResource[] => {
     if (!Array.isArray(raw)) return [];
     return raw
       .filter((item): item is Record<string, unknown> => typeof item === 'object' && item !== null)
       .map((item) => item as Record<string, unknown>)
       .filter((item) => typeof item.label === 'string' && typeof item.href === 'string')
       .map((item) => ({ label: item.label as string, href: item.href as string }));
-  };
+  }, []);
 
-  const onSend = async (text: string) => {
-    if (crisisAlert) {
-      return;
-    }
+  const onSend = useCallback(async (text: string) => {
+    if (crisisAlert) return;
     if (agreementsLoading || showAgreementsModal) return;
+    const trimmed = text.trim();
+    if (!trimmed.length) return;
     setNetErr(null);
     const sentAt = Date.now();
-    const userMsg: Message = { id: mkId(), role: 'user', text, at: sentAt };
+    const userMsg: Message = { id: mkId(), role: 'user', text: trimmed, at: sentAt };
     setMessages((prev) => [...prev, userMsg]);
     setBusy(true);
     try {
-      const reply = await sendMessageToAPI(text, sessionId, language);
+      const reply = await sendMessageToAPI(trimmed, sessionId, language);
       if (reply.session_id) setSessionId(reply.session_id);
       const assistantText =
         (typeof reply.response === 'string' && reply.response.trim().length
@@ -341,7 +354,60 @@ export default function Chat() {
     } finally {
       setBusy(false);
     }
-  };
+  }, [
+    agreementsLoading,
+    showAgreementsModal,
+    crisisAlert,
+    filterCrisisResources,
+    language,
+    sessionId,
+    t,
+  ]);
+
+  useEffect(() => {
+    onSendRef.current = onSend;
+    setAutoSendReady(true);
+    return () => {
+      onSendRef.current = null;
+      setAutoSendReady(false);
+    };
+  }, [onSend]);
+
+  useEffect(() => {
+    if (!pendingPrompt) {
+      autoSendKeyRef.current = null;
+      return;
+    }
+
+    const text = pendingPrompt.text.trim();
+    if (!text.length) {
+      setPendingPrompt(null);
+      autoSendKeyRef.current = null;
+      return;
+    }
+
+    if (!autoSendReady) return;
+
+    const handler = onSendRef.current;
+    if (!handler) return;
+
+    const key = `${pendingPrompt.createdAt}:${text}`;
+    if (autoSendKeyRef.current === key) return;
+    if (busy || agreementsLoading || showAgreementsModal || crisisAlert) return;
+
+    autoSendKeyRef.current = key;
+
+    (async () => {
+      try {
+        await handler(text);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setPendingPrompt(null);
+        autoSendKeyRef.current = null;
+      }
+    })();
+  }, [pendingPrompt, busy, agreementsLoading, showAgreementsModal, crisisAlert, autoSendReady]);
 
   const handleServiceFormClose = () => {
     setServiceFormOpen(false);

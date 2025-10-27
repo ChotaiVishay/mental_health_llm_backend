@@ -16,7 +16,8 @@ export default function Home() {
     if (seed) {
       const now = Date.now();
       savePreloginChat({
-        messages: [{ id: `u_${now}`, role: 'user', text: seed, at: now }],
+        messages: [],
+        pendingPrompt: { text: seed, createdAt: now },
       });
     }
     nav('/chat');
