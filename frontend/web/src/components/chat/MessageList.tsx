@@ -3,6 +3,7 @@ import { speak } from '@/hooks/useTextToSpeech';
 import { markdownToHtml } from '@/utils/markdown';
 import { useLanguage } from '@/i18n/LanguageProvider';
 import { Fragment, useMemo } from 'react';
+import { Volume2 } from 'lucide-react';
 
 export type Message = {
   id: string;
@@ -48,10 +49,10 @@ export default function MessageList({ items }: Props) {
                     type="button"
                     className="icon-inline"
                     aria-label="Play this reply"
-                    onClick={() => speak(m.text)}
+                    onClick={() => speak(m.text, locale)}
                     title="Play reply"
                   >
-                    🔊
+                    <Volume2 aria-hidden="true" />
                   </button>
                 </div>
               )}

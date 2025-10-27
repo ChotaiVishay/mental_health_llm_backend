@@ -8,6 +8,7 @@ import { useSpeechToText } from '@/hooks/useSpeechToText';
 import { useMicRecorder } from '@/hooks/useMicRecorder';
 import { useLanguage } from '@/i18n/LanguageProvider';
 import ChatComposer from './ChatComposer';
+import { sendAudioForTranscription } from '@/features/stt/sendAudio';
 
 type Props = {
   onSend: (text: string) => void | Promise<void>;
@@ -25,6 +26,7 @@ export default function MessageInput({ onSend, disabled, maxVisibleLines, isSend
   const { t, locale, language, keyboard } = useLanguage();
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const maxLines = maxVisibleLines ?? DEFAULT_MAX_VISIBLE_LINES;
+  const [sttUploadError, setSttUploadError] = useState<string | null>(null);
 
   const resizeTextarea = useCallback(() => {
     const el = textareaRef.current;
@@ -56,29 +58,56 @@ export default function MessageInput({ onSend, disabled, maxVisibleLines, isSend
 
   useEffect(() => {
     resizeTextarea();
-  }, [resizeTextarea, value, stt.interim, stt.isListening]);
+  }, [resizeTextarea, value, stt.interim, stt.isListening, sttUploadError]);
 
   async function uploadAndInsert(blob: Blob) {
-    const fd = new FormData();
-    fd.append('audio', blob, 'voice.webm');
-    const r = await fetch('/api/stt', { method: 'POST', body: fd });
-    const { text } = (await r.json()) as { text?: string };
-    if (text) setValue((prev) => (prev ? `${prev} ${text}` : text));
+    setSttUploadError(null);
+    try {
+      const transcript = await sendAudioForTranscription(blob, language, locale);
+      if (transcript) {
+        setValue((prev) => (prev ? `${prev} ${transcript}` : transcript));
+      } else {
+        setSttUploadError(t('chat.errors.generic'));
+      }
+    } catch (error) {
+      console.error('STT upload failed', error);
+      setSttUploadError(t('chat.errors.network'));
+    }
   }
 
   async function handleMicClick() {
-    // Prefer native STT where supported
-    if (stt.isSupported) {
-      if (stt.isListening) stt.stop();
-      else {
-        const speechLocale = locale || (typeof navigator !== 'undefined' ? navigator.language || 'en-AU' : 'en-AU');
-        stt.start(speechLocale);
+    const fatalSpeechErrors = new Set([
+      'unsupported',
+      'insecure',
+      'blocked',
+      'no-mic',
+      'network',
+      'lang-unsupported',
+    ]);
+
+    setSttUploadError(null);
+
+    const canUseSpeechApi = stt.isSupported && !fatalSpeechErrors.has(stt.errorCode ?? '');
+
+    if (canUseSpeechApi) {
+      if (stt.isListening) {
+        stt.stop();
+        return;
       }
-      return;
+
+      const speechLocale = locale || (typeof navigator !== 'undefined' ? navigator.language || 'en-AU' : 'en-AU');
+      const started = await stt.start(speechLocale);
+      if (started) {
+        return;
+      }
+      // Speech API failed immediately; fall through to recorder fallback
     }
-    // Fallback recorder (Edge/Firefox/Safari)
+
     if (!rec.recording) {
       await rec.start();
+      if (!rec.recording && rec.error) {
+        setSttUploadError(rec.error);
+      }
     } else {
       const blob = rec.stop();
       if (blob) await uploadAndInsert(blob);
@@ -106,6 +135,8 @@ export default function MessageInput({ onSend, disabled, maxVisibleLines, isSend
     placeholder = t('chat.composer.placeholder.recording');
   } else if (rec.error) {
     placeholder = rec.error;
+  } else if (sttUploadError) {
+    placeholder = sttUploadError;
   }
 
   const keyboardChars = keyboard.filter((char) => char.trim().length > 0);

@@ -72,7 +72,6 @@ export function useSpeechToText(opts?: { lang?: string; interim?: boolean }) {
   })();
 
   const recRef       = useRef<SpeechRecognition | null>(null);
-  const startedRef   = useRef(false);
   const candsRef     = useRef<string[]>([]);
   const candIdxRef   = useRef(0);
 
@@ -81,6 +80,18 @@ export function useSpeechToText(opts?: { lang?: string; interim?: boolean }) {
   const [interim,     setInterim]   = useState('');
   const [finalText,   setFinal]     = useState<string | null>(null);
   const [errorText,   setErrorText] = useState<string | null>(null);
+  const [errorCode,   setErrorCode] = useState<ErrCode | null>(null);
+  const startPromiseRef = useRef<((value: boolean) => void) | null>(null);
+
+  const setError = useCallback((code: ErrCode, raw?: string) => {
+    setErrorCode(code);
+    setErrorText(friendly(code, raw));
+  }, []);
+
+  const clearError = useCallback(() => {
+    setErrorCode(null);
+    setErrorText(null);
+  }, []);
 
   const preflight = useCallback(async () => {
     if (!navigator.mediaDevices?.getUserMedia) return true;
@@ -90,12 +101,12 @@ export function useSpeechToText(opts?: { lang?: string; interim?: boolean }) {
       return true;
     } catch (e: unknown) {
       const name = (e as { name?: string })?.name || '';
-      if (name === 'NotAllowedError' || name === 'SecurityError') setErrorText(friendly('blocked'));
-      else if (name === 'NotFoundError' || name === 'OverconstrainedError') setErrorText(friendly('no-mic'));
-      else setErrorText(friendly('other', (e as Error)?.message));
+      if (name === 'NotAllowedError' || name === 'SecurityError') setError('blocked');
+      else if (name === 'NotFoundError' || name === 'OverconstrainedError') setError('no-mic');
+      else setError('other', (e as Error)?.message);
       return false;
     }
-  }, []);
+  }, [setError]);
 
   type SRLikeEvent = {
     resultIndex: number;
@@ -103,12 +114,18 @@ export function useSpeechToText(opts?: { lang?: string; interim?: boolean }) {
   };
 
   const newRecognizer = useCallback(
-    (onLangUnsupported: () => void): SpeechRecognition => {
+    (onLangUnsupported: () => boolean): SpeechRecognition => {
       const rec = new (SR as SRClass)();
       rec.interimResults = opts?.interim ?? true;
       rec.continuous = false;
 
-      rec.onstart = () => { setListening(true); setErrorText(null); setInterim(''); };
+      rec.onstart = () => {
+        setListening(true);
+        clearError();
+        setInterim('');
+        startPromiseRef.current?.(true);
+        startPromiseRef.current = null;
+      };
       rec.onresult = (e: unknown) => {
         const ev = e as SRLikeEvent;
         let interimChunk = '';
@@ -123,19 +140,33 @@ export function useSpeechToText(opts?: { lang?: string; interim?: boolean }) {
       };
       rec.onerror = (e: unknown) => {
         const err = String((e as { error?: string })?.error || '');
-        if (err === 'language-not-supported') { onLangUnsupported(); return; }
-        if (err === 'not-allowed' || err === 'service-not-allowed') setErrorText(friendly('blocked'));
-        else if (err === 'audio-capture') setErrorText(friendly('no-mic'));
-        else if (err === 'no-speech') setErrorText(friendly('no-speech'));
-        else if (err === 'network') setErrorText(friendly('network'));
-        else if (err === 'aborted') setErrorText(friendly('aborted'));
-        else if (err === 'busy') setErrorText(friendly('busy'));
-        else setErrorText(friendly('other', err));
+        if (err === 'language-not-supported') {
+          const handled = onLangUnsupported();
+          if (!handled) setError('lang-unsupported');
+          if (!startedRef.current) {
+            startPromiseRef.current?.(handled);
+            startPromiseRef.current = null;
+          }
+          return;
+        }
+        if (err === 'not-allowed' || err === 'service-not-allowed') setError('blocked');
+        else if (err === 'audio-capture') setError('no-mic');
+        else if (err === 'no-speech') setError('no-speech');
+        else if (err === 'network') setError('network');
+        else if (err === 'aborted') setError('aborted');
+        else if (err === 'busy') setError('busy');
+        else setError('other', err);
+        if (startPromiseRef.current) {
+          startPromiseRef.current(false);
+          startPromiseRef.current = null;
+        }
       };
-      rec.onend = () => { setListening(false); startedRef.current = false; };
+      rec.onend = () => {
+        setListening(false);
+      };
       return rec;
     },
-    [SR, opts?.interim]
+    [SR, clearError, opts?.interim, setError]
   );
 
   const tryStartChain = useCallback((rec: SpeechRecognition) => {
@@ -145,27 +176,26 @@ export function useSpeechToText(opts?: { lang?: string; interim?: boolean }) {
       try {
         rec.lang = lang;
         rec.start();
-        startedRef.current = true;
         return true;
       } catch (e: unknown) {
         const msg = String((e as { message?: string; name?: string })?.message || (e as { name?: string })?.name || '');
-        if (/not-allowed|service-not-allowed/i.test(msg)) { setErrorText(friendly('blocked')); return false; }
-        if (/audio-capture/i.test(msg))                 { setErrorText(friendly('no-mic'));   return false; }
-        if (/network/i.test(msg))                       { setErrorText(friendly('network'));  return false; }
-        if (/already started|busy/i.test(msg))          { setErrorText(friendly('busy'));     return false; }
+        if (/not-allowed|service-not-allowed/i.test(msg)) { setError('blocked'); return false; }
+        if (/audio-capture/i.test(msg))                 { setError('no-mic');   return false; }
+        if (/network/i.test(msg))                       { setError('network');  return false; }
+        if (/already started|busy/i.test(msg))          { setError('busy');     return false; }
         candIdxRef.current += 1; // language issue → next candidate
         continue;
       }
     }
-    setErrorText(friendly('lang-unsupported'));
+    setError('lang-unsupported');
     return false;
-  }, []);
+  }, [setError]);
 
   const tryNextCandidate = useCallback(() => {
     candIdxRef.current += 1;
     if (candIdxRef.current >= candsRef.current.length) {
-      setErrorText(friendly('lang-unsupported'));
-      return;
+      setError('lang-unsupported');
+      return false;
     }
     try {
       recRef.current?.abort();
@@ -174,35 +204,55 @@ export function useSpeechToText(opts?: { lang?: string; interim?: boolean }) {
     }
     const rec = newRecognizer(tryNextCandidate);
     recRef.current = rec;
-    tryStartChain(rec);
-  }, [newRecognizer, tryStartChain]);
+    return tryStartChain(rec);
+  }, [newRecognizer, tryStartChain, setError]);
 
   const start = useCallback(async (lang?: string) => {
-    if (!isSupported) { setErrorText(friendly('unsupported')); return; }
-    if (!isSecure)     { setErrorText(friendly('insecure'));   return; }
-    if (isListening || startedRef.current) return;
+    if (!isSupported) { setError('unsupported'); return false; }
+    if (!isSecure)     { setError('insecure');   return false; }
+    if (isListening || startPromiseRef.current) return false;
 
     setFinal(null);
     setInterim('');
-    setErrorText(null);
+    clearError();
 
     const requested = lang || opts?.lang || (typeof navigator !== 'undefined' ? navigator.language : 'en-AU');
     candsRef.current = buildLangCandidates(requested);
     candIdxRef.current = 0;
 
-    // Immediate attempt to preserve the user gesture.
-    let rec = newRecognizer(tryNextCandidate);
-    recRef.current = rec;
-    if (tryStartChain(rec)) return;
+    return new Promise<boolean>(async (resolve) => {
+      startPromiseRef.current = resolve;
 
-    // If we got a synchronous failure, do a permission preflight then retry the chain.
-    const ok = await preflight();
-    if (!ok) return;
+      const rec1 = newRecognizer(() => tryNextCandidate());
+      recRef.current = rec1;
+      if (tryStartChain(rec1)) return;
 
-    rec = newRecognizer(tryNextCandidate);
-    recRef.current = rec;
-    tryStartChain(rec);
-  }, [isSupported, isSecure, isListening, opts?.lang, preflight, newRecognizer, tryStartChain, tryNextCandidate]);
+      const ok = await preflight();
+      if (!ok) {
+        startPromiseRef.current?.(false);
+        startPromiseRef.current = null;
+        return;
+      }
+
+      const rec2 = newRecognizer(() => tryNextCandidate());
+      recRef.current = rec2;
+      if (tryStartChain(rec2)) return;
+
+      startPromiseRef.current?.(false);
+      startPromiseRef.current = null;
+    });
+  }, [
+    clearError,
+    isListening,
+    isSecure,
+    isSupported,
+    newRecognizer,
+    opts?.lang,
+    preflight,
+    tryNextCandidate,
+    tryStartChain,
+    setError,
+  ]);
 
   const stop = useCallback(() => {
     const r = recRef.current;
@@ -211,7 +261,6 @@ export function useSpeechToText(opts?: { lang?: string; interim?: boolean }) {
       try { r.abort(); } catch (err) { void err; }
       recRef.current = null;
     }
-    startedRef.current = false;
   }, []);
 
   useEffect(() => () => stop(), [stop]);
@@ -222,6 +271,7 @@ export function useSpeechToText(opts?: { lang?: string; interim?: boolean }) {
     interim,
     finalText,
     error: errorText,
+    errorCode,
     start,
     stop,
   };
