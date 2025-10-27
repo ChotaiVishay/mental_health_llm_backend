@@ -187,6 +187,9 @@
 
 .bottom-tab-label{
   line-height:1.2;
+  display:block;
+  width:100%;
+  text-align:center;
 }
 
 .bottom-tab-item.active{

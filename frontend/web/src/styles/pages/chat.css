@@ -492,6 +492,7 @@
   .chat-route-main{
     padding:12px 12px calc(12px + env(safe-area-inset-bottom, 0));
     gap:12px;
+    overflow-x:hidden;
   }
   .chat-page{
     grid-template-columns:1fr;
@@ -501,6 +502,8 @@
       "main"
       "composer";
     gap:12px;
+    min-height: calc(100dvh - 24px - env(safe-area-inset-bottom, 0));
+    overflow-x:hidden;
   }
   .chat-sidebar{
     display:none;
@@ -510,12 +513,19 @@
     box-shadow:none;
     background:transparent;
     border-radius:20px;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    min-height:0;
   }
   .chat-head{
     padding:10px 12px;
     border-radius:16px;
     background: color-mix(in srgb, var(--surface) 96%, rgba(255, 255, 255, 0.92));
     border:1px solid color-mix(in srgb, var(--grey-200) 65%, transparent);
+    flex-wrap:wrap;
+    gap:8px 12px;
+    align-items:flex-start;
   }
   .chat-back{
     padding:6px 10px;
@@ -526,12 +536,18 @@
   }
   .chat-head .muted{
     font-size:0.78rem;
+    white-space:normal;
+    margin-left:auto;
+    max-width:100%;
+    text-align:right;
   }
   .chat-alert{
     margin:10px 0 0;
   }
   .chat-scroller{
     padding:16px 12px;
+    flex:1 1 auto;
+    min-height:0;
   }
   .chat-scroller::after{
     content:'';
@@ -550,6 +566,7 @@
     padding:12px 12px calc(12px + env(safe-area-inset-bottom, 0));
     border:1px solid color-mix(in srgb, var(--grey-200) 65%, transparent);
     box-shadow:0 16px 32px rgba(15, 23, 42, 0.14);
+    width:100%;
   }
   .anon-banner{
     padding:6px 10px;
