@@ -56,8 +56,10 @@ export default function App() {
   useEffect(() => {
     if (typeof document === 'undefined') return;
     document.body.classList.toggle('chat-route-active', isChatRoute);
+    document.body.classList.toggle('body--chat', isChatRoute);
     return () => {
       document.body.classList.remove('chat-route-active');
+      document.body.classList.remove('body--chat');
     };
   }, [isChatRoute]);
 

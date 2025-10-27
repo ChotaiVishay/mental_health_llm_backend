@@ -279,7 +279,7 @@ html[data-high-contrast="on"] .chat-alert {
   background: color-mix(in srgb, var(--danger) 20%, var(--surface));
 }
 
-html[data-high-contrast="on"] .composer-dock .chat-input textarea {
+html[data-high-contrast="on"] .composer-dock .chat-composer textarea {
   background: var(--surface);
   color: var(--text);
   border: 2px solid var(--focus);
@@ -586,7 +586,7 @@ html[data-easy-mode="on"] .composer-actions {
   gap: 16px;
 }
 
-html[data-easy-mode="on"] .chat-input textarea {
+html[data-easy-mode="on"] .chat-composer textarea {
   min-height: 140px;
 }
 

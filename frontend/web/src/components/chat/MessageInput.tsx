@@ -1,25 +1,24 @@
 import {
   useState,
-  FormEvent,
   useEffect,
   useRef,
   useCallback,
-  KeyboardEvent,
 } from 'react';
-import { Mic, MicOff, Send } from 'lucide-react';
 import { useSpeechToText } from '@/hooks/useSpeechToText';
 import { useMicRecorder } from '@/hooks/useMicRecorder';
 import { useLanguage } from '@/i18n/LanguageProvider';
+import ChatComposer from './ChatComposer';
 
 type Props = {
   onSend: (text: string) => void | Promise<void>;
   disabled?: boolean;
   maxVisibleLines?: number;
+  isSending?: boolean;
 };
 
 const DEFAULT_MAX_VISIBLE_LINES = 5;
 
-export default function MessageInput({ onSend, disabled, maxVisibleLines }: Props) {
+export default function MessageInput({ onSend, disabled, maxVisibleLines, isSending = false }: Props) {
   const [value, setValue] = useState('');
   const stt = useSpeechToText();           // Chrome path
   const rec = useMicRecorder();            // Fallback path
@@ -98,18 +97,6 @@ export default function MessageInput({ onSend, disabled, maxVisibleLines }: Prop
     }
   }, [disabled, onSend, value]);
 
-  const handleSubmit = (event: FormEvent) => {
-    event.preventDefault();
-    submit();
-  };
-
-  const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
-    if (event.key === 'Enter' && !event.shiftKey && !event.altKey && !event.ctrlKey && !event.metaKey) {
-      event.preventDefault();
-      submit();
-    }
-  };
-
   const basePlaceholder = t('chat.composer.placeholder.default');
   let placeholder = basePlaceholder;
   if (stt.isSupported) {
@@ -133,40 +120,26 @@ export default function MessageInput({ onSend, disabled, maxVisibleLines }: Prop
   const listening = stt.isListening || rec.recording;
 
   return (
-    <form className="chat-input" onSubmit={handleSubmit} aria-label={t('chat.composer.aria')}>
-      <label htmlFor="chat-input" className="sr-only">{t('chat.composer.label')}</label>
-      <button
-        type="button"
-        className={listening ? 'composer-icon-btn listening' : 'composer-icon-btn'}
-        aria-pressed={listening}
-        aria-label={listening ? t('chat.composer.mic.stop') : t('chat.composer.mic.start')}
-        onClick={handleMicClick}
-        title={t('chat.composer.mic.tooltip')}
-        disabled={disabled}
-        data-easy-mode="hide"
-      >
-        {listening ? <MicOff aria-hidden /> : <Mic aria-hidden />}
-      </button>
-      <textarea
-        id="chat-input"
+    <>
+      <ChatComposer
         ref={textareaRef}
-        rows={1}
-        placeholder={placeholder}
         value={displayValue}
-        onChange={(e) => setValue(e.target.value)}
+        onChange={setValue}
+        onSend={submit}
         disabled={disabled}
+        placeholder={placeholder}
+        showMic
+        ariaLabel={t('chat.composer.label')}
+        formLabel={t('chat.composer.aria')}
+        onMicClick={handleMicClick}
+        isMicActive={listening}
+        loading={isSending}
+        sendDisabled={!canSend}
+        micLabelStart={t('chat.composer.mic.start')}
+        micLabelStop={t('chat.composer.mic.stop')}
+        sendAriaLabel={t('chat.composer.send')}
         lang={language}
-        aria-label={t('chat.composer.label')}
-        onKeyDown={handleKeyDown}
       />
-      <button
-        className="composer-icon-btn send"
-        type="submit"
-        disabled={!canSend}
-        aria-label={t('chat.composer.send')}
-      >
-        <Send aria-hidden />
-      </button>
       {showKeyboard && (
         <div className="virtual-keyboard" aria-label={t('chat.keyboard.title')}>
           <p className="virtual-keyboard-hint">{t('chat.keyboard.hint')}</p>
@@ -184,6 +157,6 @@ export default function MessageInput({ onSend, disabled, maxVisibleLines }: Prop
           </div>
         </div>
       )}
-    </form>
+    </>
   );
 }

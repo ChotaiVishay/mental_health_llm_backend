@@ -221,6 +221,12 @@
   }
 }
 
+@media (max-width: 768px){
+  body.body--chat .bottom-tab-bar{
+    display:none;
+  }
+}
+
 .mobile-menu-root{
   position: fixed;
   inset:0;

@@ -44,12 +44,12 @@ type CrisisAlert = { message: string; resources: CrisisResource[] };
 function mkId() { return Math.random().toString(36).slice(2); }
 function toUI(items?: ChatMessageStore[]): Message[] {
   if (!items?.length) return [];
-  return items.map(({ id, role, text }) => ({ id, role, text }));
+  return items.map(({ id, role, text, at }) => ({ id, role, text, at }));
 }
 function toStore(items: Message[], prev?: ChatMessageStore[]): ChatMessageStore[] {
   const now = Date.now();
   const prevMap = new Map(prev?.map((m) => [m.id, m.at]));
-  return items.map((m) => ({ id: m.id, role: m.role, text: m.text, at: prevMap.get(m.id) ?? now }));
+  return items.map((m) => ({ id: m.id, role: m.role, text: m.text, at: m.at ?? prevMap.get(m.id) ?? now }));
 }
 function formatRelativeTime(ms: number, locale: string) {
   const diffSeconds = Math.round((Date.now() - ms) / 1000);
@@ -117,7 +117,7 @@ export default function Chat() {
   // Refs
   const scrollerRef = useRef<HTMLDivElement>(null!) as React.RefObject<HTMLDivElement>; // transcript scroller
 
-  const { atBottom, scrollToBottom } = useAtBottom(scrollerRef);
+  const { atBottom, scrollToBottom } = useAtBottom(scrollerRef, 200);
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [busy, setBusy] = useState(false);
@@ -242,7 +242,8 @@ export default function Chat() {
       const maxAt = Math.max(...session.messages.map((m: ChatMsgStore) => Number(m.at) || 0));
       setLastActivity(Number.isFinite(maxAt) ? maxAt : Date.now());
     } else {
-      setMessages([{ id: mkId(), role: 'assistant', text: t('chat.initialMessage') }]);
+      const now = Date.now();
+      setMessages([{ id: mkId(), role: 'assistant', text: t('chat.initialMessage'), at: now }]);
       setLastActivity(Date.now());
     }
   }, [t, userId]);
@@ -335,7 +336,8 @@ export default function Chat() {
     }
     if (agreementsLoading || showAgreementsModal) return;
     setNetErr(null);
-    const userMsg: Message = { id: mkId(), role: 'user', text };
+    const sentAt = Date.now();
+    const userMsg: Message = { id: mkId(), role: 'user', text, at: sentAt };
     setMessages((prev) => [...prev, userMsg]);
     setBusy(true);
     try {
@@ -347,7 +349,7 @@ export default function Chat() {
           : typeof reply.message === 'string'
             ? reply.message
             : t('chat.errors.generic'));
-      setMessages((prev) => [...prev, { id: mkId(), role: 'assistant', text: assistantText }]);
+      setMessages((prev) => [...prev, { id: mkId(), role: 'assistant', text: assistantText, at: Date.now() }]);
 
       if (reply.action === 'crisis_halt') {
         setServiceAction(null);
@@ -371,7 +373,7 @@ export default function Chat() {
       }
     } catch {
       setNetErr(t('chat.errors.network'));
-      setMessages((prev) => [...prev, { id: mkId(), role: 'assistant', text: t('chat.errors.generic') }]);
+      setMessages((prev) => [...prev, { id: mkId(), role: 'assistant', text: t('chat.errors.generic'), at: Date.now() }]);
     } finally {
       setBusy(false);
     }
@@ -402,8 +404,8 @@ export default function Chat() {
 
       setMessages((prev) => [
         ...prev,
-        { id: mkId(), role: 'user', text: userSummary },
-        { id: mkId(), role: 'assistant', text: response.message },
+        { id: mkId(), role: 'user', text: userSummary, at: Date.now() },
+        { id: mkId(), role: 'assistant', text: response.message, at: Date.now() },
       ]);
 
       setServiceFormOpen(false);
@@ -534,6 +536,7 @@ export default function Chat() {
             onSend={onSend}
             disabled={busy || agreementsLoading || showAgreementsModal || Boolean(crisisAlert)}
             maxVisibleLines={isMobileLayout ? 3 : undefined}
+            isSending={busy}
           />
         </div>
       </div>
