@@ -35,6 +35,7 @@ import Styleguide from '@/pages/Styleguide';
 import '@/styles/index.css';
 import NotFound from '@/pages/NotFound';
 import ConsentSheet from '@/components/ConsentSheet';
+import QuickExitBar from '@/components/QuickExitBar';
 import { CONSENT_STORAGE_KEY } from '@/constants/consent';
 
 export default function App() {
@@ -133,6 +134,7 @@ export default function App() {
 
   return (
     <div className={isChatRoute ? 'app app--chat' : 'app'}>
+      <QuickExitBar />
       <ConsentSheet
         open={consentOpen}
         onAccept={handleConsentAccept}
