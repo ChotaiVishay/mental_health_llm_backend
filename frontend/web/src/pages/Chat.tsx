@@ -21,6 +21,7 @@ import {
   type ChatMessage as ChatMsgStore,
   type PendingPrompt,
 } from '@/features/chat/sessionStore';
+import { translateFromEnglish, translateToEnglish } from '@/features/translation/translator';
 import ChatList from '@/components/chat/ChatList';
 import { sendMessageToAPI } from '@/api/chat';
 import { submitServiceDraft } from '@/api/serviceDraft';
@@ -312,20 +313,46 @@ export default function Chat() {
     if (agreementsLoading || showAgreementsModal) return;
     const trimmed = text.trim();
     if (!trimmed.length) return;
+
     setNetErr(null);
     const sentAt = Date.now();
     const userMsg: Message = { id: mkId(), role: 'user', text: trimmed, at: sentAt };
     setMessages((prev) => [...prev, userMsg]);
     setBusy(true);
-    try {
-      const reply = await sendMessageToAPI(trimmed, sessionId, language);
+
+    const userLanguage = language ?? 'en';
+    let messageForBackend = trimmed;
+    let backendLanguage = userLanguage;
+    let translationUsed = false;
+
+    if (userLanguage !== 'en') {
+      const translated = await translateToEnglish(trimmed, userLanguage);
+      if (translated.ok) {
+        messageForBackend = translated.text;
+        backendLanguage = 'en';
+        translationUsed = true;
+      }
+    }
+
+    const handleReply = async (
+      reply: Awaited<ReturnType<typeof sendMessageToAPI>>,
+      replyLanguage: string,
+    ) => {
       if (reply.session_id) setSessionId(reply.session_id);
-      const assistantText =
+      let assistantText =
         (typeof reply.response === 'string' && reply.response.trim().length
           ? reply.response
           : typeof reply.message === 'string'
             ? reply.message
             : t('chat.errors.generic'));
+
+      if (assistantText && userLanguage !== 'en' && replyLanguage === 'en') {
+        const translated = await translateFromEnglish(assistantText, userLanguage);
+        if (translated.ok) {
+          assistantText = translated.text;
+        }
+      }
+
       setMessages((prev) => [...prev, { id: mkId(), role: 'assistant', text: assistantText, at: Date.now() }]);
 
       if (reply.action === 'crisis_halt') {
@@ -348,7 +375,23 @@ export default function Chat() {
       } else {
         setServiceAction(null);
       }
+    };
+
+    try {
+      const reply = await sendMessageToAPI(messageForBackend, sessionId, backendLanguage);
+      await handleReply(reply, backendLanguage);
     } catch {
+      if (translationUsed) {
+        // If translation failed on the backend call, try resending with the original language.
+        try {
+          const fallbackReply = await sendMessageToAPI(trimmed, sessionId, userLanguage);
+          await handleReply(fallbackReply, userLanguage);
+          return;
+        } catch {
+          // fall through to generic error handling
+        }
+      }
+
       setNetErr(t('chat.errors.network'));
       setMessages((prev) => [...prev, { id: mkId(), role: 'assistant', text: t('chat.errors.generic'), at: Date.now() }]);
     } finally {

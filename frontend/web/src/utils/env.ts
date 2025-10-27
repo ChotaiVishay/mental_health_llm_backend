@@ -16,6 +16,7 @@ export type ViteEnv = {
   VITE_ADMIN_AUTH_APPLE?: string;
   VITE_SHOW_ADMIN_LINK?: string;
   VITE_APP_BASE_URL?: string;
+  VITE_TRANSLATION_API_URL?: string;
 };
 
 const metaEnv = (import.meta as ImportMeta & {
