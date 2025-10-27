@@ -45,6 +45,7 @@ export default function Footer() {
   const { pathname } = useLocation();
   const t = useTranslation();
   const ctas = getCtas(pathname);
+  const disclaimerEmergency = t('footer.disclaimer.line3').replace('{emergency}', '000');
 
   return (
     <footer className="footer" role="contentinfo">
@@ -113,7 +114,7 @@ export default function Footer() {
         <p className="footer-disclaimer" role="note">
           <span>{t('footer.disclaimer.line1')}</span>{' '}
           <span>{t('footer.disclaimer.line2')}</span>{' '}
-          <span>{t('footer.disclaimer.line3', { emergency: '000' })}</span>{' '}
+          <span>{disclaimerEmergency}</span>{' '}
           <span>
             {t('footer.disclaimer.line4')}{' '}
             <a href="/help">{t('footer.disclaimer.helpLink')}</a>.
