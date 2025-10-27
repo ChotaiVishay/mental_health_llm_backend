@@ -25,6 +25,7 @@ export default function MessageInput({ onSend, disabled, maxVisibleLines, isSend
   const rec = useMicRecorder();            // Fallback path
   const { t, locale, language, keyboard } = useLanguage();
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const prevDisabledRef = useRef<boolean>(Boolean(disabled));
   const maxLines = maxVisibleLines ?? DEFAULT_MAX_VISIBLE_LINES;
   const [sttUploadError, setSttUploadError] = useState<string | null>(null);
 
@@ -59,6 +60,13 @@ export default function MessageInput({ onSend, disabled, maxVisibleLines, isSend
   useEffect(() => {
     resizeTextarea();
   }, [resizeTextarea, value, stt.interim, stt.isListening, sttUploadError]);
+
+  useEffect(() => {
+    if (prevDisabledRef.current === true && !disabled) {
+      textareaRef.current?.focus();
+    }
+    prevDisabledRef.current = Boolean(disabled);
+  }, [disabled]);
 
   async function uploadAndInsert(blob: Blob) {
     setSttUploadError(null);

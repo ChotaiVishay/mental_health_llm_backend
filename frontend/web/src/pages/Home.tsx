@@ -62,7 +62,7 @@ export default function Home() {
     [t, language],
   );
 
-  const helpCards = useMemo(
+  const infoCards = useMemo(
     () => [
       { title: t('home.help.card1.title'), body: t('home.help.card1.body') },
       { title: t('home.help.card2.title'), body: t('home.help.card2.body') },
@@ -247,19 +247,28 @@ export default function Home() {
             </a>
           </div>
 
-          <div className="grid grid-3 reveal delay-3">
-            {helpCards.map(card => (
-              <div className="card" key={card.title}>
+          <div className="cta-row reveal delay-3">
+            <button className="btn btn-primary" onClick={() => start()}>
+              {t('home.help.cta')}
+            </button>
+          </div>
+        </Container>
+      </section>
+
+      <section id="support-overview" className="edge section pattern-info support-info">
+        <Container>
+          <header className="section-head reveal">
+            <h2 className="h1">{t('home.help.overview.title')}</h2>
+            <p className="muted">{t('home.help.overview.subtitle')}</p>
+          </header>
+
+          <div className="grid grid-3 reveal delay-1">
+            {infoCards.map(card => (
+              <div className="card info-card" key={card.title}>
                 <h3>{card.title}</h3>
                 <p>{card.body}</p>
               </div>
             ))}
-          </div>
-
-          <div className="cta-row reveal delay-4">
-            <button className="btn btn-primary" onClick={() => start()}>
-              {t('home.help.cta')}
-            </button>
           </div>
         </Container>
       </section>

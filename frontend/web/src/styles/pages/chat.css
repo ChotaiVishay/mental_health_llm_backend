@@ -1,16 +1,19 @@
 /* Chat layout shell */
 .chat-route-main{
   min-height: 100dvh;
+  height: 100dvh;
   padding: clamp(12px, 2vw, 24px) clamp(12px, 4vw, 36px) calc(clamp(12px, 2vw, 24px) + env(safe-area-inset-bottom, 0));
   background: var(--bg);
   display: flex;
   flex-direction: column;
   gap: clamp(12px, 2vw, 24px);
+  overflow: hidden;
 }
 
 .chat-page{
   flex: 1 1 auto;
   display: grid;
+  height: 100%;
   grid-template-columns: minmax(0, 320px) minmax(0, 1fr);
   grid-template-rows: minmax(0, 1fr) auto;
   grid-template-areas:
@@ -78,8 +81,10 @@
 .chat-main{
   grid-area: main;
   display:grid;
+  height:100%;
   grid-template-rows:auto auto 1fr;
   min-height:0;
+  overflow:hidden;
   border-radius: clamp(18px, 2vw, 24px);
   border:1px solid color-mix(in srgb, var(--grey-200) 70%, transparent);
   background: color-mix(in srgb, var(--surface) 96%, rgba(255, 255, 255, 0.9));
@@ -176,8 +181,10 @@
 
 .chat-scroller{
   min-height:0;
+  flex:1;
   overflow:auto;
-  padding:20px clamp(16px, 4vw, 28px);
+  padding:20px clamp(16px, 4vw, 28px) clamp(140px, 20vh, 200px);
+  scroll-padding-bottom: clamp(140px, 20vh, 200px);
   overscroll-behavior:contain;
   display:flex;
   flex-direction:column;
@@ -728,9 +735,9 @@
     min-height:0;
     overflow-y:auto;
     overflow-x:hidden;
-    padding:12px 16px 18px;
+    padding:12px 16px clamp(120px, 18vh, 180px);
     scroll-behavior:smooth;
-    scroll-padding-bottom:140px;
+    scroll-padding-bottom: clamp(120px, 18vh, 180px);
     -webkit-overflow-scrolling:touch;
   }
   .chat-messages .chat-body{
@@ -852,14 +859,15 @@
   inset:0;
   background:rgba(17,24,39,.55);
   display:flex;
-  align-items:center;
+  align-items:flex-start;
   justify-content:center;
-  padding:24px;
+  padding: clamp(56px, 10vh, 96px) 16px clamp(32px, 8vh, 72px);
   z-index:1000;
+  overflow:auto;
 }
 .chat-agreements-modal{
   width:min(720px, 100%);
-  max-height:100%;
+  max-height:calc(100vh - clamp(120px, 18vh, 200px));
   overflow:auto;
   background:var(--surface);
   border-radius:var(--radius-xl, 18px);

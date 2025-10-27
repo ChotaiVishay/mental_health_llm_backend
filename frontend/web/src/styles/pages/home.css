@@ -106,6 +106,22 @@
     radial-gradient(900px 500px at -10% 10%, rgba(133,201,176,.18), transparent 60%),
     var(--offwhite-2);
 }
+.pattern-info{
+  background:
+    radial-gradient(600px 400px at 20% 0%, rgba(47,132,104,.12), transparent 65%),
+    radial-gradient(700px 480px at 80% 10%, rgba(133,201,176,.12), transparent 65%),
+    var(--offwhite-1);
+}
+.support-info{
+  min-height:auto;
+  display:block;
+}
+.support-info .section-head{
+  max-width:720px;
+}
+.info-card{
+  min-height:0;
+}
 
 /* Steps */
 .steps{ list-style:none; padding:0; display:grid; gap:18px; margin:8px 0 0; }
