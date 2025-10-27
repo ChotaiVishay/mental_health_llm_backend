@@ -317,45 +317,47 @@
   backdrop-filter: blur(12px);
 }
 
-.anon-banner{
+.anon-pill{
   display:flex;
   align-items:center;
   gap:10px;
-  padding:8px 12px;
+  padding:6px 10px;
   border-radius:999px;
   border:1px solid color-mix(in srgb, var(--grey-200) 70%, transparent);
-  background: color-mix(in srgb, var(--surface) 95%, rgba(255, 255, 255, 0.9));
-  font-size:0.82rem;
-  color: var(--muted);
+  background: color-mix(in srgb, var(--surface) 98%, rgba(255, 255, 255, 0.92));
+  font-size:0.85rem;
+  color: color-mix(in srgb, var(--text) 78%, transparent);
 }
 
-.anon-banner span{
+.anon-pill span{
   flex:1;
+  min-width:0;
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
 }
 
-.anon-banner-link{
+.anon-pill-link{
   display:inline-flex;
   align-items:center;
   justify-content:center;
-  min-height:36px;
-  padding:0 14px;
+  min-height:30px;
+  padding:0 12px;
   border-radius:999px;
-  border:1px solid color-mix(in srgb, var(--brand) 70%, transparent);
+  border:1px solid color-mix(in srgb, var(--brand) 60%, transparent);
   background: color-mix(in srgb, var(--surface) 95%, rgba(255, 255, 255, 0.9));
   color: var(--brand);
   font-weight:600;
   text-decoration:none;
+  flex-shrink:0;
 }
 
-.anon-banner-link:hover{
+.anon-pill-link:hover{
   text-decoration:none;
-  background: color-mix(in srgb, var(--surface) 88%, rgba(255, 255, 255, 0.95));
+  background: color-mix(in srgb, var(--surface) 90%, rgba(255, 255, 255, 0.95));
 }
 
-.anon-banner-close{
+.anon-pill-close{
   border:none;
   background:transparent;
   color:inherit;
@@ -370,7 +372,7 @@
   flex-shrink:0;
 }
 
-.anon-banner-close:hover{
+.anon-pill-close:hover{
   background: rgba(0,0,0,0.08);
 }
 
@@ -384,6 +386,7 @@
 .chat-input textarea{
   width:100%;
   min-height:48px;
+  min-width:0;
   border-radius:16px;
   border:1px solid color-mix(in srgb, var(--grey-200) 70%, transparent);
   background: color-mix(in srgb, var(--surface) 96%, rgba(255, 255, 255, 0.9));
@@ -526,6 +529,9 @@
     flex-wrap:wrap;
     gap:8px 12px;
     align-items:flex-start;
+    position:sticky;
+    top:0;
+    z-index:10;
   }
   .chat-back{
     padding:6px 10px;
@@ -548,34 +554,60 @@
     padding:16px 12px;
     flex:1 1 auto;
     min-height:0;
+    gap:10px;
   }
   .chat-scroller::after{
     content:'';
     display:block;
     height:12px;
   }
+  .chat-body{
+    gap:10px;
+  }
+  .transcript{
+    gap:10px;
+  }
   .msg{
-    max-width:86%;
-    font-size:0.92rem;
-    box-shadow:0 10px 22px rgba(15, 23, 42, 0.12);
+    max-width:90%;
+    font-size:0.9rem;
+    padding:10px 12px;
+    box-shadow:0 8px 18px rgba(15, 23, 42, 0.1);
   }
   .msg.user{
-    max-width:74%;
+    max-width:78%;
   }
   .composer-dock{
     padding:12px 12px calc(12px + env(safe-area-inset-bottom, 0));
     border:1px solid color-mix(in srgb, var(--grey-200) 65%, transparent);
     box-shadow:0 16px 32px rgba(15, 23, 42, 0.14);
     width:100%;
-  }
-  .anon-banner{
-    padding:6px 10px;
+    gap:8px;
   }
   .chat-input{
-    gap:8px;
+    gap:6px;
+    grid-template-columns:auto 1fr auto;
+    align-items:center;
   }
   .chat-input textarea{
     font-size:0.95rem;
+    padding:10px 12px;
+  }
+  .composer-icon-btn{
+    width:40px;
+    height:40px;
+  }
+  .composer-icon-btn svg{
+    width:18px;
+    height:18px;
+  }
+  .anon-pill{
+    padding:6px 10px;
+    font-size:0.8rem;
+  }
+  .anon-pill-link{
+    min-height:28px;
+    padding:0 10px;
+    font-size:0.78rem;
   }
 }
 

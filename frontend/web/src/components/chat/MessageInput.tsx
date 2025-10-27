@@ -14,16 +14,18 @@ import { useLanguage } from '@/i18n/LanguageProvider';
 type Props = {
   onSend: (text: string) => void | Promise<void>;
   disabled?: boolean;
+  maxVisibleLines?: number;
 };
 
-const MAX_VISIBLE_LINES = 5;
+const DEFAULT_MAX_VISIBLE_LINES = 5;
 
-export default function MessageInput({ onSend, disabled }: Props) {
+export default function MessageInput({ onSend, disabled, maxVisibleLines }: Props) {
   const [value, setValue] = useState('');
   const stt = useSpeechToText();           // Chrome path
   const rec = useMicRecorder();            // Fallback path
   const { t, locale, language, keyboard } = useLanguage();
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const maxLines = maxVisibleLines ?? DEFAULT_MAX_VISIBLE_LINES;
 
   const resizeTextarea = useCallback(() => {
     const el = textareaRef.current;
@@ -33,11 +35,11 @@ export default function MessageInput({ onSend, disabled }: Props) {
     const padding = parseFloat(styles.paddingTop || '0') + parseFloat(styles.paddingBottom || '0');
     const border = parseFloat(styles.borderTopWidth || '0') + parseFloat(styles.borderBottomWidth || '0');
     el.style.height = 'auto';
-    const maxHeight = lineHeight * MAX_VISIBLE_LINES + padding + border;
+    const maxHeight = lineHeight * maxLines + padding + border;
     const minHeight = lineHeight + padding + border;
     const next = Math.min(el.scrollHeight, maxHeight);
     el.style.height = `${Math.max(next, minHeight)}px`;
-  }, []);
+  }, [maxLines]);
 
   // Keep dictated text after the mic stops: append final transcript, or last interim if no final arrives.
   useEffect(() => {

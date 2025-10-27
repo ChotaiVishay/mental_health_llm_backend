@@ -106,8 +106,10 @@ export default function Chat() {
   }, [navigate]);
 
   const getIsNarrow = () => (typeof window !== 'undefined' ? window.matchMedia('(max-width: 900px)').matches : false);
+  const getIsMobileLayout = () => (typeof window !== 'undefined' ? window.matchMedia('(max-width: 768px)').matches : false);
 
   const [isNarrow, setIsNarrow] = useState<boolean>(getIsNarrow);
+  const [isMobileLayout, setIsMobileLayout] = useState<boolean>(getIsMobileLayout);
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(() => (getIsNarrow() ? false : !easyMode));
   const userId = user?.id ? String(user.id) : undefined;
   const isAuthenticated = Boolean(user);
@@ -269,6 +271,27 @@ export default function Chat() {
 
     const legacyHandler = (event: MediaQueryListEvent) => {
       setIsNarrow(event.matches);
+    };
+    mq.addListener(legacyHandler);
+    return () => mq.removeListener(legacyHandler);
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return;
+    const mq = window.matchMedia('(max-width: 768px)');
+    setIsMobileLayout(mq.matches);
+
+    const handleChange = (event: MediaQueryListEvent) => {
+      setIsMobileLayout(event.matches);
+    };
+
+    if (typeof mq.addEventListener === 'function') {
+      mq.addEventListener('change', handleChange);
+      return () => mq.removeEventListener('change', handleChange);
+    }
+
+    const legacyHandler = (event: MediaQueryListEvent) => {
+      setIsMobileLayout(event.matches);
     };
     mq.addListener(legacyHandler);
     return () => mq.removeListener(legacyHandler);
@@ -494,12 +517,12 @@ export default function Chat() {
         {/* Composer dock — separate row pinned at grid bottom */}
         <div className="composer-dock">
           {!user && showAnonNotice && (
-            <div className="anon-banner" role="note" aria-live="polite" aria-label={t('chat.banner.aria')} data-easy-mode="hide">
+            <div className="anon-pill" role="note" aria-live="polite" aria-label={t('chat.banner.aria')} data-easy-mode="hide">
               <span>{t('chat.anonBanner')}</span>
-              <a className="anon-banner-link" href="/login">{t('chat.banner.button')}</a>
+              <a className="anon-pill-link" href="/login">{t('chat.banner.button')}</a>
               <button
                 type="button"
-                className="anon-banner-close"
+                className="anon-pill-close"
                 aria-label={t('chat.alert.dismiss')}
                 onClick={() => setShowAnonNotice(false)}
               >
@@ -507,7 +530,11 @@ export default function Chat() {
               </button>
             </div>
           )}
-          <MessageInput onSend={onSend} disabled={busy || agreementsLoading || showAgreementsModal || Boolean(crisisAlert)} />
+          <MessageInput
+            onSend={onSend}
+            disabled={busy || agreementsLoading || showAgreementsModal || Boolean(crisisAlert)}
+            maxVisibleLines={isMobileLayout ? 3 : undefined}
+          />
         </div>
       </div>
 
