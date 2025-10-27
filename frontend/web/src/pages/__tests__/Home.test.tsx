@@ -1,8 +1,9 @@
 import {
   afterEach, beforeEach, expect, it, vi,
 } from 'vitest';
+import { useEffect } from 'react';
 import {
-  render, screen, fireEvent, waitFor,
+  render, screen, fireEvent, waitFor, act,
 } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from '@/auth/AuthContext';
@@ -10,6 +11,8 @@ import Home from '@/pages/Home';
 import Chat from '@/pages/Chat';
 import { fetchAgreementStatus, acceptAgreements } from '@/api/agreements';
 import { sendMessageToAPI } from '@/api/chat';
+import { LanguageProvider, useLanguage } from '@/i18n/LanguageProvider';
+import type { SupportedLanguageCode } from '@/i18n/translations';
 
 vi.mock('@/api/agreements', async () => {
   const actual = await vi.importActual<typeof import('@/api/agreements')>('@/api/agreements');
@@ -27,6 +30,14 @@ vi.mock('@/api/chat', async () => {
     sendMessageToAPI: vi.fn(),
   };
 });
+
+function LanguageCapture({ onReady }: { onReady: (setter: (code: SupportedLanguageCode) => void) => void }) {
+  const { setLanguage } = useLanguage();
+  useEffect(() => {
+    onReady(setLanguage);
+  }, [onReady, setLanguage]);
+  return null;
+}
 
 beforeEach(() => {
   vi.mocked(fetchAgreementStatus).mockResolvedValue({
@@ -102,4 +113,33 @@ it('auto-sends quick prompt messages into chat', async () => {
 
   expect(await screen.findByText('Low-cost counselling')).toBeInTheDocument();
   expect(await screen.findByText('Assistance is on the way.', undefined, { timeout: 3000 })).toBeInTheDocument();
+});
+
+it('re-renders localized sections when the language changes', async () => {
+  let setter: ((code: SupportedLanguageCode) => void) | undefined;
+
+  render(
+    <LanguageProvider>
+      <MemoryRouter initialEntries={['/']}>
+        <LanguageCapture onReady={(fn) => { setter = fn; }} />
+        <Home />
+      </MemoryRouter>
+    </LanguageProvider>
+  );
+
+  expect(screen.getByRole('heading', { name: /help & crisis/i })).toBeInTheDocument();
+
+  await waitFor(() => {
+    expect(typeof setter).toBe('function');
+  });
+
+  await act(async () => {
+    setter?.('es');
+  });
+
+  expect(await screen.findByRole('heading', { name: /ayuda y crisis/i })).toBeInTheDocument();
+  expect(screen.getByRole('heading', { name: /preguntas frecuentes/i })).toBeInTheDocument();
+  expect(
+    screen.getByRole('button', { name: /iniciar chat — no necesitas iniciar sesión/i }),
+  ).toBeInTheDocument();
 });

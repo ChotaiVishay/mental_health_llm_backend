@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useId, useRef } from 'react';
+import { useTranslation } from '@/i18n/LanguageProvider';
 
 const SAFE_URLS = [
   'https://www.abc.net.au/news',
@@ -29,6 +30,7 @@ function openSafeDestination(target: string) {
 }
 
 export default function QuickExitBar() {
+  const t = useTranslation();
   const lastEscapeRef = useRef<number | null>(null);
   const copyId = useId();
 
@@ -57,16 +59,16 @@ export default function QuickExitBar() {
     <div className="quick-exit-bar" role="complementary" aria-label="Quick exit banner">
       <div className="quick-exit-inner">
         <span className="quick-exit-copy" id={copyId}>
-          Need to leave quickly? This button opens a neutral site and replaces Support Atlas. Press Escape twice for the same action.
+          {t('quickExit.copy')}
         </span>
         <button
           type="button"
           className="quick-exit-button"
           aria-describedby={copyId}
-          aria-label="Leave this site"
+          aria-label={t('quickExit.buttonAria')}
           onClick={handleExit}
         >
-          Leave this site
+          {t('quickExit.button')}
         </button>
       </div>
     </div>

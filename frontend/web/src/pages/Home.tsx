@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import Title from '@/components/misc/Title';
 import Container from '@/components/layout/Container';
 import { savePreloginChat } from '@/features/chat/sessionStore';
-import { useTranslation } from '@/i18n/LanguageProvider';
+import { useLanguage, useTranslation } from '@/i18n/LanguageProvider';
 import { scrollToHash } from '@/utils/scroll';
 import '@/styles/pages/home.css';
 
@@ -11,6 +11,7 @@ export default function Home() {
   const nav = useNavigate();
   const location = useLocation();
   const t = useTranslation();
+  const { language } = useLanguage();
 
   const start = (seed?: string) => {
     if (seed) {
@@ -49,7 +50,7 @@ export default function Home() {
       { text: t('home.hero.prompt3.text'), aria: t('home.hero.prompt3.aria') },
       { text: t('home.hero.prompt4.text'), aria: t('home.hero.prompt4.aria') },
     ],
-    [t],
+    [t, language],
   );
 
   const steps = useMemo(
@@ -58,7 +59,7 @@ export default function Home() {
       { num: '2', title: t('home.how.step2.title'), body: t('home.how.step2.body') },
       { num: '3', title: t('home.how.step3.title'), body: t('home.how.step3.body') },
     ],
-    [t],
+    [t, language],
   );
 
   const helpCards = useMemo(
@@ -67,7 +68,7 @@ export default function Home() {
       { title: t('home.help.card2.title'), body: t('home.help.card2.body') },
       { title: t('home.help.card3.title'), body: t('home.help.card3.body') },
     ],
-    [t],
+    [t, language],
   );
 
   const principles = useMemo(
@@ -77,7 +78,7 @@ export default function Home() {
       { title: t('home.principles.support.title'), body: t('home.principles.support.body') },
       { title: t('home.principles.inclusive.title'), body: t('home.principles.inclusive.body') },
     ],
-    [t],
+    [t, language],
   );
 
   const faqItems = useMemo(
@@ -96,7 +97,7 @@ export default function Home() {
         ),
       },
     ],
-    [t],
+    [t, language],
   );
 
   return (
@@ -230,19 +231,19 @@ export default function Home() {
             aria-label={t('home.help.hotline.aria')}
           >
             <a className="hotline" href="tel:131114" aria-label={t('home.help.hotline.lifeline.aria')}>
-              <h3>Lifeline</h3>
+              <h3>{t('home.help.hotline.lifeline.name')}</h3>
               <p className="phone">13 11 14</p>
-              <span className="tag">24/7</span>
+              <span className="tag">{t('home.help.hotline.tag')}</span>
             </a>
             <a className="hotline" href="tel:1800551800" aria-label={t('home.help.hotline.kids.aria')}>
-              <h3>Kids Helpline</h3>
+              <h3>{t('home.help.hotline.kids.name')}</h3>
               <p className="phone">1800 55 1800</p>
-              <span className="tag">24/7</span>
+              <span className="tag">{t('home.help.hotline.tag')}</span>
             </a>
             <a className="hotline" href="tel:1300224636" aria-label={t('home.help.hotline.beyond.aria')}>
-              <h3>Beyond Blue</h3>
+              <h3>{t('home.help.hotline.beyond.name')}</h3>
               <p className="phone">1300 22 4636</p>
-              <span className="tag">24/7</span>
+              <span className="tag">{t('home.help.hotline.tag')}</span>
             </a>
           </div>
 

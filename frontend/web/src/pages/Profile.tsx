@@ -3,6 +3,7 @@ import { useAuth } from '@/auth/AuthContext';
 import { getSupabaseClient } from '@/auth/supabaseClient';
 import { mapSupabaseUser } from '@/auth/mapSupabaseUser';
 import { getSupabaseAdminClient } from '@/admin/supabaseAdminClient';
+import { useTranslation } from '@/i18n/LanguageProvider';
 import '@/styles/pages/profile.css';
 import { VITE } from '@/utils/env';
 
@@ -10,6 +11,7 @@ export default function Profile() {
   const { user, setUser } = useAuth();
   const supabase = getSupabaseClient();
   const adminClient = getSupabaseAdminClient();
+  const t = useTranslation();
 
   const [displayName, setDisplayName] = useState(user?.name ?? '');
   const [avatarUrl, setAvatarUrl] = useState(user?.avatarUrl ?? '');
@@ -57,7 +59,7 @@ export default function Profile() {
     setProfileStatus(null);
 
     if (!supabase) {
-      setProfileError('Profile editing is unavailable in this environment.');
+      setProfileError(t('profile.error.unavailable'));
       return;
     }
 
@@ -78,9 +80,9 @@ export default function Profile() {
       if (data.user && setUser) {
         setUser(mapSupabaseUser(data.user));
       }
-      setProfileStatus('Account details updated.');
+      setProfileStatus(t('profile.status.updated'));
     } catch (err) {
-      setProfileError(err instanceof Error ? err.message : 'Unable to update profile.');
+      setProfileError(err instanceof Error ? err.message : t('profile.error.generic'));
     } finally {
       setProfileLoading(false);
     }
@@ -92,7 +94,7 @@ export default function Profile() {
     setPasswordStatus(null);
 
     if (!supabase) {
-      setPasswordError('Password updates are unavailable in this environment.');
+      setPasswordError(t('profile.error.passwordUnavailable'));
       return;
     }
 
@@ -100,11 +102,11 @@ export default function Profile() {
     const trimmedConfirm = confirmPassword.trim();
 
     if (!trimmed || trimmed.length < 6) {
-      setPasswordError('Password must be at least 6 characters long.');
+      setPasswordError(t('profile.error.passwordLength'));
       return;
     }
     if (trimmed !== trimmedConfirm) {
-      setPasswordError('Passwords do not match.');
+      setPasswordError(t('profile.error.passwordMismatch'));
       return;
     }
 
@@ -118,11 +120,11 @@ export default function Profile() {
       if (data.user && setUser) {
         setUser(mapSupabaseUser(data.user));
       }
-      setPasswordStatus('Password updated successfully.');
+      setPasswordStatus(t('profile.status.passwordUpdated'));
       setPassword('');
       setConfirmPassword('');
     } catch (err) {
-      setPasswordError(err instanceof Error ? err.message : 'Unable to update password.');
+      setPasswordError(err instanceof Error ? err.message : t('profile.error.passwordGeneric'));
     } finally {
       setPasswordLoading(false);
     }
@@ -132,15 +134,15 @@ export default function Profile() {
     setDeleteError(null);
     if (!user) return;
 
-    const confirmed = window.confirm('Delete your Support Atlas profile and remove saved information? This cannot be undone.');
+    const confirmed = window.confirm(t('profile.delete.confirm'));
     if (!confirmed) return;
 
     if (!adminClient) {
-      setDeleteError('Account deletion is unavailable in this environment.');
+      setDeleteError(t('profile.error.deleteUnavailable'));
       return;
     }
     if (!supabase) {
-      setDeleteError('Authentication is unavailable.');
+      setDeleteError(t('profile.error.authUnavailable'));
       return;
     }
 
@@ -157,7 +159,7 @@ export default function Profile() {
       const safeRedirect = VITE.VITE_APP_BASE_URL?.trim() || '/';
       window.location.href = safeRedirect;
     } catch (err) {
-      setDeleteError(err instanceof Error ? err.message : 'Unable to delete account.');
+      setDeleteError(err instanceof Error ? err.message : t('profile.error.deleteGeneric'));
     } finally {
       setDeleteLoading(false);
     }
@@ -175,25 +177,26 @@ export default function Profile() {
             )}
           </div>
           <div>
-            <h1 id="profile-title" className="profile-title">Your profile</h1>
+            <h1 id="profile-title" className="profile-title">{t('profile.title')}</h1>
             <p className="profile-summary">
-              Manage your account details and keep information up to date.
+              {t('profile.summary')}
             </p>
             <p className="profile-email">
-              Signed in as <strong>{user.email ?? 'unknown email'}</strong>
+              {t('profile.signedInPrefix')}{' '}
+              <strong>{user.email ?? t('profile.signedInUnknown')}</strong>
             </p>
           </div>
         </header>
 
         <section className="profile-section" aria-labelledby="profile-account-heading">
           <div className="profile-section-head">
-            <h2 id="profile-account-heading">Account details</h2>
-            <p className="muted">Update your basic information, contact details, and preferences.</p>
+            <h2 id="profile-account-heading">{t('profile.section.account.title')}</h2>
+            <p className="muted">{t('profile.section.account.description')}</p>
           </div>
           <form className="profile-form" onSubmit={onSaveProfile} noValidate>
             <fieldset disabled={profileLoading}>
               <label className="field">
-                <span>Display name</span>
+                <span>{t('profile.field.displayName')}</span>
                 <input
                   type="text"
                   name="display-name"
@@ -204,11 +207,11 @@ export default function Profile() {
               </label>
 
               <label className="field">
-                <span>Avatar URL</span>
+                <span>{t('profile.field.avatarUrl')}</span>
                 <input
                   type="url"
                   name="avatar-url"
-                  placeholder="https://example.com/avatar.png"
+                  placeholder={t('profile.field.avatarUrl.placeholder')}
                   autoComplete="url"
                   value={avatarUrl}
                   onChange={(evt) => setAvatarUrl(evt.target.value)}
@@ -228,7 +231,7 @@ export default function Profile() {
 
               <div className="profile-actions">
                 <button type="submit" className="btn btn-primary" disabled={profileLoading}>
-                  Save changes
+                  {profileLoading ? t('profile.button.saving') : t('profile.button.save')}
                 </button>
               </div>
             </fieldset>
@@ -237,13 +240,13 @@ export default function Profile() {
 
         <section className="profile-section" aria-labelledby="profile-security-heading">
           <div className="profile-section-head">
-            <h2 id="profile-security-heading">Security</h2>
-            <p className="muted">Change your password after verifying with email sign-in.</p>
+            <h2 id="profile-security-heading">{t('profile.section.security.title')}</h2>
+            <p className="muted">{t('profile.section.security.description')}</p>
           </div>
           <form className="profile-form" onSubmit={onChangePassword} noValidate>
             <fieldset disabled={passwordLoading}>
               <label className="field">
-                <span>New password</span>
+                <span>{t('profile.field.newPassword')}</span>
                 <input
                   type="password"
                   name="new-password"
@@ -255,7 +258,7 @@ export default function Profile() {
                 />
               </label>
               <label className="field">
-                <span>Confirm password</span>
+                <span>{t('profile.field.confirmPassword')}</span>
                 <input
                   type="password"
                   name="confirm-password"
@@ -280,7 +283,7 @@ export default function Profile() {
 
               <div className="profile-actions">
                 <button type="submit" className="btn btn-secondary" disabled={passwordLoading}>
-                  Update password
+                  {passwordLoading ? t('profile.button.updatingPassword') : t('profile.button.updatePassword')}
                 </button>
               </div>
             </fieldset>
@@ -289,8 +292,8 @@ export default function Profile() {
 
         <section className="profile-section profile-danger" aria-labelledby="profile-danger-heading">
           <div className="profile-section-head">
-            <h2 id="profile-danger-heading">Delete your profile</h2>
-            <p className="muted">Remove your Support Atlas account and any saved chat data. This action cannot be undone.</p>
+            <h2 id="profile-danger-heading">{t('profile.section.delete.title')}</h2>
+            <p className="muted">{t('profile.section.delete.description')}</p>
           </div>
           {deleteError && (
             <p className="error" role="alert">{deleteError}</p>
@@ -302,7 +305,7 @@ export default function Profile() {
               onClick={onDeleteAccount}
               disabled={deleteLoading}
             >
-              {deleteLoading ? 'Deleting…' : 'Delete account'}
+              {deleteLoading ? t('profile.button.deleting') : t('profile.button.delete')}
             </button>
           </div>
         </section>
