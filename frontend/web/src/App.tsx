@@ -14,6 +14,8 @@ import AuthCallback from '@/pages/AuthCallback';
 import ResetPassword from '@/pages/ResetPassword';
 import Accessibility from '@/pages/Accessibility';
 import Contact from '@/pages/Contact';
+import Privacy from '@/pages/Privacy';
+import Terms from '@/pages/Terms';
 import TopHeader from '@/components/TopHeader';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
@@ -89,6 +91,8 @@ export default function App() {
       <Route path="/help" element={<Navigate to="/#help-crisis" replace />} />
 
       <Route path="/services" element={<Services />} />
+      <Route path="/privacy" element={<Privacy />} />
+      <Route path="/terms" element={<Terms />} />
 
       {/* Regular user auth */}
       <Route path="/login" element={<Login />} />

@@ -209,6 +209,8 @@ export const LANGUAGE_PACKS: Record<SupportedLanguageCode, LanguagePack> = {
       'agreements.actions.saving': 'Saving...',
       'agreements.versionNoteSeparator': ' • ',
       'agreements.modal.aria': 'Chat agreements',
+      'agreements.links.viewTerms': 'Read the full Terms of Service',
+      'agreements.links.viewPrivacy': 'Read the full Privacy Policy',
     },
     lists: {
       'agreements.terms.points': [
@@ -451,6 +453,8 @@ export const LANGUAGE_PACKS: Record<SupportedLanguageCode, LanguagePack> = {
       'agreements.actions.saving': 'Guardando...',
       'agreements.versionNoteSeparator': ' • ',
       'agreements.modal.aria': 'Acuerdos del chat',
+      'agreements.links.viewTerms': 'Leer los Términos de servicio completos',
+      'agreements.links.viewPrivacy': 'Leer la Política de privacidad completa',
     },
     lists: {
       'agreements.terms.points': [
@@ -697,6 +701,8 @@ export const LANGUAGE_PACKS: Record<SupportedLanguageCode, LanguagePack> = {
       'agreements.actions.saving': 'सहेजा जा रहा है...',
       'agreements.versionNoteSeparator': ' • ',
       'agreements.modal.aria': 'चैट की सहमति',
+      'agreements.links.viewTerms': 'पूरा सेवा नियम पढ़ें',
+      'agreements.links.viewPrivacy': 'पूरी गोपनीयता नीति पढ़ें',
     },
     lists: {
       'agreements.terms.points': [
@@ -817,6 +823,8 @@ export const LANGUAGE_PACKS: Record<SupportedLanguageCode, LanguagePack> = {
       'agreements.actions.saving': '正在保存…',
       'agreements.versionNoteSeparator': ' • ',
       'agreements.modal.aria': '聊天协议',
+      'agreements.links.viewTerms': '查看完整的服务条款',
+      'agreements.links.viewPrivacy': '查看完整的隐私政策',
       'home.metaTitle': 'Support Atlas — 快速寻找支持',
       'home.hero.title': '快速找到心理健康支持。',
       'home.hero.subtitle': '浏览可信的服务信息或向助手提问。默认匿名——稍后登录即可保存历史。',

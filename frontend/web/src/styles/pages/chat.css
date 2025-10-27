@@ -887,6 +887,14 @@
   padding:16px;
   background:var(--surface-alt, #f9fafb);
 }
+.chat-agreements-readmore{
+  margin:8px 0 0;
+  font-size:0.88rem;
+}
+.chat-agreements-readmore a{
+  color:var(--brand);
+  text-decoration:underline;
+}
 .chat-agreements-section h3{
   margin-top:0;
   margin-bottom:8px;

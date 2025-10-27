@@ -34,7 +34,6 @@ import {
 } from '@/api/agreements';
 import '@/styles/pages/chat.css';
 import { useLanguage } from '@/i18n/LanguageProvider';
-import { CONSENT_STORAGE_KEY } from '@/constants/consent';
 import { ArrowLeft } from 'lucide-react';
 
 type ChatMessageStore = { id: string; role: 'user' | 'assistant'; text: string; at: number };
@@ -143,35 +142,11 @@ export default function Chat() {
       setAgreementsLoading(true);
       setAgreementsError(null);
 
-      const storedConsent = (() => {
-        try {
-          return typeof window !== 'undefined'
-            && window.localStorage.getItem(CONSENT_STORAGE_KEY) === 'true';
-        } catch {
-          return false;
-        }
-      })();
-
-      if (!userId && storedConsent) {
-        if (!active) return;
-        const acceptedStatus: AgreementStatus = {
-          termsVersion: AGREEMENT_TERMS_VERSION,
-          privacyVersion: AGREEMENT_PRIVACY_VERSION,
-          termsAccepted: true,
-          privacyAccepted: true,
-          requiresAcceptance: false,
-        };
-        setAgreementStatus(acceptedStatus);
-        setShowAgreementsModal(false);
-        setAgreementsLoading(false);
-        return;
-      }
-
       try {
         const status = await fetchAgreementStatus(userId);
         if (!active) return;
         setAgreementStatus(status);
-        setShowAgreementsModal(status.requiresAcceptance || !isAuthenticated);
+        setShowAgreementsModal(status.requiresAcceptance || !userId);
       } catch {
         if (!active) return;
         setAgreementsError('We could not load the latest terms. Please try again.');
@@ -185,26 +160,17 @@ export default function Chat() {
     return () => {
       active = false;
     };
-  }, [userId, isAuthenticated]);
+  }, [userId]);
 
   const handleAcceptAgreements = async () => {
     if (!userId) {
-      try {
-        if (typeof window !== 'undefined') {
-          window.localStorage.setItem(CONSENT_STORAGE_KEY, 'true');
-        }
-      } catch {
-        // Ignore storage failures; rely on state fallback.
-      }
-      setAgreementStatus((prev) => prev
-        ? { ...prev, termsAccepted: true, privacyAccepted: true, requiresAcceptance: false }
-        : {
-            termsVersion: AGREEMENT_TERMS_VERSION,
-            privacyVersion: AGREEMENT_PRIVACY_VERSION,
-            termsAccepted: true,
-            privacyAccepted: true,
-            requiresAcceptance: false,
-          });
+      setAgreementStatus({
+        termsVersion: AGREEMENT_TERMS_VERSION,
+        privacyVersion: AGREEMENT_PRIVACY_VERSION,
+        termsAccepted: true,
+        privacyAccepted: true,
+        requiresAcceptance: false,
+      });
       setAgreementsError(null);
       setShowAgreementsModal(false);
       return;

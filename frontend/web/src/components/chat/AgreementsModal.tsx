@@ -80,6 +80,11 @@ export default function AgreementsModal({
                   <li key={item}>{item}</li>
                 ))}
               </ul>
+              <p className="chat-agreements-readmore">
+                <a href="/terms" target="_blank" rel="noopener noreferrer">
+                  {t('agreements.links.viewTerms')}
+                </a>
+              </p>
             </section>
 
             <section className="chat-agreements-section" aria-labelledby="chat-privacy-heading">
@@ -90,6 +95,11 @@ export default function AgreementsModal({
                   <li key={item}>{item}</li>
                 ))}
               </ul>
+              <p className="chat-agreements-readmore">
+                <a href="/privacy" target="_blank" rel="noopener noreferrer">
+                  {t('agreements.links.viewPrivacy')}
+                </a>
+              </p>
             </section>
           </div>
 
