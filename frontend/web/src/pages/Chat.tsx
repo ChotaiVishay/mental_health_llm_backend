@@ -18,9 +18,21 @@ import {
   loadUserChat,
   saveUserChat,
   type ChatSession,
-  type ChatMessage as ChatMsgStore,
+  type ChatMessage,
   type PendingPrompt,
 } from '@/features/chat/sessionStore';
+import {
+  listSessions as listHistorySessions,
+  createSession as createHistorySession,
+  recordMessages as recordHistoryMessages,
+  updateSessionMetadata as updateHistorySessionMetadata,
+  setActiveSessionId as setHistoryActiveSessionId,
+  getSessionById as getHistorySessionById,
+  getActiveSession as getHistoryActiveSession,
+  getPendingPrompt as getHistoryPendingPrompt,
+  setPendingPrompt as setHistoryPendingPrompt,
+  type StoredHistorySession,
+} from '@/features/chat/historyStore';
 import { translateFromEnglish, translateToEnglish } from '@/features/translation/translator';
 import ChatList from '@/components/chat/ChatList';
 import { sendMessageToAPI } from '@/api/chat';
@@ -38,7 +50,7 @@ import '@/styles/pages/chat.css';
 import { useLanguage } from '@/i18n/LanguageProvider';
 import { ArrowLeft } from 'lucide-react';
 
-type ChatMessageStore = { id: string; role: 'user' | 'assistant'; text: string; at: number };
+type ChatMessageStore = ChatMessage;
 type CrisisResource = { label: string; href: string };
 type CrisisAlert = { message: string; resources: CrisisResource[] };
 
@@ -51,6 +63,9 @@ function toStore(items: Message[], prev?: ChatMessageStore[]): ChatMessageStore[
   const now = Date.now();
   const prevMap = new Map(prev?.map((m) => [m.id, m.at]));
   return items.map((m) => ({ id: m.id, role: m.role, text: m.text, at: m.at ?? prevMap.get(m.id) ?? now }));
+}
+function mkAssistantMessage(text: string, at: number): Message {
+  return { id: mkId(), role: 'assistant', text, at };
 }
 function formatRelativeTime(ms: number, locale: string) {
   const diffSeconds = Math.round((Date.now() - ms) / 1000);
@@ -136,8 +151,10 @@ export default function Chat() {
   const [savingAgreement, setSavingAgreement] = useState(false);
   const [crisisAlert, setCrisisAlert] = useState<CrisisAlert | null>(null);
   const [showAnonNotice, setShowAnonNotice] = useState(true);
-  const [pendingPrompt, setPendingPrompt] = useState<PendingPrompt | null>(null);
+  const [pendingPromptState, setPendingPromptState] = useState<PendingPrompt | null>(null);
   const [autoSendReady, setAutoSendReady] = useState(false);
+  const [historySessions, setHistorySessions] = useState<StoredHistorySession[]>([]);
+  const [activeHistorySessionId, setActiveHistorySessionId] = useState<string | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -199,26 +216,86 @@ export default function Chat() {
 
   // initial load
   useEffect(() => {
-    const prelogin = loadPreloginChat();
-    const session: ChatSession | null = userId
-      ? loadUserChat(userId) ?? prelogin
-      : prelogin;
+    const bootstrapMessages = (records: ChatMessageStore[]) => {
+      setMessages(toUI(records));
+      const maxAt = records.length ? Math.max(...records.map((m) => Number(m.at) || 0)) : Date.now();
+      setLastActivity(Number.isFinite(maxAt) ? maxAt : Date.now());
+    };
 
-    setPendingPrompt(prelogin?.pendingPrompt ?? null);
-
-    setSessionId(null);
     setServiceAction(null);
     setServiceFormOpen(false);
+    setCrisisAlert(null);
+    setNetErr(null);
 
-    if (session?.messages?.length) {
-      setMessages(toUI(session.messages as unknown as ChatMessageStore[]));
-      const maxAt = Math.max(...session.messages.map((m: ChatMsgStore) => Number(m.at) || 0));
-      setLastActivity(Number.isFinite(maxAt) ? maxAt : Date.now());
-    } else {
-      const now = Date.now();
-      setMessages([{ id: mkId(), role: 'assistant', text: t('chat.initialMessage'), at: now }]);
-      setLastActivity(Date.now());
+    if (!userId) {
+      const prelogin = loadPreloginChat();
+      setPendingPromptState(prelogin?.pendingPrompt ?? null);
+      setSessionId(null);
+      setHistorySessions([]);
+      setActiveHistorySessionId(null);
+
+      if (prelogin?.messages?.length) {
+        bootstrapMessages(prelogin.messages);
+      } else {
+        const now = Date.now();
+        setMessages([mkAssistantMessage(t('chat.initialMessage'), now)]);
+        setLastActivity(now);
+      }
+      return;
     }
+
+    const prelogin = loadPreloginChat();
+    const stored = loadUserChat(userId);
+    const baseSession: ChatSession | null = stored ?? prelogin ?? null;
+
+    const historyPending = getHistoryPendingPrompt(userId);
+    const pending = historyPending ?? baseSession?.pendingPrompt ?? null;
+    if (pending) setHistoryPendingPrompt(userId, pending);
+    else setHistoryPendingPrompt(userId, null);
+
+    let activeHistorySession = getHistoryActiveSession(userId);
+    if (!activeHistorySession) {
+      const sessions = listHistorySessions(userId);
+      activeHistorySession = sessions[0] ?? null;
+    }
+
+    if (!activeHistorySession) {
+      const now = Date.now();
+      const seedMessages = baseSession?.messages ?? undefined;
+      let initialMessages: ChatMessageStore[];
+      if (seedMessages && seedMessages.length) {
+        initialMessages = seedMessages;
+      } else {
+        const welcomeMessage = mkAssistantMessage(t('chat.initialMessage'), now);
+        initialMessages = toStore([welcomeMessage]);
+      }
+      const created = createHistorySession(userId);
+      recordHistoryMessages(userId, created.id, initialMessages);
+      activeHistorySession = getHistorySessionById(userId, created.id) ?? {
+        ...created,
+        messages: initialMessages,
+        updatedAt: initialMessages[initialMessages.length - 1]?.at ?? now,
+      };
+    }
+
+    setHistorySessions(listHistorySessions(userId));
+    if (activeHistorySession?.id) {
+      setActiveHistorySessionId(activeHistorySession.id);
+      setHistoryActiveSessionId(userId, activeHistorySession.id);
+    }
+
+    if (activeHistorySession?.messages?.length) {
+      bootstrapMessages(activeHistorySession.messages);
+    } else if (activeHistorySession?.id) {
+      const now = Date.now();
+      const welcomeStore = toStore([mkAssistantMessage(t('chat.initialMessage'), now)]);
+      bootstrapMessages(welcomeStore);
+      recordHistoryMessages(userId, activeHistorySession.id, welcomeStore);
+      setHistorySessions(listHistorySessions(userId));
+    }
+
+    setPendingPromptState(pending ?? null);
+    setSessionId(activeHistorySession?.backendSessionId ?? null);
   }, [t, userId]);
 
   useEffect(() => {
@@ -280,17 +357,30 @@ export default function Chat() {
   // persist
   useEffect(() => {
     const prev = userId ? loadUserChat(userId) ?? undefined : loadPreloginChat() ?? undefined;
-    const prevMessages = prev?.messages as unknown as ChatMessageStore[] | undefined;
+    const prevMessages = prev?.messages ?? undefined;
     const storedMessages = toStore(messages, prevMessages);
     const payload: ChatSession = {
       messages: storedMessages,
-      ...(pendingPrompt ? { pendingPrompt } : {}),
+      ...(pendingPromptState ? { pendingPrompt: pendingPromptState } : {}),
     };
     const maxAt = payload.messages.length ? Math.max(...payload.messages.map((m) => m.at)) : Date.now();
     setLastActivity(maxAt);
-    if (userId) saveUserChat(userId, payload);
-    else savePreloginChat(payload);
-  }, [messages, userId, pendingPrompt]);
+    if (userId) {
+      saveUserChat(userId, payload);
+      if (activeHistorySessionId) {
+        recordHistoryMessages(userId, activeHistorySessionId, storedMessages);
+        setHistorySessions(listHistorySessions(userId));
+      }
+    } else {
+      savePreloginChat(payload);
+    }
+  }, [messages, userId, pendingPromptState, activeHistorySessionId]);
+
+  useEffect(() => {
+    if (!userId) return;
+    if (pendingPromptState) setHistoryPendingPrompt(userId, pendingPromptState);
+    else setHistoryPendingPrompt(userId, null);
+  }, [userId, pendingPromptState]);
 
   // auto-scroll only when already near the bottom
   useEffect(() => { if (atBottom) scrollToBottom(); }, [messages.length, atBottom, scrollToBottom]);
@@ -338,7 +428,14 @@ export default function Chat() {
       reply: Awaited<ReturnType<typeof sendMessageToAPI>>,
       replyLanguage: string,
     ) => {
-      if (reply.session_id) setSessionId(reply.session_id);
+      if (reply.session_id) {
+        setSessionId(reply.session_id);
+        if (userId && activeHistorySessionId) {
+          updateHistorySessionMetadata(userId, activeHistorySessionId, { backendSessionId: reply.session_id });
+          setHistorySessions(listHistorySessions(userId));
+          setHistoryActiveSessionId(userId, activeHistorySessionId);
+        }
+      }
       let assistantText =
         (typeof reply.response === 'string' && reply.response.trim().length
           ? reply.response
@@ -404,8 +501,55 @@ export default function Chat() {
     filterCrisisResources,
     language,
     sessionId,
+    userId,
+    activeHistorySessionId,
     t,
   ]);
+
+  const handleSelectSession = useCallback((sessionId: string) => {
+    if (!userId) return;
+    const session = getHistorySessionById(userId, sessionId);
+    if (!session) return;
+    setHistoryActiveSessionId(userId, sessionId);
+    setActiveHistorySessionId(sessionId);
+    setHistorySessions(listHistorySessions(userId));
+    setSessionId(session.backendSessionId ?? null);
+    setMessages(toUI(session.messages));
+    const maxAt = session.messages.length
+      ? Math.max(...session.messages.map((m) => Number(m.at) || 0))
+      : session.updatedAt;
+    setLastActivity(Number.isFinite(maxAt) ? maxAt : Date.now());
+    setServiceAction(null);
+    setServiceFormOpen(false);
+    setCrisisAlert(null);
+    setNetErr(null);
+  }, [userId]);
+
+  const handleStartNewSession = useCallback(() => {
+    if (!userId) return;
+    const created = createHistorySession(userId);
+    const now = Date.now();
+    const welcomeMessage = mkAssistantMessage(t('chat.initialMessage'), now);
+    const welcomeStore = toStore([welcomeMessage]);
+    recordHistoryMessages(userId, created.id, welcomeStore);
+    const session = getHistorySessionById(userId, created.id) ?? {
+      ...created,
+      messages: welcomeStore,
+      updatedAt: now,
+    };
+    setActiveHistorySessionId(session.id);
+    setHistoryActiveSessionId(userId, session.id);
+    setHistorySessions(listHistorySessions(userId));
+    setMessages([welcomeMessage]);
+    setSessionId(null);
+    setLastActivity(now);
+    setServiceAction(null);
+    setServiceFormOpen(false);
+    setCrisisAlert(null);
+    setNetErr(null);
+    setPendingPromptState(null);
+    setHistoryPendingPrompt(userId, null);
+  }, [userId, t]);
 
   useEffect(() => {
     onSendRef.current = onSend;
@@ -417,14 +561,14 @@ export default function Chat() {
   }, [onSend]);
 
   useEffect(() => {
-    if (!pendingPrompt) {
+    if (!pendingPromptState) {
       autoSendKeyRef.current = null;
       return;
     }
 
-    const text = pendingPrompt.text.trim();
+    const text = pendingPromptState.text.trim();
     if (!text.length) {
-      setPendingPrompt(null);
+      setPendingPromptState(null);
       autoSendKeyRef.current = null;
       return;
     }
@@ -434,7 +578,7 @@ export default function Chat() {
     const handler = onSendRef.current;
     if (!handler) return;
 
-    const key = `${pendingPrompt.createdAt}:${text}`;
+    const key = `${pendingPromptState.createdAt}:${text}`;
     if (autoSendKeyRef.current === key) return;
     if (busy || agreementsLoading || showAgreementsModal || crisisAlert) return;
 
@@ -446,11 +590,11 @@ export default function Chat() {
       } catch (error) {
         console.error(error);
       } finally {
-        setPendingPrompt(null);
+        setPendingPromptState(null);
         autoSendKeyRef.current = null;
       }
     })();
-  }, [pendingPrompt, busy, agreementsLoading, showAgreementsModal, crisisAlert, autoSendReady]);
+  }, [pendingPromptState, busy, agreementsLoading, showAgreementsModal, crisisAlert, autoSendReady]);
 
   const handleServiceFormClose = () => {
     setServiceFormOpen(false);
@@ -605,6 +749,11 @@ export default function Chat() {
     </header>
   );
 
+  const sidebarEmptyMessage = t('chat.sidebar.empty');
+  const sidebarSignInCta = t('chat.sidebar.signInCta');
+  const sidebarSignInButton = t('chat.sidebar.signInButton');
+  const sidebarNewChatLabel = t('chat.sidebar.newChat');
+
   const renderMobileContent = () => (
     <div className="chat-shell">
       <div className="chat-topbar">
@@ -632,7 +781,18 @@ export default function Chat() {
             <button className="icon-btn" aria-label={t('chat.sidebar.hide')} onClick={() => setSidebarOpen(false)}>×</button>
           </header>
           <div className="sidebar-body">
-            <ChatList />
+            <ChatList
+              userId={userId}
+              locale={locale}
+              sessions={historySessions}
+              activeSessionId={activeHistorySessionId}
+              onSelectSession={handleSelectSession}
+              onStartNewSession={handleStartNewSession}
+              emptyMessage={sidebarEmptyMessage}
+              signInCtaLabel={sidebarSignInCta}
+              signInButtonLabel={sidebarSignInButton}
+              newChatLabel={sidebarNewChatLabel}
+            />
           </div>
         </aside>
       ) : (

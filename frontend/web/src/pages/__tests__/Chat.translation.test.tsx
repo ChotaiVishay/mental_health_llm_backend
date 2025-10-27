@@ -126,8 +126,11 @@ describe('Chat translations', () => {
     expect(translateToEnglishMock).toHaveBeenCalledWith('Hola necesito ayuda', 'es');
     expect(translateFromEnglishMock).toHaveBeenCalledWith('English response', 'es');
 
-    expect(await screen.findByText('Hola necesito ayuda')).toBeInTheDocument();
-    expect(await screen.findByText(/respuesta en español/i)).toBeInTheDocument();
+    const transcript = await screen.findByLabelText('Conversation');
+    await waitFor(() => {
+      expect(transcript.textContent).toContain('Hola necesito ayuda');
+      expect(transcript.textContent).toMatch(/respuesta en español/i);
+    });
   });
 
   it('falls back to the original language when translation is unavailable', async () => {
@@ -162,7 +165,10 @@ describe('Chat translations', () => {
     await waitFor(() => expect(sendMessageMock).toHaveBeenCalledTimes(1));
     expect(sendMessageMock).toHaveBeenCalledWith('Hola', null, 'es');
     expect(translateFromEnglishMock).not.toHaveBeenCalled();
-    expect(await screen.findByText((content) => content.trim() === 'Hola')).toBeInTheDocument();
+    const transcript = await screen.findByLabelText('Conversation');
+    await waitFor(() => {
+      expect(transcript.textContent).toContain('Hola');
+    });
     await waitFor(() => {
       const matches = screen.queryAllByText(
         (_content, element) => element?.textContent?.includes('Respuesta directa del asistente') ?? false,
