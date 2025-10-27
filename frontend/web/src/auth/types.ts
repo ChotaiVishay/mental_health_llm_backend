@@ -5,6 +5,11 @@ export interface User {
   name?: string;
   email?: string;
   avatarUrl?: string;
+  phoneNumber?: string;
+  timezone?: string;
+  prefWeeklyDigest?: boolean;
+  prefProductUpdates?: boolean;
+  prefShareAnonymisedData?: boolean;
 }
 
 export interface AuthState {

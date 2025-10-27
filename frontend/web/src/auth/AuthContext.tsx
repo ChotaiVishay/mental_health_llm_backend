@@ -9,6 +9,7 @@ import { signIn as clientSignIn, parseCallbackAndStore } from './client';
 import { mergePreloginIntoUser } from '@/features/chat/sessionStore';
 import { getSupabaseClient } from './supabaseClient';
 import { VITE } from '@/utils/env';
+import { mapSupabaseUser } from './mapSupabaseUser';
 
 type EmailCredentials = { email: string; password: string };
 type EmailSignUpPayload = EmailCredentials & { name?: string };
@@ -63,13 +64,7 @@ function commitSession(session: Session | null, setUser: React.Dispatch<React.Se
   }
 
   const supaUser = session.user;
-  const metadata = (supaUser.user_metadata ?? {}) as Record<string, unknown>;
-  const mapped: User = {
-    id: supaUser.id,
-    name: (metadata.full_name as string | undefined) ?? supaUser.email ?? undefined,
-    email: supaUser.email ?? undefined,
-    avatarUrl: (metadata.avatar_url as string | undefined) ?? undefined,
-  };
+  const mapped: User = mapSupabaseUser(supaUser);
 
   setUser(mapped);
   if (session.access_token) saveAuth(session.access_token, mapped);

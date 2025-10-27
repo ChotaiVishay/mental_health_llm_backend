@@ -1,23 +1,16 @@
 import { FormEvent, useEffect, useMemo, useState } from 'react';
-import type { User as SupabaseUser } from '@supabase/supabase-js';
 import { useAuth } from '@/auth/AuthContext';
 import { getSupabaseClient } from '@/auth/supabaseClient';
 import type { User } from '@/auth/types';
+import { mapSupabaseUser } from '@/auth/mapSupabaseUser';
+import { getSupabaseAdminClient } from '@/admin/supabaseAdminClient';
 import '@/styles/pages/profile.css';
-
-function mapSupabaseUser(u: SupabaseUser): User {
-  const metadata = (u.user_metadata ?? {}) as Record<string, unknown>;
-  return {
-    id: u.id,
-    name: (metadata.full_name as string | undefined) ?? u.email ?? undefined,
-    email: u.email ?? undefined,
-    avatarUrl: (metadata.avatar_url as string | undefined) ?? undefined,
-  };
-}
+import { VITE } from '@/utils/env';
 
 export default function Profile() {
   const { user, setUser } = useAuth();
   const supabase = getSupabaseClient();
+  const adminClient = getSupabaseAdminClient();
 
   const [displayName, setDisplayName] = useState(user?.name ?? '');
   const [avatarUrl, setAvatarUrl] = useState(user?.avatarUrl ?? '');
@@ -31,11 +24,17 @@ export default function Profile() {
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [passwordStatus, setPasswordStatus] = useState<string | null>(null);
   const [passwordLoading, setPasswordLoading] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   useEffect(() => {
     setDisplayName(user?.name ?? '');
     setAvatarUrl(user?.avatarUrl ?? '');
-  }, [user?.id, user?.name, user?.avatarUrl]);
+  }, [
+    user?.id,
+    user?.name,
+    user?.avatarUrl,
+  ]);
 
   const initials = useMemo(() => {
     const source = user?.name ?? user?.email ?? '';
@@ -130,6 +129,41 @@ export default function Profile() {
     }
   };
 
+  const onDeleteAccount = async () => {
+    setDeleteError(null);
+    if (!user) return;
+
+    const confirmed = window.confirm('Delete your Support Atlas profile and remove saved information? This cannot be undone.');
+    if (!confirmed) return;
+
+    if (!adminClient) {
+      setDeleteError('Account deletion is unavailable in this environment.');
+      return;
+    }
+    if (!supabase) {
+      setDeleteError('Authentication is unavailable.');
+      return;
+    }
+
+    setDeleteLoading(true);
+    try {
+      const { error } = await adminClient.auth.admin.deleteUser(user.id);
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      await supabase.auth.signOut();
+      if (setUser) setUser(null);
+
+      const safeRedirect = VITE.VITE_APP_BASE_URL?.trim() || '/';
+      window.location.href = safeRedirect;
+    } catch (err) {
+      setDeleteError(err instanceof Error ? err.message : 'Unable to delete account.');
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
   return (
     <section className="profile-page" aria-labelledby="profile-title">
       <div className="profile-card" role="region" aria-live="polite">
@@ -155,7 +189,7 @@ export default function Profile() {
         <section className="profile-section" aria-labelledby="profile-account-heading">
           <div className="profile-section-head">
             <h2 id="profile-account-heading">Account details</h2>
-            <p className="muted">Update your display name and avatar.</p>
+            <p className="muted">Update your basic information, contact details, and preferences.</p>
           </div>
           <form className="profile-form" onSubmit={onSaveProfile} noValidate>
             <fieldset disabled={profileLoading}>
@@ -252,6 +286,26 @@ export default function Profile() {
               </div>
             </fieldset>
           </form>
+        </section>
+
+        <section className="profile-section profile-danger" aria-labelledby="profile-danger-heading">
+          <div className="profile-section-head">
+            <h2 id="profile-danger-heading">Delete your profile</h2>
+            <p className="muted">Remove your Support Atlas account and any saved chat data. This action cannot be undone.</p>
+          </div>
+          {deleteError && (
+            <p className="error" role="alert">{deleteError}</p>
+          )}
+          <div className="profile-actions">
+            <button
+              type="button"
+              className="btn btn-crisis"
+              onClick={onDeleteAccount}
+              disabled={deleteLoading}
+            >
+              {deleteLoading ? 'Deleting…' : 'Delete account'}
+            </button>
+          </div>
         </section>
       </div>
     </section>

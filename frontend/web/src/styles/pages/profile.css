@@ -130,6 +130,17 @@
 .profile-form .error{ color: var(--danger); }
 .profile-form .status{ color: var(--success); }
 
+.profile-danger{
+  border-top:0;
+  border:1px solid color-mix(in srgb, var(--danger) 40%, transparent);
+  background: color-mix(in srgb, var(--danger) 12%, transparent);
+  border-radius:12px;
+  padding:20px;
+}
+.profile-danger .profile-actions{
+  justify-content:flex-start;
+}
+
 @media (max-width: 640px){
   .profile-card{ padding:20px; }
   .profile-avatar{ width:56px; height:56px; }

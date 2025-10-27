@@ -15,6 +15,7 @@ export type ViteEnv = {
   VITE_ADMIN_AUTH_GITHUB?: string;
   VITE_ADMIN_AUTH_APPLE?: string;
   VITE_SHOW_ADMIN_LINK?: string;
+  VITE_APP_BASE_URL?: string;
 };
 
 const metaEnv = (import.meta as ImportMeta & {
