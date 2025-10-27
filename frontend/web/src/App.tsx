@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import {
   Route,
   Routes,
@@ -34,27 +34,11 @@ import RequireAuth from '@/auth/RequireAuth';
 import Styleguide from '@/pages/Styleguide';
 import '@/styles/index.css';
 import NotFound from '@/pages/NotFound';
-import ConsentSheet from '@/components/ConsentSheet';
 import QuickExitBar from '@/components/QuickExitBar';
-import { CONSENT_STORAGE_KEY } from '@/constants/consent';
 
 export default function App() {
   const location = useLocation();
   const isChatRoute = location.pathname.startsWith('/chat');
-
-  const [consentAccepted, setConsentAccepted] = useState<boolean>(() => {
-    if (typeof window === 'undefined') return true;
-    try {
-      return window.localStorage.getItem(CONSENT_STORAGE_KEY) === 'true';
-    } catch {
-      return true;
-    }
-  });
-  const [consentOpen, setConsentOpen] = useState<boolean>(() => !consentAccepted);
-
-  useEffect(() => {
-    setConsentOpen(!consentAccepted);
-  }, [consentAccepted]);
 
   useEffect(() => {
     if (typeof document === 'undefined') return;
@@ -65,21 +49,6 @@ export default function App() {
       document.body.classList.remove('body--chat');
     };
   }, [isChatRoute]);
-
-  const handleConsentAccept = () => {
-    if (typeof window !== 'undefined') {
-      try {
-        window.localStorage.setItem(CONSENT_STORAGE_KEY, 'true');
-      } catch {
-        // Ignore storage failures and rely on state for this session.
-      }
-    }
-    setConsentAccepted(true);
-  };
-
-  const handleConsentDismiss = () => {
-    setConsentOpen(false);
-  };
 
   const appRoutes = (
     <Routes>
@@ -135,11 +104,6 @@ export default function App() {
   return (
     <div className={isChatRoute ? 'app app--chat' : 'app'}>
       <QuickExitBar />
-      <ConsentSheet
-        open={consentOpen}
-        onAccept={handleConsentAccept}
-        onDismiss={handleConsentDismiss}
-      />
       {!isChatRoute && <TopHeader />}
       {!isChatRoute && <Header />}
       {isChatRoute ? (
