@@ -9,6 +9,16 @@ import { AuthProvider } from '@/auth/AuthContext';
 import Chat from '@/pages/Chat';
 import { fetchAgreementStatus, acceptAgreements } from '@/api/agreements';
 
+vi.mock('@/api/chat', async () => {
+  const actual = await vi.importActual<typeof import('@/api/chat')>('@/api/chat');
+  return {
+    ...actual,
+    sendMessageToAPI: vi.fn(async () => ({ response: 'Mock reply', session_id: null })),
+    fetchChatSessions: vi.fn(async () => []),
+    fetchChatConversation: vi.fn(async () => []),
+  };
+});
+
 vi.mock('@/api/agreements', async () => {
   const actual = await vi.importActual<typeof import('@/api/agreements')>('@/api/agreements');
   return {

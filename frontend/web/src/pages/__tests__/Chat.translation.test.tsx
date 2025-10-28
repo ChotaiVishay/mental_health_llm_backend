@@ -56,6 +56,8 @@ vi.mock('@/api/chat', async () => {
   return {
     ...actual,
     sendMessageToAPI: hoistedMocks.sendMessageMock,
+    fetchChatSessions: vi.fn(async () => []),
+    fetchChatConversation: vi.fn(async () => []),
   };
 });
 
@@ -122,7 +124,7 @@ describe('Chat translations', () => {
     fireEvent.click(sendButton);
 
     await waitFor(() => expect(sendMessageMock).toHaveBeenCalledTimes(1));
-    expect(sendMessageMock).toHaveBeenCalledWith('affordable counselling', null, 'en');
+    expect(sendMessageMock).toHaveBeenCalledWith('affordable counselling', null, 'en', 'u1');
     expect(translateToEnglishMock).toHaveBeenCalledWith('Hola necesito ayuda', 'es');
     expect(translateFromEnglishMock).toHaveBeenCalledWith('English response', 'es');
 
@@ -163,7 +165,7 @@ describe('Chat translations', () => {
     fireEvent.click(sendButton);
 
     await waitFor(() => expect(sendMessageMock).toHaveBeenCalledTimes(1));
-    expect(sendMessageMock).toHaveBeenCalledWith('Hola', null, 'es');
+    expect(sendMessageMock).toHaveBeenCalledWith('Hola', null, 'es', 'u1');
     expect(translateFromEnglishMock).not.toHaveBeenCalled();
     const transcript = await screen.findByLabelText('Conversation');
     await waitFor(() => {

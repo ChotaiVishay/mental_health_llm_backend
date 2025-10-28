@@ -22,12 +22,52 @@ class MentalHealthChatService:
     def __init__(self):
         self.settings = get_settings()
 
-    async def process_message(
-        self,
-        message: str,
-        session_id: Optional[str] = None,
-        user_context: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+    async def insert_chat(self,*,user_id: str | None,session_id: str,user_text: str,assistant_text: str) -> None:
+        if not user_id:
+            return  # anonymous chat -> skip persistence
+
+        cleaned_user = (user_text or "").strip()
+        cleaned_assistant = (assistant_text or "").strip()
+        if not cleaned_user and not cleaned_assistant:
+            return
+
+        try:
+            supabase_db = await get_supabase_db()
+
+            if cleaned_user:
+                supabase_db.insert_chat_message(
+                    session_id=session_id,
+                    user_id=user_id,
+                    role="user",
+                    content=cleaned_user,
+                )
+
+            if cleaned_assistant:
+                supabase_db.insert_chat_message(
+                    session_id=session_id,
+                    user_id=user_id,
+                    role="assistant",
+                    content=cleaned_assistant,
+                )
+
+            supabase_db.upsert_chat_session(
+                user_id=user_id,
+                session_id=session_id,
+                title=cleaned_user[:40] or None,
+                last_message=cleaned_assistant[:100],
+                last_role="assistant",
+            )
+
+        except Exception as exc:
+            logger.warning(
+                "Could not persist chat messages",
+                session_id=session_id,
+                user_id=user_id,
+                error=str(exc),
+                exc_info=True,
+            )
+
+    async def process_message(self,message: str, user_id: Optional[str] = None, session_id: Optional[str] = None, user_context: Optional[Dict] = None) -> Dict[str, Any]:
         """Process user message using vector search for semantic understanding."""
         try:
             if not session_id:
@@ -61,6 +101,9 @@ class MentalHealthChatService:
                     "It sounds like you might be in immediate danger. "
                     "I can't continue this conversation, but please reach out to emergency services or the crisis helplines below."
                 )
+
+                assistant_text = crisis_text
+                await self.insert_chat(user_id=user_id,session_id=session_id,user_text=message,assistant_text=assistant_text)
                 return {
                     "message": crisis_text,
                     "response": crisis_text,
@@ -81,6 +124,15 @@ class MentalHealthChatService:
 
             if intent == "add_service":
                 logger.info("Add service intent detected")
+                
+                assistant_text = "I can help add a new service. Please provide the details via the form."
+                await self.insert_chat(
+                    user_id=user_id,
+                    session_id=session_id,
+                    user_text=message,
+                    assistant_text=assistant_text,
+                )
+
                 return {
                     "message": "I can help add a new service. Please provide the details via the form.",
                     "session_id": session_id,
@@ -226,8 +278,11 @@ Be warm, supportive, and practical in your response."""
                     )
                     
                     response_text = response.choices[0].message.content
+                    
                     logger.info("✓ AI response generated", length=len(response_text))
                     
+                    await self.insert_chat(user_id=user_id,session_id=session_id,user_text=message,assistant_text=response_text)
+                            
                     return {
                         "message": response_text,
                         "session_id": session_id,
@@ -262,7 +317,10 @@ Provide a supportive response that:
                         temperature=self.settings.openai_temperature,
                         max_tokens=self.settings.max_response_tokens
                     )
-                    
+
+                    response_text = response.choices[0].message.content
+                    await self.insert_chat(user_id=user_id,session_id=session_id,user_text=message,assistant_text=response_text)
+
                     return {
                         "message": response.choices[0].message.content,
                         "session_id": session_id,
@@ -313,11 +371,7 @@ Provide a supportive response that:
                 "error": str(e),
             }
 
-    async def process_service_form(
-        self,
-        form_data: Dict[str, Any],
-        session_id: Optional[str] = None
-    ) -> Dict[str, Any]:
+    async def process_service_form(self,form_data: Dict[str, Any],session_id: Optional[str] = None) -> Dict[str, Any]:
         """Process service creation form submission."""
         if not session_id:
             session_id = str(uuid.uuid4())
@@ -356,19 +410,28 @@ Provide a supportive response that:
                 "error": str(e),
             }
 
-    async def get_conversation_history(self, session_id: str, limit: int = 20) -> List[Dict]:
+    async def get_conversation_history(self, session_id: str, user_id: str, limit: int = 20) -> List[Dict]:
         """Get conversation history for a session."""
         try:
             supabase_db = await get_supabase_db()
-            messages = supabase_db.query_table(
-                "messages",
-                filters={"session_id": session_id},
+            return supabase_db.get_session_messages(
+                session_id=session_id,
+                user_id=user_id,
                 limit=limit
             )
-            return messages
         except Exception as e:
-            logger.error("Failed to get conversation history", error=str(e))
-            return []
+            logger.error("Failed to get conversation history", session_id=session_id, user_id=user_id, error=str(e))
+            raise
+        
+    async def list_sessions(self, user_id: str, limit: int = 20) -> List[Dict[str, Any]]:
+        """Return the latest chat sessions for a user, newest first."""
+        supabase_db = await get_supabase_db()
+        try:
+            return supabase_db.list_chat_sessions(user_id=user_id, limit=limit)
+        except Exception as exc:
+            logger.error("Failed to list chat sessions", user_id=user_id, error=str(exc), exc_info=True)
+            raise
+
 
     async def get_suggested_questions(self) -> List[str]:
         """Get suggested questions using relevant terminology."""

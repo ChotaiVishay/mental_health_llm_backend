@@ -12,6 +12,7 @@ import { fetchAgreementStatus, acceptAgreements } from '@/api/agreements';
 vi.mock('@/api/chat', () => ({
   sendMessageToAPI: vi.fn(async () => { throw new Error('Failed to fetch'); }),
   fetchChatSessions: vi.fn(async () => []),
+  fetchChatConversation: vi.fn(async () => []),
 }));
 
 vi.mock('@/api/agreements', async () => {

@@ -1,52 +1,82 @@
 // web/src/api/chat.ts
 import { VITE } from '@/utils/env';
 
-export interface ChatSession {
+export interface ChatSessionSummary {
   id: string;
-  title: string;
+  title: string | null;
+  last_message: string | null;
+  last_message_role: 'user' | 'assistant' | null;
   created_at: string;
   updated_at: string;
 }
 
+export interface ChatMessageRecord {
+  id: string;
+  session_id: string;
+  user_id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  created_at: string;
+}
+
 // Get API base URL from environment variable, fallback to CloudFront
-const API_BASE_URL = 
-  VITE.VITE_API_BASE_URL?.trim() || 
+const API_BASE_URL =
+  VITE.VITE_API_BASE_URL?.trim() ||
   'https://d1hfq1dvtow5bt.cloudfront.net';
 
 // FastAPI endpoints
 const CHAT_ENDPOINT = `${API_BASE_URL}/api/v1/chat/chat`;
 const SESSIONS_ENDPOINT = `${API_BASE_URL}/api/v1/chat/sessions`;
+const CONVERSATION_ENDPOINT = `${API_BASE_URL}/api/v1/chat/conversation`;
 
-// Chat sessions are not implemented on FastAPI yet
-const CHAT_SESSIONS_SUPPORTED = false;
+function buildUrl(base: string, params: Record<string, string | number | undefined>): string {
+  const url = new URL(base);
+  Object.entries(params).forEach(([key, value]) => {
+    if (typeof value === 'undefined' || value === null) return;
+    url.searchParams.set(key, String(value));
+  });
+  return url.toString();
+}
 
-/**
- * Fetch all chat sessions (not currently supported by backend)
- */
-export async function fetchChatSessions(): Promise<ChatSession[]> {
-  if (!CHAT_SESSIONS_SUPPORTED) {
-    return [];
+function handleResponse<T>(response: Response, endpoint: string): Promise<T> {
+  if (!response.ok) {
+    return response.text().then((text) => {
+      throw new Error(`HTTP ${response.status} on ${endpoint}: ${text.slice(0, 200)}`);
+    });
   }
-  
+  return response.json() as Promise<T>;
+}
+
+export async function fetchChatSessions(userId: string, limit = 20): Promise<ChatSessionSummary[]> {
+  if (!userId?.trim()) return [];
+
+  const url = buildUrl(SESSIONS_ENDPOINT, { user_id: userId, limit });
+
   try {
-    const response = await fetch(SESSIONS_ENDPOINT, {
+    const response = await fetch(url, {
       headers: { Accept: 'application/json' },
     });
-    
-    if (response.status === 404) {
-      return [];
-    }
-    
-    if (!response.ok) {
-      const text = await response.text();
-      throw new Error(`HTTP ${response.status} on ${SESSIONS_ENDPOINT}: ${text.slice(0, 120)}`);
-    }
-    
-    const data = await response.json();
-    return data as ChatSession[];
+    return await handleResponse<ChatSessionSummary[]>(response, url);
   } catch (error) {
     console.error('Error fetching chat sessions:', error);
     return [];
+  }
+}
+
+export async function fetchChatConversation(sessionId: string, userId: string, limit = 100): Promise<ChatMessageRecord[]> {
+  if (!sessionId?.trim() || !userId?.trim()) return [];
+
+  const endpoint = `${CONVERSATION_ENDPOINT}/${encodeURIComponent(sessionId)}`;
+  const url = buildUrl(endpoint, { user_id: userId, limit });
+
+  try {
+    const response = await fetch(url, {
+      headers: { Accept: 'application/json' },
+    });
+    return await handleResponse<ChatMessageRecord[]>(response, url);
+  } catch (error) {
+    console.error('Error fetching chat conversation:', error);
+    throw error;
   }
 }
 
@@ -112,6 +142,7 @@ export async function sendMessageToAPI(
   payload: ChatRequestPayload | string,
   sessionId?: string | null,
   language?: string,
+  userId?: string | null,
 ): Promise<ChatReply> {
   try {
     // Handle both old signature (message, sessionId) and new signature (payload)
@@ -124,11 +155,21 @@ export async function sendMessageToAPI(
         session_id: sessionId ?? null,
       };
       if (language) body.language = language;
+      if (userId) body.user_id = userId;
     } else {
       // New signature: sendMessageToAPI(payload)
       body = 'type' in payload
         ? { ...payload, session_id: payload.session_id ?? null }
         : { message: payload.message, session_id: payload.session_id ?? null };
+      if (typeof sessionId !== 'undefined' && body.session_id == null) {
+        body.session_id = sessionId;
+      }
+      if (language && !body.language) {
+        body.language = language;
+      }
+      if (userId && !body.user_id) {
+        body.user_id = userId;
+      }
     }
 
     console.log('Sending request to:', CHAT_ENDPOINT);

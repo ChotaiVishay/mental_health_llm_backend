@@ -1,9 +1,7 @@
-import type { StoredHistorySession } from '@/features/chat/historyStore';
-
 type ChatListProps = {
   userId?: string;
   locale: string;
-  sessions: StoredHistorySession[];
+  sessions: ChatListSession[];
   activeSessionId: string | null;
   onSelectSession: (sessionId: string) => void;
   onStartNewSession: () => void;
@@ -11,6 +9,15 @@ type ChatListProps = {
   signInCtaLabel: string;
   signInButtonLabel: string;
   newChatLabel: string;
+};
+
+export type ChatListSession = {
+  id: string;
+  title: string | null;
+  lastMessage: string | null;
+  lastMessageRole: 'user' | 'assistant' | null;
+  createdAt: number;
+  updatedAt: number;
 };
 
 function formatRelativeTime(ms: number, locale: string) {
@@ -36,19 +43,17 @@ function formatRelativeTime(ms: number, locale: string) {
   return rtf.format(-diffDays, 'day');
 }
 
-function deriveTitle(session: StoredHistorySession) {
-  if (session.title) return session.title;
-  const firstUserMessage = session.messages.find((m) => m.role === 'user');
-  if (firstUserMessage?.text) return firstUserMessage.text.slice(0, 60) || 'Conversation';
-  const firstAssistant = session.messages.find((m) => m.role === 'assistant');
-  if (firstAssistant?.text) return firstAssistant.text.slice(0, 60) || 'Conversation';
+function deriveTitle(session: ChatListSession) {
+  const fromTitle = session.title?.trim();
+  if (fromTitle) return fromTitle;
+  const preview = session.lastMessage?.trim();
+  if (preview) return preview.slice(0, 60) || 'Conversation';
   return 'Conversation';
 }
 
-function derivePreview(session: StoredHistorySession) {
-  if (!session.messages.length) return '';
-  const last = session.messages[session.messages.length - 1];
-  return last.text.slice(0, 80);
+function derivePreview(session: ChatListSession) {
+  if (!session.lastMessage) return '';
+  return session.lastMessage.slice(0, 80);
 }
 
 export default function ChatList({

@@ -5,6 +5,8 @@ Enhanced search with better keyword extraction and context understanding.
 
 import httpx
 import re
+import uuid
+from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 import structlog
 
@@ -34,7 +36,7 @@ class SupabaseOnlyConnection:
             "apikey": key,
             "Authorization": f"Bearer {key}",
             "Content-Type": "application/json",
-            "Prefer": "return=representation"
+            "Prefer": "return=representation,resolution=merge-duplicates",
         }
 
     def _extract_location_keywords(self, text: str) -> List[str]:
@@ -380,6 +382,102 @@ class SupabaseOnlyConnection:
                         exc_info=True)
             raise Exception(f"Database search failed: {str(e)}")
 
+    def _timestamp(self) -> str:
+        """Return an ISO-8601 UTC timestamp without microseconds."""
+        return datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+    
+    def upsert_chat_session(self, *, user_id: str, session_id: str | None, title: str | None, last_message: str, last_role: str) -> dict:
+        payload = {
+            "id": session_id or str(uuid.uuid4()),
+            "user_id": user_id,
+            "title": title,
+            "last_message": last_message,
+            "last_message_role": last_role,
+            "updated_at": self._timestamp(),
+        }
+        url = f"{self.settings.supabase_url}/rest/v1/chat_sessions"
+        params = {
+            "on_conflict": "id",
+            "select": "id,user_id,title,last_message,last_message_role,created_at,updated_at",
+        }
+
+        response = self.http_client.post(
+            url,
+            headers=self._get_headers(),
+            params=params,
+            json=payload,
+        )
+        response.raise_for_status()
+
+        data = response.json()
+        if isinstance(data, list):
+            if not data:
+                raise RuntimeError("Supabase upsert returned an empty list")
+            return data[0]
+        return data
+
+    def insert_chat_message(self, *, session_id: str, user_id: str, role: str, content: str) -> dict:
+        payload = {
+            "id": str(uuid.uuid4()),
+            "session_id": session_id,
+            "user_id": user_id,
+            "role": role,
+            "content": content,
+            "created_at": self._timestamp(),
+        }
+        # POST to chat_messages
+        url = f"{self.settings.supabase_url}/rest/v1/chat_messages"
+        response = self.http_client.post(
+            url,
+            headers=self._get_headers(),
+            json=payload,
+        )
+        response.raise_for_status()
+
+        data = response.json()
+        if isinstance(data, list):
+            if not data:
+                raise RuntimeError("Supabase insert returned an empty list")
+            return data[0]
+        return data
+
+    def list_chat_sessions(self, *, user_id: str, limit: int) -> list[dict]:
+        # GET /chat_sessions?select=...&user_id=eq.{user_id}&order=updated_at.desc&limit=...
+        url = f"{self.settings.supabase_url}/rest/v1/chat_sessions"
+        params = {
+            "select": "id,user_id,title,last_message,last_message_role,created_at,updated_at",
+            "user_id": f"eq.{user_id}",
+            "order": "updated_at.desc",
+            "limit": str(limit),
+        }
+
+        response = self.http_client.get(
+            url,
+            headers=self._get_headers(),
+            params=params,
+        )
+        response.raise_for_status()
+        return response.json()
+
+    def get_session_messages(self, *, session_id: str, user_id: str, limit: int) -> list[dict]:
+        # GET /chat_messages?select=...&session_id=eq...&user_id=eq...
+        url = f"{self.settings.supabase_url}/rest/v1/chat_messages"
+        params = {
+            "select": "id,session_id,user_id,role,content,created_at",
+            "session_id": f"eq.{session_id}",
+            "user_id": f"eq.{user_id}",
+            "order": "created_at.asc",
+            "limit": str(limit),
+        }
+
+        response = self.http_client.get(
+            url,
+            headers=self._get_headers(),
+            params=params,
+        )
+        response.raise_for_status()
+        return response.json()
+
     async def test_connection(self) -> Dict[str, Any]:
         """Test Supabase connection."""
         try:
@@ -402,6 +500,8 @@ class SupabaseOnlyConnection:
         """Close HTTP client."""
         if self._http_client:
             self._http_client.close()
+
+    
 
 
 supabase_db = SupabaseOnlyConnection()

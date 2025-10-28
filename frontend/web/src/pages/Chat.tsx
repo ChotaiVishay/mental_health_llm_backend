@@ -12,30 +12,16 @@ import MessageList, { Message } from '@/components/chat/MessageList';
 import MessageInput from '@/components/chat/MessageInput';
 import { useAuth } from '@/auth/AuthContext';
 import { useEasyMode } from '@/accessibility/EasyModeContext';
-import {
-  loadPreloginChat,
-  savePreloginChat,
-  loadUserChat,
-  saveUserChat,
-  type ChatSession,
-  type ChatMessage,
-  type PendingPrompt,
-} from '@/features/chat/sessionStore';
-import {
-  listSessions as listHistorySessions,
-  createSession as createHistorySession,
-  recordMessages as recordHistoryMessages,
-  updateSessionMetadata as updateHistorySessionMetadata,
-  setActiveSessionId as setHistoryActiveSessionId,
-  getSessionById as getHistorySessionById,
-  getActiveSession as getHistoryActiveSession,
-  getPendingPrompt as getHistoryPendingPrompt,
-  setPendingPrompt as setHistoryPendingPrompt,
-  type StoredHistorySession,
-} from '@/features/chat/historyStore';
 import { translateFromEnglish, translateToEnglish } from '@/features/translation/translator';
-import ChatList from '@/components/chat/ChatList';
-import { sendMessageToAPI } from '@/api/chat';
+import { loadPreloginChat, savePreloginChat } from '@/features/chat/sessionStore';
+import ChatList, { type ChatListSession } from '@/components/chat/ChatList';
+import {
+  sendMessageToAPI,
+  fetchChatSessions,
+  fetchChatConversation,
+  type ChatSessionSummary as ApiChatSessionSummary,
+  type ChatMessageRecord,
+} from '@/api/chat';
 import { submitServiceDraft } from '@/api/serviceDraft';
 import AgreementsModal from '@/components/chat/AgreementsModal';
 import ServiceFormModal, { type ServiceFormAction } from '@/components/chat/ServiceFormModal';
@@ -50,7 +36,9 @@ import '@/styles/pages/chat.css';
 import { useLanguage } from '@/i18n/LanguageProvider';
 import { ArrowLeft } from 'lucide-react';
 
-type ChatMessageStore = ChatMessage;
+type PendingPrompt = { text: string; createdAt: number };
+type ChatMessageStore = { id: string; role: 'user' | 'assistant'; text: string; at: number };
+type StoredChatSession = { messages: ChatMessageStore[]; pendingPrompt?: PendingPrompt };
 type CrisisResource = { label: string; href: string };
 type CrisisAlert = { message: string; resources: CrisisResource[] };
 
@@ -88,6 +76,11 @@ function formatRelativeTime(ms: number, locale: string) {
 
   const diffDays = Math.round(diffHours / 24);
   return rtf.format(-diffDays, 'day');
+}
+
+function parseDate(value: string | null | undefined): number {
+  const ms = value ? Date.parse(value) : NaN;
+  return Number.isFinite(ms) ? ms : Date.now();
 }
 
 function useAtBottom(ref: React.RefObject<HTMLDivElement>, threshold = 64) {
@@ -153,8 +146,8 @@ export default function Chat() {
   const [showAnonNotice, setShowAnonNotice] = useState(true);
   const [pendingPromptState, setPendingPromptState] = useState<PendingPrompt | null>(null);
   const [autoSendReady, setAutoSendReady] = useState(false);
-  const [historySessions, setHistorySessions] = useState<StoredHistorySession[]>([]);
-  const [activeHistorySessionId, setActiveHistorySessionId] = useState<string | null>(null);
+  const [sessions, setSessions] = useState<ChatListSession[]>([]);
+  const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -214,89 +207,134 @@ export default function Chat() {
     navigate('/');
   };
 
+  const refreshSessions = useCallback(async (): Promise<ChatListSession[]> => {
+    if (!userId) {
+      setSessions([]);
+      return [];
+    }
+
+    try {
+      const raw = await fetchChatSessions(userId);
+      const mapped = raw.map((item: ApiChatSessionSummary): ChatListSession => ({
+        id: item.id,
+        title: item.title ?? null,
+        lastMessage: item.last_message ?? null,
+        lastMessageRole: (item.last_message_role ?? null) as 'user' | 'assistant' | null,
+        createdAt: parseDate(item.created_at),
+        updatedAt: parseDate(item.updated_at ?? item.created_at),
+      }));
+      setSessions(mapped);
+      return mapped;
+    } catch (error) {
+      console.error('Failed to load chat sessions', error);
+      setSessions([]);
+      return [];
+    }
+  }, [userId]);
+
+  const loadConversation = useCallback(
+    async (session: string | ChatListSession) => {
+      if (!userId) return;
+      const sessionId = typeof session === 'string' ? session : session.id;
+      try {
+        const records = await fetchChatConversation(sessionId, userId);
+        const mapped: Message[] = records
+          .map((record: ChatMessageRecord) => ({
+            id: record.id,
+            role: record.role === 'assistant' ? 'assistant' : 'user',
+            text: record.content,
+            at: parseDate(record.created_at),
+          }))
+          .sort((a, b) => (a.at ?? 0) - (b.at ?? 0));
+
+        if (mapped.length) {
+          setMessages(mapped);
+          const timestamps = mapped
+            .map((m) => m.at ?? Date.now())
+            .filter((value) => Number.isFinite(value));
+          const maxAt = timestamps.length ? Math.max(...timestamps) : Date.now();
+          setLastActivity(Number.isFinite(maxAt) ? maxAt : Date.now());
+        } else {
+          const now = Date.now();
+          const welcome = mkAssistantMessage(t('chat.initialMessage'), now);
+          setMessages([welcome]);
+          setLastActivity(now);
+        }
+
+        setSessionId(sessionId);
+        setActiveSessionId(sessionId);
+        setPendingPromptState(null);
+        setServiceAction(null);
+        setServiceFormOpen(false);
+        setCrisisAlert(null);
+        setNetErr(null);
+      } catch (error) {
+        console.error('Failed to load conversation', error);
+        setNetErr(t('chat.errors.network'));
+      }
+    },
+    [userId, t],
+  );
+
   // initial load
   useEffect(() => {
-    const bootstrapMessages = (records: ChatMessageStore[]) => {
-      setMessages(toUI(records));
-      const maxAt = records.length ? Math.max(...records.map((m) => Number(m.at) || 0)) : Date.now();
-      setLastActivity(Number.isFinite(maxAt) ? maxAt : Date.now());
-    };
-
     setServiceAction(null);
     setServiceFormOpen(false);
     setCrisisAlert(null);
     setNetErr(null);
 
     if (!userId) {
-      const prelogin = loadPreloginChat();
-      setPendingPromptState(prelogin?.pendingPrompt ?? null);
-      setSessionId(null);
-      setHistorySessions([]);
-      setActiveHistorySessionId(null);
-
-      if (prelogin?.messages?.length) {
-        bootstrapMessages(prelogin.messages);
+      const stored = loadPreloginChat();
+      const storedMessages = Array.isArray(stored?.messages)
+        ? (stored.messages as ChatMessageStore[])
+        : undefined;
+      const restored = storedMessages ? toUI(storedMessages) : null;
+      if (restored && restored.length) {
+        setMessages(restored);
+        const timestamps = restored
+          .map((m) => m.at ?? Date.now())
+          .filter((value) => Number.isFinite(value));
+        const maxAt = timestamps.length ? Math.max(...timestamps) : Date.now();
+        setLastActivity(Number.isFinite(maxAt) ? maxAt : Date.now());
       } else {
         const now = Date.now();
-        setMessages([mkAssistantMessage(t('chat.initialMessage'), now)]);
+        const welcome = mkAssistantMessage(t('chat.initialMessage'), now);
+        setMessages([welcome]);
         setLastActivity(now);
       }
+      setPendingPromptState(stored?.pendingPrompt ?? null);
+      setSessionId(null);
+      setActiveSessionId(null);
+      setSessions([]);
       return;
     }
 
-    const prelogin = loadPreloginChat();
-    const stored = loadUserChat(userId);
-    const baseSession: ChatSession | null = stored ?? prelogin ?? null;
+    setPendingPromptState(null);
+    let cancelled = false;
 
-    const historyPending = getHistoryPendingPrompt(userId);
-    const pending = historyPending ?? baseSession?.pendingPrompt ?? null;
-    if (pending) setHistoryPendingPrompt(userId, pending);
-    else setHistoryPendingPrompt(userId, null);
-
-    let activeHistorySession = getHistoryActiveSession(userId);
-    if (!activeHistorySession) {
-      const sessions = listHistorySessions(userId);
-      activeHistorySession = sessions[0] ?? null;
-    }
-
-    if (!activeHistorySession) {
-      const now = Date.now();
-      const seedMessages = baseSession?.messages ?? undefined;
-      let initialMessages: ChatMessageStore[];
-      if (seedMessages && seedMessages.length) {
-        initialMessages = seedMessages;
+    (async () => {
+      const currentSessions = await refreshSessions();
+      if (cancelled) return;
+      if (currentSessions.length) {
+        const first = currentSessions[0];
+        if (first?.id) {
+          await loadConversation(first);
+          if (cancelled) return;
+        }
       } else {
-        const welcomeMessage = mkAssistantMessage(t('chat.initialMessage'), now);
-        initialMessages = toStore([welcomeMessage]);
+        const now = Date.now();
+        const welcome = mkAssistantMessage(t('chat.initialMessage'), now);
+        setMessages([welcome]);
+        setLastActivity(now);
+        setSessionId(null);
+        setActiveSessionId(null);
       }
-      const created = createHistorySession(userId);
-      recordHistoryMessages(userId, created.id, initialMessages);
-      activeHistorySession = getHistorySessionById(userId, created.id) ?? {
-        ...created,
-        messages: initialMessages,
-        updatedAt: initialMessages[initialMessages.length - 1]?.at ?? now,
-      };
-    }
+    })();
 
-    setHistorySessions(listHistorySessions(userId));
-    if (activeHistorySession?.id) {
-      setActiveHistorySessionId(activeHistorySession.id);
-      setHistoryActiveSessionId(userId, activeHistorySession.id);
-    }
-
-    if (activeHistorySession?.messages?.length) {
-      bootstrapMessages(activeHistorySession.messages);
-    } else if (activeHistorySession?.id) {
-      const now = Date.now();
-      const welcomeStore = toStore([mkAssistantMessage(t('chat.initialMessage'), now)]);
-      bootstrapMessages(welcomeStore);
-      recordHistoryMessages(userId, activeHistorySession.id, welcomeStore);
-      setHistorySessions(listHistorySessions(userId));
-    }
-
-    setPendingPromptState(pending ?? null);
-    setSessionId(activeHistorySession?.backendSessionId ?? null);
-  }, [t, userId]);
+    return () => {
+      cancelled = true;
+    };
+  }, [userId, t, refreshSessions, loadConversation]);
 
   useEffect(() => {
     if (isNarrow) {
@@ -354,33 +392,21 @@ export default function Chat() {
     }
   }, [user]);
 
-  // persist
+  // persist pre-login chat only so returning visitors can continue where they left off
   useEffect(() => {
-    const prev = userId ? loadUserChat(userId) ?? undefined : loadPreloginChat() ?? undefined;
-    const prevMessages = prev?.messages ?? undefined;
-    const storedMessages = toStore(messages, prevMessages);
-    const payload: ChatSession = {
+    const storedMessages = toStore(messages);
+    const payload: StoredChatSession = {
       messages: storedMessages,
       ...(pendingPromptState ? { pendingPrompt: pendingPromptState } : {}),
     };
-    const maxAt = payload.messages.length ? Math.max(...payload.messages.map((m) => m.at)) : Date.now();
-    setLastActivity(maxAt);
-    if (userId) {
-      saveUserChat(userId, payload);
-      if (activeHistorySessionId) {
-        recordHistoryMessages(userId, activeHistorySessionId, storedMessages);
-        setHistorySessions(listHistorySessions(userId));
-      }
-    } else {
+    const maxAt = storedMessages.length
+      ? Math.max(...storedMessages.map((m) => m.at ?? Date.now()))
+      : Date.now();
+    setLastActivity(Number.isFinite(maxAt) ? maxAt : Date.now());
+    if (!userId) {
       savePreloginChat(payload);
     }
-  }, [messages, userId, pendingPromptState, activeHistorySessionId]);
-
-  useEffect(() => {
-    if (!userId) return;
-    if (pendingPromptState) setHistoryPendingPrompt(userId, pendingPromptState);
-    else setHistoryPendingPrompt(userId, null);
-  }, [userId, pendingPromptState]);
+  }, [messages, pendingPromptState, userId]);
 
   // auto-scroll only when already near the bottom
   useEffect(() => { if (atBottom) scrollToBottom(); }, [messages.length, atBottom, scrollToBottom]);
@@ -430,10 +456,13 @@ export default function Chat() {
     ) => {
       if (reply.session_id) {
         setSessionId(reply.session_id);
-        if (userId && activeHistorySessionId) {
-          updateHistorySessionMetadata(userId, activeHistorySessionId, { backendSessionId: reply.session_id });
-          setHistorySessions(listHistorySessions(userId));
-          setHistoryActiveSessionId(userId, activeHistorySessionId);
+        if (userId) {
+          setActiveSessionId(reply.session_id);
+          try {
+            await refreshSessions();
+          } catch (error) {
+            console.error('Failed to refresh sessions after reply', error);
+          }
         }
       }
       let assistantText =
@@ -475,13 +504,13 @@ export default function Chat() {
     };
 
     try {
-      const reply = await sendMessageToAPI(messageForBackend, sessionId, backendLanguage);
+      const reply = await sendMessageToAPI(messageForBackend, sessionId, backendLanguage, userId);
       await handleReply(reply, backendLanguage);
     } catch {
       if (translationUsed) {
         // If translation failed on the backend call, try resending with the original language.
         try {
-          const fallbackReply = await sendMessageToAPI(trimmed, sessionId, userLanguage);
+          const fallbackReply = await sendMessageToAPI(trimmed, sessionId, userLanguage, userId);
           await handleReply(fallbackReply, userLanguage);
           return;
         } catch {
@@ -502,54 +531,29 @@ export default function Chat() {
     language,
     sessionId,
     userId,
-    activeHistorySessionId,
+    refreshSessions,
     t,
   ]);
 
-  const handleSelectSession = useCallback((sessionId: string) => {
+  const handleSelectSession = useCallback((nextSessionId: string) => {
     if (!userId) return;
-    const session = getHistorySessionById(userId, sessionId);
-    if (!session) return;
-    setHistoryActiveSessionId(userId, sessionId);
-    setActiveHistorySessionId(sessionId);
-    setHistorySessions(listHistorySessions(userId));
-    setSessionId(session.backendSessionId ?? null);
-    setMessages(toUI(session.messages));
-    const maxAt = session.messages.length
-      ? Math.max(...session.messages.map((m) => Number(m.at) || 0))
-      : session.updatedAt;
-    setLastActivity(Number.isFinite(maxAt) ? maxAt : Date.now());
-    setServiceAction(null);
-    setServiceFormOpen(false);
-    setCrisisAlert(null);
-    setNetErr(null);
-  }, [userId]);
+    setActiveSessionId(nextSessionId);
+    void loadConversation(nextSessionId);
+  }, [userId, loadConversation]);
 
   const handleStartNewSession = useCallback(() => {
-    if (!userId) return;
-    const created = createHistorySession(userId);
     const now = Date.now();
     const welcomeMessage = mkAssistantMessage(t('chat.initialMessage'), now);
-    const welcomeStore = toStore([welcomeMessage]);
-    recordHistoryMessages(userId, created.id, welcomeStore);
-    const session = getHistorySessionById(userId, created.id) ?? {
-      ...created,
-      messages: welcomeStore,
-      updatedAt: now,
-    };
-    setActiveHistorySessionId(session.id);
-    setHistoryActiveSessionId(userId, session.id);
-    setHistorySessions(listHistorySessions(userId));
     setMessages([welcomeMessage]);
     setSessionId(null);
+    setActiveSessionId(null);
     setLastActivity(now);
     setServiceAction(null);
     setServiceFormOpen(false);
     setCrisisAlert(null);
     setNetErr(null);
     setPendingPromptState(null);
-    setHistoryPendingPrompt(userId, null);
-  }, [userId, t]);
+  }, [t]);
 
   useEffect(() => {
     onSendRef.current = onSend;
@@ -784,8 +788,8 @@ export default function Chat() {
             <ChatList
               userId={userId}
               locale={locale}
-              sessions={historySessions}
-              activeSessionId={activeHistorySessionId}
+              sessions={sessions}
+              activeSessionId={activeSessionId}
               onSelectSession={handleSelectSession}
               onStartNewSession={handleStartNewSession}
               emptyMessage={sidebarEmptyMessage}

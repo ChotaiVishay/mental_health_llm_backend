@@ -1,7 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
-import ChatList from '@/components/chat/ChatList';
-import type { StoredHistorySession } from '@/features/chat/historyStore';
+import ChatList, { type ChatListSession } from '@/components/chat/ChatList';
 
 const baseProps = {
   locale: 'en-AU',
@@ -48,25 +47,22 @@ describe('<ChatList />', () => {
 
   it('renders sessions and calls selection callback', () => {
     const handleSelect = vi.fn();
-    const sessions: StoredHistorySession[] = [
+    const sessions: ChatListSession[] = [
       {
         id: 'session-1',
-        backendSessionId: 'backend-1',
         title: null,
+        lastMessage: 'Sure, let me help',
+        lastMessageRole: 'assistant',
         createdAt: 1,
-        updatedAt: 1,
-        messages: [
-          { id: 'm1', role: 'user', text: 'Need help with anxiety', at: 1 },
-          { id: 'm2', role: 'assistant', text: 'Sure, let me help', at: 2 },
-        ],
+        updatedAt: 2,
       },
       {
         id: 'session-2',
-        backendSessionId: null,
         title: 'Named conversation',
+        lastMessage: null,
+        lastMessageRole: null,
         createdAt: 3,
         updatedAt: 4,
-        messages: [],
       },
     ];
 
@@ -82,13 +78,12 @@ describe('<ChatList />', () => {
     );
 
     expect(screen.getByText('Named conversation')).toBeInTheDocument();
-    expect(screen.getByText('Need help with anxiety')).toBeInTheDocument();
-    expect(screen.getByText('Sure, let me help')).toBeInTheDocument();
+    expect(screen.getAllByText('Sure, let me help').length).toBeGreaterThan(0);
 
     const active = screen.getByRole('button', { name: /Named conversation/i });
     expect(active.className.includes('is-active')).toBe(true);
 
-    const other = screen.getByRole('button', { name: /Need help with anxiety/i });
+    const other = screen.getByRole('button', { name: /sure, let me help/i });
     fireEvent.click(other);
     expect(handleSelect).toHaveBeenCalledWith('session-1');
   });

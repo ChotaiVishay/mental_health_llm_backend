@@ -28,6 +28,8 @@ vi.mock('@/api/chat', async () => {
   return {
     ...actual,
     sendMessageToAPI: vi.fn(),
+    fetchChatSessions: vi.fn(async () => []),
+    fetchChatConversation: vi.fn(async () => []),
   };
 });
 
