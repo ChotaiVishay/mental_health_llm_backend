@@ -230,7 +230,7 @@ export function setActiveSessionId(userId: string, sessionId: string): StoredHis
 
 export function createSession(
   userId: string,
-  seed?: Partial<Omit<StoredHistorySession, 'id' | 'createdAt' | 'updatedAt'>>,
+  seed?: Partial<Omit<StoredHistorySession, 'id'>>,
 ): StoredHistorySession {
   const now = Date.now();
   const session: StoredHistorySession = {
