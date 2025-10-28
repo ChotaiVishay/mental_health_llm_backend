@@ -16,6 +16,48 @@
 
 .auth-card .muted{ color: var(--grey-600, #6b7280); margin: 6px 0 16px; }
 
+.auth-card .form{
+  display:flex;
+  flex-direction:column;
+  gap: var(--space-5, 24px);
+  margin-top: var(--space-4, 16px);
+  align-items:flex-start;
+}
+
+.form-field{
+  display:flex;
+  flex-direction:column;
+  gap: var(--space-3, 12px);
+  font-weight:600;
+  color: var(--grey-700, #3b4440);
+  width:100%;
+  max-width: 360px;
+}
+
+.form-field span{
+  font-size:0.95rem;
+}
+
+.form-field input{
+  width:100%;
+  padding:12px 14px;
+  border-radius: var(--radius-md, 12px);
+  border:1px solid var(--grey-300, #e5e7eb);
+  background:#fff;
+  color: var(--text, #111827);
+}
+
+.form-field input:focus{
+  outline:none;
+  border-color: var(--focus, #648046);
+  box-shadow:0 0 0 3px rgba(100, 128, 70, 0.25);
+}
+
+.auth-card .form .btn{
+  margin-top: var(--space-2, 8px);
+  align-self:flex-start;
+}
+
 .oauth-list{ display:flex; flex-direction:column; gap:10px; margin-top:12px; }
 
 /* Base OAuth button */

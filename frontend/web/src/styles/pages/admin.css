@@ -230,19 +230,24 @@ tbody tr:hover {
 
 .admin-page {
   display: grid;
-  gap: var(--space-5);
+  gap: var(--space-6);
 }
 
 .admin-page__hero {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: var(--space-4);
+  gap: var(--space-6);
   flex-wrap: wrap;
   padding: var(--space-6);
   border-radius: var(--radius-lg);
   border: 1px solid var(--offwhite-3);
   background: var(--green-50);
+}
+
+.admin-page__hero > .btn {
+  align-self: flex-start;
+  margin-top: var(--space-3);
 }
 
 .admin-page__eyebrow {
@@ -311,13 +316,45 @@ tbody tr:hover {
 .admin-page__form {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: var(--space-5);
+}
+
+.admin-page__form label {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  font-weight: 600;
+  color: var(--grey-700);
+}
+
+.admin-page__form label > input,
+.admin-page__form label > select,
+.admin-page__form label > textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--grey-300);
+  background: #fff;
+  color: var(--text);
+}
+
+.admin-page__form label > textarea {
+  min-height: 160px;
+  resize: vertical;
+}
+
+.admin-page__form label > input:focus,
+.admin-page__form label > select:focus,
+.admin-page__form label > textarea:focus {
+  outline: none;
+  border-color: var(--focus);
+  box-shadow: 0 0 0 3px rgba(100, 128, 70, 0.25);
 }
 
 .admin-page__field-grid {
   display: grid;
-  gap: var(--space-3);
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-4);
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
 }
 
 .admin-page__hint {
@@ -328,7 +365,7 @@ tbody tr:hover {
 
 .admin-page__actions {
   display: flex;
-  gap: var(--space-3);
+  gap: var(--space-4);
   flex-wrap: wrap;
 }
 
@@ -337,6 +374,7 @@ tbody tr:hover {
   align-items: center;
   gap: var(--space-3);
   flex-wrap: wrap;
+  margin-top: var(--space-3);
 }
 
 .admin-page__search input {
@@ -459,7 +497,7 @@ tbody tr:hover {
 .admin-services__filters {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: var(--space-3);
   padding: var(--space-4);
   border-radius: var(--radius-md);
   border: 1px solid var(--offwhite-3);
@@ -488,6 +526,7 @@ tbody tr:hover {
   color: var(--green-700);
   font-weight: 600;
   font-size: 0.85rem;
+  margin-top: var(--space-2);
 }
 
 .admin-services__danger-link {
@@ -558,14 +597,19 @@ tbody tr:hover {
 
 .admin-services__actions {
   flex-wrap: wrap;
-  gap: var(--space-2);
+  gap: var(--space-3);
 }
 
 .admin-services__actions .admin-page__table-link {
   padding: 0 6px;
 }
 
+.admin-services__panel--form .admin-page__form {
+  margin-top: var(--space-3);
+}
+
 .admin-services__panel--queue .table-wrapper {
+  margin-top: var(--space-3);
   max-height: 280px;
   overflow-y: auto;
 }
@@ -576,6 +620,23 @@ tbody tr:hover {
 
 .admin-admins__grid {
   grid-template-columns: minmax(280px, 320px) 1fr;
+}
+
+.admin-profile__form {
+  gap: var(--space-5);
+}
+
+.admin-profile__field-grid {
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.admin-profile__notes textarea {
+  min-height: 180px;
+}
+
+.admin-profile__actions {
+  justify-content: flex-start;
+  margin-top: var(--space-2);
 }
 .provider-layout {
   display: grid;
