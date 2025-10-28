@@ -208,13 +208,14 @@ export default function Chat() {
   };
 
   const refreshSessions = useCallback(async (): Promise<ChatListSession[]> => {
-    if (!userId) {
+    const uid = userId;
+    if (!uid) {
       setSessions([]);
       return [];
     }
 
     try {
-      const raw = await fetchChatSessions(userId);
+      const raw = await fetchChatSessions(uid);
       const mapped = raw.map((item: ApiChatSessionSummary): ChatListSession => ({
         id: item.id,
         title: item.title ?? null,
@@ -234,12 +235,13 @@ export default function Chat() {
 
   const loadConversation = useCallback(
     async (session: string | ChatListSession) => {
-      if (!userId) return;
+      const uid = userId;
+      if (!uid) return;
       const sessionId = typeof session === 'string' ? session : session.id;
       try {
-        const records = await fetchChatConversation(sessionId, userId);
-        const mapped: Message[] = records
-          .map((record: ChatMessageRecord) => ({
+        const records = await fetchChatConversation(sessionId, uid);
+        const mapped = records
+          .map<Message>((record) => ({
             id: record.id,
             role: record.role === 'assistant' ? 'assistant' : 'user',
             text: record.content,
