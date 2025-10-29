@@ -11,7 +11,10 @@ from core.database.supabase_only import get_supabase_db
 from core.llm.openai_client import get_openai_client
 from app.config import get_settings
 from services.intent_router import detect_intent
-from services.flows.service_creation import prepare_payload
+from services.flows.service_creation import (
+    prepare_payload,
+    build_service_form_prompt,
+)
 
 logger = structlog.get_logger(__name__)
 
@@ -21,6 +24,10 @@ class MentalHealthChatService:
 
     def __init__(self):
         self.settings = get_settings()
+
+        service_form_prompt = build_service_form_prompt()
+        self.service_form_message: str = service_form_prompt["message"]
+        self.service_form_action: Dict[str, Any] = service_form_prompt["action"]
 
     async def insert_chat(self,*,user_id: str | None,session_id: str,user_text: str,assistant_text: str) -> None:
         if not user_id:
@@ -125,7 +132,7 @@ class MentalHealthChatService:
             if intent == "add_service":
                 logger.info("Add service intent detected")
                 
-                assistant_text = "I can help add a new service. Please provide the details via the form."
+                assistant_text = self.service_form_message
                 await self.insert_chat(
                     user_id=user_id,
                     session_id=session_id,
@@ -134,11 +141,11 @@ class MentalHealthChatService:
                 )
 
                 return {
-                    "message": "I can help add a new service. Please provide the details via the form.",
+                    "message": assistant_text,
                     "session_id": session_id,
                     "services_found": 0,
                     "query_successful": True,
-                    "action": "request_service_form",
+                    "action": self.service_form_action,
                 }
 
             # Validate configuration
