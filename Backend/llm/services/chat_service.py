@@ -1,7 +1,3 @@
-"""
-Minimal working chat service.
-"""
-
 import uuid
 import structlog
 from typing import Dict, Any, List, Optional
@@ -35,50 +31,118 @@ class MentalHealthChatService:
             self._vector_search = get_vector_search_service()
         return self._vector_search
     
+    def _detect_service_creation_intent(self, message: str) -> bool:
+        """Detect if user wants to add/submit a service."""
+        intent_keywords = [
+            'add a service',
+            'add service',
+            'submit a service',
+            'submit service',
+            'create a service',
+            'create service',
+            'register a service',
+            'register service',
+            'new service',
+            'list my service',
+            'list a service',
+        ]
+        
+        message_lower = message.lower()
+        return any(keyword in message_lower for keyword in intent_keywords)
+    
     def _generate_ai_response(
         self,
         query: str,
         search_results: List[Dict[str, Any]]
     ) -> str:
-        """Generate AI response using OpenAI."""
+        """Generate AI response using OpenAI with full service details."""
         try:
-            # Build context from search results
+            # Build context with FULL details (address, website, etc.)
             context_parts = []
-            for idx, service in enumerate(search_results[:5], 1):
+            for idx, service in enumerate(search_results, 1):
+                # Build full address
+                address_parts = []
+                if service.get('address'):
+                    address_parts.append(service['address'])
+                if service.get('suburb'):
+                    address_parts.append(service['suburb'])
+                if service.get('state'):
+                    address_parts.append(service['state'])
+                if service.get('postcode'):
+                    address_parts.append(service['postcode'])
+                
+                full_address = ', '.join(address_parts) if address_parts else 'Address not available'
+                
+                # Format service with all details
                 service_info = (
-                    f"{idx}. {service.get('service_name', 'Unknown')}\n"
-                    f"   Org: {service.get('organisation_name', 'N/A')}\n"
-                    f"   Location: {service.get('suburb', 'N/A')}, {service.get('state', 'N/A')}\n"
-                    f"   Type: {service.get('service_type', 'N/A')}\n"
+                    f"{idx}. {service.get('service_name', 'Unknown Service')}\n"
+                    f"   Organization: {service.get('organisation_name', 'N/A')}\n"
+                    f"   Full Address: {full_address}\n"
+                    f"   Service Type: {service.get('service_type', 'N/A')}\n"
+                    f"   Delivery Method: {service.get('delivery_method', 'N/A')}\n"
                     f"   Cost: {service.get('cost', 'N/A')}\n"
-                    f"   Phone: {service.get('phone', 'N/A')}\n"
                 )
+                
+                # Add all contact details
+                if service.get('phone'):
+                    service_info += f"   Phone: {service['phone']}\n"
+                if service.get('email'):
+                    service_info += f"   Email: {service['email']}\n"
+                if service.get('website'):
+                    service_info += f"   Website: {service['website']}\n"
+                
+                # Add notes if available (truncate if too long)
+                if service.get('notes'):
+                    notes = service['notes'][:150]
+                    service_info += f"   Additional Info: {notes}...\n"
+                
                 context_parts.append(service_info)
             
-            context = "\n".join(context_parts) if context_parts else "No services found."
+            context = "\n".join(context_parts) if context_parts else "No services found matching the criteria."
             
-            # System prompt
+            # Enhanced system prompt
             system_prompt = """You are a helpful mental health support assistant for Victoria, Australia.
-Help people find mental health services based on their needs.
 
-Guidelines:
-- Be empathetic and supportive
-- Provide clear information
-- Include contact details
-- Mention if services are free
-- For crisis: Lifeline 13 11 14 or 000"""
+Your role:
+- Help people find appropriate mental health services
+- Be warm, empathetic, and professional
+- Provide clear, actionable next steps
+
+CRITICAL INSTRUCTIONS:
+1. Present ALL services provided in the context (usually 3-7 services based on confidence)
+2. For EACH service, you MUST include:
+   - Service name
+   - FULL street address (not just suburb)
+   - COMPLETE website URL if available
+   - Phone number
+   - Cost information (especially highlight if FREE or bulk-billed)
+
+Response format:
+- Brief empathetic acknowledgment (1-2 sentences)
+- List all services with complete details
+- Suggest next steps (call, visit website)
+- For any crisis mentions: Include Lifeline 13 11 14
+
+Response style:
+- Use clear formatting with line breaks between services
+- Make addresses and websites easy to read and copy
+- Be conversational but professional
+- Present all services - don't skip any
+
+For crisis situations, ALWAYS include: "Immediate support is available at 000 at any time."
+"""
             
-            # Generate response
+            # Generate response with enough tokens for full details
             messages = [
                 {"role": "system", "content": system_prompt},
-                {"role": "user", "content": f"Query: {query}\n\nServices:\n{context}"}
+                {"role": "user", "content": f"User query: {query}\n\nAvailable services (present ALL of these):\n{context}\n\nProvide a helpful response with complete contact details for each service."}
             ]
             
             response = self.openai_client.chat.completions.create(
                 model=self.settings.openai_model,
                 messages=messages,
                 temperature=0.7,
-                max_tokens=500
+                max_tokens=1200
             )
             
             return response.choices[0].message.content
@@ -86,16 +150,28 @@ Guidelines:
         except Exception as e:
             logger.error("Failed to generate AI response", error=str(e))
             
-            # Fallback
+            # Fallback with full details for top result
             if search_results:
-                return (
-                    f"I found {len(search_results)} services. "
-                    f"Top result: {search_results[0].get('service_name')} "
-                    f"in {search_results[0].get('suburb')}."
+                top = search_results[0]
+                address = f"{top.get('address', '')}, {top.get('suburb', '')}, {top.get('state', '')} {top.get('postcode', '')}"
+                
+                fallback = (
+                    f"I found {len(search_results)} services. Here's the top result:\n\n"
+                    f"**{top.get('service_name')}**\n"
+                    f"Address: {address}\n"
                 )
+                if top.get('phone'):
+                    fallback += f"Phone: {top['phone']}\n"
+                if top.get('website'):
+                    fallback += f"Website: {top['website']}\n"
+                if top.get('cost'):
+                    fallback += f"Cost: {top['cost']}\n"
+                
+                fallback += "\nPlease contact them directly for more information."
+                return fallback
             else:
                 return (
-                    "I'm having trouble right now. For support:\n"
+                    "I'm having trouble right now. For immediate support:\n"
                     "- Lifeline: 13 11 14 (24/7)\n"
                     "- Beyond Blue: 1300 22 4636\n"
                     "- Emergency: 000"
@@ -114,17 +190,40 @@ Guidelines:
             
             logger.info("Processing message", session_id=session_id)
             
+            # Check for service creation intent FIRST
+            if self._detect_service_creation_intent(message):
+                logger.info("Service creation intent detected")
+                
+                # Import here to avoid circular imports
+                from services.flows.service_creation import build_service_form_prompt
+                
+                # Return service form prompt
+                form_response = build_service_form_prompt()
+                
+                return {
+                    "message": form_response["message"],
+                    "session_id": session_id,
+                    "services_found": 0,
+                    "query_successful": True,
+                    "action": form_response.get("action")
+                }
+            
             # Crisis check
-            crisis_keywords = ['suicide', 'kill myself', 'want to die']
+            crisis_keywords = ['suicide', 'kill myself', 'want to die', 'end it all', 'no point living']
             if any(keyword in message.lower() for keyword in crisis_keywords):
                 logger.warning("Crisis query detected")
                 return {
                     "message": (
-                        "I'm concerned about what you've shared. Please reach out:\n\n"
-                        "🆘 Emergency: 000\n"
-                        "📞 Lifeline: 13 11 14 (24/7)\n"
-                        "💬 Lifeline Text: 0477 13 11 14\n\n"
-                        "You don't have to face this alone."
+                        "I'm concerned about what you've shared. Please reach out for immediate support:\n\n"
+                        "🆘 **In an emergency**: Call 000\n"
+                        "📞 **Lifeline**: 13 11 14 (24/7 crisis support)\n"
+                        "💬 **Lifeline Text**: 0477 13 11 14\n"
+                        "🌐 **Lifeline Chat**: www.lifeline.org.au/crisis-chat\n\n"
+                        "**Other crisis services:**\n"
+                        "- Beyond Blue: 1300 22 4636\n"
+                        "- Suicide Call Back Service: 1300 659 467\n"
+                        "- Kids Helpline (under 25): 1800 55 1800\n\n"
+                        "You don't have to face this alone. These services are confidential and available right now."
                     ),
                     "session_id": session_id,
                     "services_found": 0,
@@ -132,14 +231,17 @@ Guidelines:
                     "action": "crisis_halt"
                 }
             
-            # Vector search
+            # Vector search (smart_search already does confidence-based filtering)
             try:
                 search_results = self.vector_search.smart_search(query=message)
+                logger.info("Search completed", 
+                           query=message,
+                           results_count=len(search_results))
             except Exception as e:
                 logger.error("Vector search failed", error=str(e))
                 search_results = []
             
-            # Generate AI response
+            # Generate AI response (will present all results from smart_search)
             ai_response = self._generate_ai_response(message, search_results)
             
             return {
@@ -147,7 +249,7 @@ Guidelines:
                 "session_id": session_id,
                 "services_found": len(search_results),
                 "query_successful": True,
-                "raw_data": search_results[:3] if search_results else []
+                "raw_data": search_results[:5] if search_results else []
             }
         
         except Exception as e:

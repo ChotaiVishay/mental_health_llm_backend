@@ -7,7 +7,7 @@ from typing import Optional, List, Dict, Any
 import structlog
 from pydantic import BaseModel, EmailStr, validator
 
-from ...core.database.supabase_only import get_supabase_db
+from core.database.supabase_only import get_supabase_db
 
 logger = structlog.get_logger(__name__)
 
