@@ -194,21 +194,52 @@ For crisis situations, ALWAYS include: "Immediate support is available at 000 at
             if self._detect_service_creation_intent(message):
                 logger.info("Service creation intent detected")
                 
-                # Import here to avoid circular imports
-                from services.flows.service_creation import build_service_form_prompt
+                try:
+                    # Try to import service creation module
+                    from services.flows.service_creation import build_service_form_prompt
+                    
+                    # Return service form prompt
+                    form_response = build_service_form_prompt()
+                    
+                    logger.info("Service form prompt generated successfully")
+                    
+                    return {
+                        "message": form_response["message"],
+                        "session_id": session_id,
+                        "services_found": 0,
+                        "query_successful": True,
+                        "action": form_response.get("action")
+                    }
                 
-                # Return service form prompt
-                form_response = build_service_form_prompt()
+                except ImportError as e:
+                    logger.error("Failed to import service_creation module", error=str(e))
+                    
+                    # Fallback response
+                    return {
+                        "message": (
+                            "I understand you'd like to add a service to our directory. "
+                            "Unfortunately, the service submission feature is temporarily unavailable. "
+                            "Please contact our support team at support@example.com to submit your service details."
+                        ),
+                        "session_id": session_id,
+                        "services_found": 0,
+                        "query_successful": True,
+                    }
                 
-                return {
-                    "message": form_response["message"],
-                    "session_id": session_id,
-                    "services_found": 0,
-                    "query_successful": True,
-                    "action": form_response.get("action")
-                }
+                except Exception as e:
+                    logger.error("Failed to build service form", error=str(e))
+                    
+                    return {
+                        "message": (
+                            "I encountered an error preparing the service submission form. "
+                            "Please try again or contact support."
+                        ),
+                        "session_id": session_id,
+                        "services_found": 0,
+                        "query_successful": False,
+                    }
             
-            # Crisis check
+            # Crisis check (MOVED OUT OF SERVICE CREATION BLOCK)
             crisis_keywords = ['suicide', 'kill myself', 'want to die', 'end it all', 'no point living']
             if any(keyword in message.lower() for keyword in crisis_keywords):
                 logger.warning("Crisis query detected")
@@ -231,7 +262,7 @@ For crisis situations, ALWAYS include: "Immediate support is available at 000 at
                     "action": "crisis_halt"
                 }
             
-            # Vector search (smart_search already does confidence-based filtering)
+            # Vector search (MOVED OUT OF SERVICE CREATION BLOCK)
             try:
                 search_results = self.vector_search.smart_search(query=message)
                 logger.info("Search completed", 
