@@ -229,7 +229,8 @@ async function fetchAdminById(id: string): Promise<AdminUser> {
     .from('admin_users_view')
     .select('*')
     .eq('id', id)
-    .single();
+    .limit(1)
+    .maybeSingle();
   if (error || !data) throw new Error(error?.message ?? 'Admin user not found.');
   return mapAdmin(data as AdminUserRow);
 }
@@ -240,7 +241,7 @@ async function fetchProviderById(id: string): Promise<ProviderProfile> {
     .from('provider_profiles_view')
     .select('*')
     .eq('id', id)
-    .single();
+    .limit(1).maybeSingle();
   if (error || !data) throw new Error(error?.message ?? 'Provider not found.');
   return {
     ...(data as ProviderRow),
@@ -253,7 +254,7 @@ async function fetchServiceById(id: string): Promise<Service> {
     .from('services_view')
     .select('*')
     .eq('id', id)
-    .single();
+    .limit(1).maybeSingle();
   if (error || !data) throw new Error(error?.message ?? 'Service not found.');
   return {
     ...(data as ServiceRow),
@@ -292,7 +293,7 @@ export async function loginAdmin(payload: LoginPayload): Promise<LoginResponse> 
       .from('admin_profiles')
       .select('email')
       .eq('username', identifier)
-      .single();
+      .limit(1).maybeSingle();
     if (error || !data) throw new Error('Unknown administrator username.');
     email = (data as { email: string }).email;
   }
@@ -431,6 +432,19 @@ type UpdateUserPayload = Partial<CreateUserPayload> & { is_active?: boolean };
 export async function createUser(payload: CreateUserPayload): Promise<AdminUser> {
   const adminClient = requireAdminClient();
 
+  const { data: existingProfile, error: existingProfileError } = await adminClient
+    .from('admin_profiles')
+    .select('user_id')
+    .eq('username', payload.username)
+    .limit(1)
+    .maybeSingle();
+  if (existingProfile) {
+    throw new Error('Username is already in use.');
+  }
+  if (existingProfileError && existingProfileError.code !== 'PGRST116') {
+    throw new Error(existingProfileError.message);
+  }
+
   const { data, error } = await adminClient.auth.admin.createUser({
     email: payload.email,
     password: payload.password,
@@ -445,16 +459,22 @@ export async function createUser(payload: CreateUserPayload): Promise<AdminUser>
 
   const { error: profileError } = await adminClient
     .from('admin_profiles')
-    .update({
-      username: payload.username,
-      email: payload.email,
-      first_name: payload.first_name,
-      last_name: payload.last_name,
+    .upsert(
+      {
+        user_id: data.user.id,
+        username: payload.username,
+        email: payload.email,
+        first_name: payload.first_name,
+        last_name: payload.last_name,
       role: payload.role,
       is_active: true,
-    })
-    .eq('user_id', data.user.id);
-  if (profileError) throw new Error(profileError.message);
+    },
+    { onConflict: 'user_id' },
+  );
+  if (profileError) {
+    await adminClient.auth.admin.deleteUser(data.user.id);
+    throw new Error(profileError.message);
+  }
 
   return fetchAdminById(data.user.id);
 }
@@ -576,7 +596,7 @@ export async function createProvider(payload: Record<string, unknown>): Promise<
     .from('provider_profiles')
     .insert(insertPayload)
     .select('*')
-    .single();
+    .limit(1).maybeSingle();
   if (error || !data) throw new Error(error?.message ?? 'Failed to create provider.');
   return fetchProviderById(data.id);
 }
@@ -588,7 +608,7 @@ export async function updateProvider(id: string, payload: Record<string, unknown
     .update(payload)
     .eq('id', id)
     .select('*')
-    .single();
+    .limit(1).maybeSingle();
   if (error || !data) throw new Error(error?.message ?? 'Failed to update provider.');
   return fetchProviderById(data.id);
 }
@@ -617,7 +637,7 @@ export async function setProviderStatus(
     .update(payload)
     .eq('id', id)
     .select('*')
-    .single();
+    .limit(1).maybeSingle();
   if (error || !data) throw new Error(error?.message ?? 'Failed to update provider status.');
   return fetchProviderById(data.id);
 }
@@ -702,7 +722,7 @@ export async function createService(payload: Record<string, unknown>): Promise<S
     .from('services')
     .insert(insertPayload)
     .select('*')
-    .single();
+    .limit(1).maybeSingle();
   if (error || !data) throw new Error(error?.message ?? 'Failed to create service.');
   const service = await fetchServiceById(data.id);
   await syncLegacyServiceRow(service);
@@ -720,7 +740,7 @@ export async function updateService(id: string, payload: Record<string, unknown>
     })
     .eq('id', id)
     .select('*')
-    .single();
+    .limit(1).maybeSingle();
   if (error || !data) throw new Error(error?.message ?? 'Failed to update service.');
   const service = await fetchServiceById(data.id);
   await syncLegacyServiceRow(service);
@@ -757,7 +777,7 @@ export async function setServiceStatus(
     })
     .eq('id', id)
     .select('*')
-    .single();
+    .limit(1).maybeSingle();
   if (error || !data) throw new Error(error?.message ?? 'Failed to update service status.');
   return fetchServiceById(data.id);
 }
@@ -798,7 +818,7 @@ export async function createServiceCategory(payload: Record<string, unknown>): P
     .from('service_categories')
     .insert(payload)
     .select('*')
-    .single();
+    .limit(1).maybeSingle();
   if (error || !data) throw new Error(error?.message ?? 'Failed to create service category.');
   return data as ServiceCategory;
 }
@@ -810,7 +830,7 @@ export async function updateServiceCategory(id: string, payload: Record<string, 
     .update(payload)
     .eq('id', id)
     .select('*')
-    .single();
+    .limit(1).maybeSingle();
   if (error || !data) throw new Error(error?.message ?? 'Failed to update service category.');
   return data as ServiceCategory;
 }
