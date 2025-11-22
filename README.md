@@ -516,17 +516,6 @@ Full API documentation available at:
 
 ---
 
-## 👥 Team
-
-| Role | Name | GitHub | Email |
-|------|------|--------|-------|
-| Product Owner | Manya Garg | @username | manyagarg312@gmail.com |
-| Scrum Master | Gurshan Singh | @gurshan2604 | gurshan2604@gmail.com |
-| Developer | Suhas Agarwal | @username | Suhas.agrawal86@gmail.com |
-| Developer | Yiling Su | @yilingsu1 | yilingsu1@gmail.com |
-| Developer | Vishay Chotai | @ChotaiVishay | chotai.vishay@gmail.com |
-
----
 
 ## 📄 License
 
